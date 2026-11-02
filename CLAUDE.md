@@ -41,9 +41,9 @@ app/
 lib/
   db/index.ts  db/schema.ts
   claude.ts  elevenlabs.ts  tranzak.ts  storage.ts  auth.ts  email.ts
-  moderation.ts  phonetics.ts  styles.ts  occasions.ts  orders.ts  env.ts
+  moderation.ts  phonetics.ts  styles.ts  occasions.ts  orders.ts  songs.ts  format.ts  env.ts
 inngest/
-  generate-song.ts
+  client.ts  generate-song.ts
 db/schema.sql              référence fonctionnelle du schéma (la source exécutable est lib/db/schema.ts)
 drizzle/                   migrations générées par drizzle-kit
 ```

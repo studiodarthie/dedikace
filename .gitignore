@@ -46,3 +46,6 @@ CLE ET API.docx
 ~$*
 dedikace-kit.zip
 scripts/out/
+
+# Documents personnels (clés, notes) : jamais sur GitHub
+*.docx

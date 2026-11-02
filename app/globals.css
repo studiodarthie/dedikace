@@ -1,26 +1,33 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+/* Palette Dédikace : fond crème lisible en plein soleil, accents chauds. */
+@theme {
+  --color-cream: #fff8ee;
+  --color-sand: #f6e7d2;
+  --color-ink: #1d1410;
+  --color-muted: #6b5a4e;
+  --color-brand: #e0451b;
+  --color-brand-dark: #b8320f;
+  --color-leaf: #1d7a4f;
+  --color-gold: #f2b233;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  --font-sans: var(--font-outfit);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html {
+  -webkit-text-size-adjust: 100%;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  background: var(--color-cream);
+  color: var(--color-ink);
+  font-family: var(--font-outfit), system-ui, sans-serif;
+}
+
+/* Cible tactile confortable et focus visible partout. */
+:where(button, a, input, textarea, select):focus-visible {
+  outline: 3px solid var(--color-gold);
+  outline-offset: 2px;
 }

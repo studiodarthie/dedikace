@@ -13,6 +13,20 @@ export const STYLES = [
   { id: "hommage", label: "Hommage acoustique", prompt: "Gentle acoustic guitar ballad, solemn and peaceful, soft {voice} vocals" },
 ] as const;
 
+// Phrase courte affichée dans le formulaire (jamais envoyée au moteur musical).
+export const STYLE_TAGLINES: Record<(typeof STYLES)[number]["id"], string> = {
+  makossa: "Guitare joyeuse, ambiance Douala",
+  bikutsi: "Rapide et dansant, rythme du Centre",
+  rumba: "Douce et élégante, guitares qui chantent",
+  ndombolo: "Pour faire danser toute la famille",
+  gospel: "Chœur et louange, plein d'espoir",
+  afrobeats: "Moderne et groovy",
+  amapiano: "Tendance, basses profondes",
+  afrozouk: "Romantique, pour les amoureux",
+  "coupe-decale": "Festif, ambiance boîte",
+  hommage: "Guitare acoustique, calme et digne",
+};
+
 export type Style = (typeof STYLES)[number];
 export type StyleId = Style["id"];
 export type Voice = "male" | "female";

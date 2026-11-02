@@ -50,14 +50,14 @@ Les clés Cloudflare R2 sont nécessaires au jour 4, Resend au jour 4 (alertes) 
 
 ## Jour 3 — Parcours de création
 
-- [ ] **Prompt 4 — Formulaire et aperçu**
+- [x] **Prompt 4 — Formulaire et aperçu** (bouton Payer branché au jour 5)
   > Construis `/creer` : formulaire en 4 étapes selon le PRD §4 (étapes 1 à 5), mobile d'abord à 360 px,
   > barre de progression, sauvegarde du brouillon dans localStorage (lecture/écriture dans try/catch).
   > Enregistre l'événement `form_started` à l'ouverture du formulaire.
   > Puis l'écran d'aperçu : paroles éditables dans un textarea, bouton « Réécrire », bouton « Payer 3 000 FCFA ».
   > Les styles viennent de `lib/styles.ts` (JSON de docs/PROMPTS.md §2).
 
-- [ ] **Prompt 5 — Accueil**
+- [x] **Prompt 5 — Accueil**
   > Construis la page d'accueil : promesse « Ton nom dans une chanson », 4 lecteurs audio d'exemples
   > (fichiers dans /public/examples), 3 étapes illustrées, FAQ courte, bouton vers /creer.
   > Ajoute le bouton WhatsApp de support flottant sur toutes les pages.
@@ -66,21 +66,21 @@ Les clés Cloudflare R2 sont nécessaires au jour 4, Resend au jour 4 (alertes) 
 
 ## Jour 4 — Génération musicale
 
-- [ ] **Prompt 6 — Moteur musical et stockage**
+- [ ] **Prompt 6 — Moteur musical et stockage** (code prêt, R2 et Resend testés ; essai ElevenLabs en attente d'une offre payante)
   > Implémente `lib/elevenlabs.ts` en suivant la documentation officielle ElevenLabs Music (consulte-la,
   > n'invente pas d'endpoint). Une fonction generateSong({stylePrompt, lyrics, voice, durationSeconds: 180})
   > qui renvoie un Buffer MP3. Applique `lib/phonetics.ts` aux paroles avant l'envoi.
   > Implémente `lib/storage.ts` pour Cloudflare R2 avec @aws-sdk/client-s3 : uploadSong(key, buffer)
   > et getSignedSongUrl(key, 3600). Implémente `lib/email.ts` avec Resend : sendAdminAlert(sujet, texte).
 
-- [ ] **Prompt 7 — Tâche Inngest**
+- [x] **Prompt 7 — Tâche Inngest** (testée avec @inngest/test : npm run test:generate)
   > Crée `inngest/generate-song.ts` déclenchée par l'événement `order/paid`. Elle génère les 2 versions
   > en parallèle (steps séparés), stocke chaque MP3 dans le bucket R2 privé `songs` sous
   > `{order_id}/v{version}-g{generation}.mp3`, met à jour `songs` et passe la commande à `delivered`.
   > 3 tentatives par version avec backoff ; après échec, statut `generation_failed` et alerte
   > (log + sendAdminAlert). Expose la fonction dans `app/api/inngest/route.ts`.
 
-- [ ] **Prompt 8 — Page chanson**
+- [x] **Prompt 8 — Page chanson**
   > Construis `/s/[code]` selon le PRD §4 étape 9. URL présignées R2 valables 1 h, régénérées à chaque visite.
   > Bouton « Partager sur WhatsApp » (lien wa.me avec texte pré-rempli + URL de la page).
   > Balises Open Graph pour un bel aperçu dans WhatsApp. Bouton de régénération gratuite (1 fois).

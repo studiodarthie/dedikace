@@ -142,6 +142,25 @@ export async function getOrderByPublicCode(code: string): Promise<Order | undefi
   return db.query.orders.findFirst({ where: eq(orders.publicCode, normalized) });
 }
 
+/**
+ * Réserve la régénération gratuite (PRD §5 : 1 par commande). Atomique : deux clics
+ * simultanés ne peuvent pas la consommer deux fois. Renvoie la commande, ou undefined si refusé.
+ */
+export async function claimFreeRegeneration(publicCode: string): Promise<Order | undefined> {
+  const [order] = await db
+    .update(orders)
+    .set({ freeRegenUsed: true })
+    .where(
+      and(
+        eq(orders.publicCode, publicCode.trim().toLowerCase()),
+        eq(orders.status, "delivered"),
+        eq(orders.freeRegenUsed, false),
+      ),
+    )
+    .returning();
+  return order;
+}
+
 /** Journalise un refus de modération (docs/PROMPTS.md §4.3). Les refus précédents sont conservés. */
 export async function addModerationNote(orderId: string, note: string): Promise<void> {
   const line = `${new Date().toISOString()} ${note}`;
