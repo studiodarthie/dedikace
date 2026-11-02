@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
+import { env } from "@/lib/env";
 import { whatsappLink } from "@/lib/format";
 import { occasionLabel } from "@/lib/occasions";
 import { getOrderByPublicCode } from "@/lib/orders";
@@ -10,7 +11,7 @@ import { getSignedSongUrl } from "@/lib/storage";
 import { getStyle } from "@/lib/styles";
 import { AutoRefresh, RegenerateButton } from "./SongActions";
 
-const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
+const APP_URL = env.NEXT_PUBLIC_APP_URL;
 const SUPPORT_PHONE = process.env.NEXT_PUBLIC_SUPPORT_WHATSAPP ?? "";
 
 // Aperçu WhatsApp (Open Graph) : WhatsApp fait partie des robots pour lesquels

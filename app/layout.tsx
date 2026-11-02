@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Outfit } from "next/font/google";
 import Link from "next/link";
+import { env } from "@/lib/env";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
 import "./globals.css";
 
@@ -8,7 +9,7 @@ import "./globals.css";
 const outfit = Outfit({ variable: "--font-outfit", subsets: ["latin"], display: "swap" });
 
 export const metadata: Metadata = {
-  metadataBase: new URL(process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000"),
+  metadataBase: new URL(env.NEXT_PUBLIC_APP_URL),
   title: { default: "Dédikace — Ton nom dans une chanson", template: "%s · Dédikace" },
   description:
     "Une chanson personnalisée en quelques minutes, sur des rythmes d'Afrique centrale : anniversaire, mariage, dot, hommage, réussite…",

@@ -41,9 +41,14 @@ const schema = z.object({
 });
 
 // Une variable vide dans .env.local (« CLE= ») est traitée comme absente.
-const raw = Object.fromEntries(
+const raw: Record<string, string | undefined> = Object.fromEntries(
   Object.entries(process.env).filter(([, v]) => v !== undefined && v !== ""),
 );
+
+// Sur Vercel, l'adresse du site est déduite automatiquement si elle n'est pas renseignée.
+if (!raw.NEXT_PUBLIC_APP_URL && process.env.VERCEL_PROJECT_PRODUCTION_URL) {
+  raw.NEXT_PUBLIC_APP_URL = `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`;
+}
 
 const parsed = schema.safeParse(raw);
 
