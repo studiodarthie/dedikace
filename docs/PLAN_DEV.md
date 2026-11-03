@@ -135,20 +135,29 @@ Les clés Cloudflare R2 sont nécessaires au jour 4, Resend au jour 4 (alertes) 
 
 ## Jour 7 — Mise en production
 
-- [ ] **Prompt 14 — Revue finale**
+- [x] **Prompt 14 — Revue finale**
   > Relis tout le code contre les règles non négociables de CLAUDE.md et liste chaque écart.
   > Vérifie qu'aucun secret n'est exposé côté client et que `lib/db` n'est importé que côté serveur.
   > Teste chaque page à 360 px. Corrige ce que tu trouves.
 
+  Résultat (3 nov.) : règles 1 à 9 respectées. Aucun secret dans le code navigateur (build analysé),
+  composants client sans import serveur, 12 pages sans débordement à 360 px.
+  Corrigé : page 404 et page d'erreur en anglais → en français (not-found, error, global-error).
+  Écarts acceptés : lib/db/schema.ts sans « server-only » (drizzle-kit doit le lire ; le navigateur n'en importe
+  que des types) ; paiement manuel admin = secours vérifié à la main dans Tranzak.
+  À surveiller : /api/lyrics (appel Claude) n'a pas de limite par visiteur → règle de limitation dans Vercel Firewall.
+
 - [ ] Passer TRANZAK_MODE en production, déployer sur Vercel, connecter le domaine
+  (TRANZAK_MODE=production et Vercel : faits ; domaine : pas encore acheté)
 - [ ] Vérifier le domaine d'envoi dans Resend (SPF/DKIM) pour que les e-mails n'arrivent pas en spam
-- [ ] Déployer Inngest en production (app synchronisée avec l'URL Vercel)
+  (envoi accepté depuis izibooking.app ; passer à une adresse @dedikace quand le domaine existera)
+- [x] Déployer Inngest en production (app synchronisée avec l'URL Vercel)
 - [ ] Dérouler la checklist ci-dessous
 
 ## Checklist avant le lancement public
 
 - [ ] Un vrai paiement MTN MoMo, un vrai Orange Money et une vraie carte, tous livrés en moins de 4 minutes
-- [ ] Une notification Tranzak rejouée ne crée pas de deuxième génération
+- [x] Une notification Tranzak rejouée ne crée pas de deuxième génération (npm run test:payments)
 - [ ] Le lien partagé sur WhatsApp affiche un bel aperçu et la chanson se lit sur Android en 3G
 - [ ] Le numéro WhatsApp de support répond, et il est affiché sur toutes les pages
 - [ ] Une génération qui échoue déclenche bien l'e-mail d'alerte
