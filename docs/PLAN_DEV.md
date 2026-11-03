@@ -151,7 +151,8 @@ Les clés Cloudflare R2 sont nécessaires au jour 4, Resend au jour 4 (alertes) 
   (TRANZAK_MODE=production et Vercel : faits ; domaine : pas encore acheté)
 - [ ] Vérifier le domaine d'envoi dans Resend (SPF/DKIM) pour que les e-mails n'arrivent pas en spam
   (envoi accepté depuis izibooking.app ; passer à une adresse @dedikace quand le domaine existera)
-- [x] Déployer Inngest en production (app synchronisée avec l'URL Vercel)
+- [ ] Déployer Inngest en production (app synchronisée avec l'URL Vercel)
+  (clés Inngest en place sur Vercel ; à confirmer par une vraie commande en ligne)
 - [ ] Dérouler la checklist ci-dessous
 
 ## Checklist avant le lancement public
