@@ -4,11 +4,11 @@ import Link from "next/link";
 import { env } from "@/lib/env";
 import { formatXaf } from "@/lib/format";
 
-// Exemples audio de l'accueil : déposer les MP3 dans public/examples/ (Jour 0).
+// Exemples audio de l'accueil : extraits de 80 s créés par npm run make:examples (public/examples/).
 const EXAMPLES = [
-  { file: "anniversaire-makossa.mp3", title: "Joyeux anniversaire Mireille", meta: "Anniversaire · Makossa" },
-  { file: "dot-bikutsi.mp3", title: "Ngono, ma future épouse", meta: "Dot · Bikutsi" },
-  { file: "bac-afrobeats.mp3", title: "Brenda, la future docteur", meta: "Réussite au Bac · Afrobeats" },
+  { file: "anniversaire-makossa.mp3", title: "Maman Mireille en fête", meta: "Anniversaire · Makossa" },
+  { file: "dot-bikutsi.mp3", title: "Ngono, ma reine de la dot", meta: "Dot · Bikutsi" },
+  { file: "bac-afrobeats.mp3", title: "Brenda la Docteur", meta: "Réussite au Bac · Afrobeats · refrain en pidgin" },
   { file: "hommage-acoustique.mp3", title: "Papa Emmanuel, ta lumière", meta: "Hommage · Acoustique" },
 ];
 
