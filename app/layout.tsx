@@ -49,7 +49,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         </footer>
         <WhatsAppButton />
         <Suspense fallback={null}>
-          <Pixels />
+          <Pixels metaId={env.META_PIXEL_ID} tiktokId={env.TIKTOK_PIXEL_ID} />
         </Suspense>
       </body>
     </html>

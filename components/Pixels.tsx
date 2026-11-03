@@ -2,7 +2,6 @@
 
 import { usePathname } from "next/navigation";
 import Script from "next/script";
-import { META_PIXEL_ID, TIKTOK_PIXEL_ID } from "@/lib/pixels";
 
 // Codes officiels de Meta et TikTok. Ils créent une file d'attente (fbq / ttq) tout de suite,
 // puis chargent le vrai script après l'affichage : les événements envoyés entre-temps ne sont pas perdus.
@@ -23,19 +22,19 @@ o.async=!0,o.src=r+"?sdkid="+e+"&lib="+t;var a=d.getElementsByTagName("script")[
 ttq.load(${JSON.stringify(id)});ttq.page();}(window, document, 'ttq');`;
 
 /** Chargé sur toutes les pages publiques, jamais dans le back-office. */
-export function Pixels() {
+export function Pixels({ metaId, tiktokId }: { metaId?: string; tiktokId?: string }) {
   const pathname = usePathname();
   if (pathname.startsWith("/admin")) return null;
   return (
     <>
-      {/^\d{5,20}$/.test(META_PIXEL_ID) && (
+      {metaId && /^\d{5,20}$/.test(metaId) && (
         <Script id="meta-pixel" strategy="afterInteractive">
-          {meta(META_PIXEL_ID)}
+          {meta(metaId)}
         </Script>
       )}
-      {/^[A-Z0-9]{10,30}$/.test(TIKTOK_PIXEL_ID) && (
+      {tiktokId && /^[A-Z0-9]{10,30}$/.test(tiktokId) && (
         <Script id="tiktok-pixel" strategy="afterInteractive">
-          {tiktok(TIKTOK_PIXEL_ID)}
+          {tiktok(tiktokId)}
         </Script>
       )}
     </>

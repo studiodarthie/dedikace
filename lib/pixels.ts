@@ -1,8 +1,5 @@
 // Meta Pixel et TikTok Pixel (PRD §9). Code navigateur : n'importe aucun module serveur.
-// Les identifiants de pixel sont publics par nature (ils apparaissent dans la page), ce ne sont pas des secrets.
-
-export const META_PIXEL_ID = process.env.NEXT_PUBLIC_META_PIXEL_ID ?? "";
-export const TIKTOK_PIXEL_ID = process.env.NEXT_PUBLIC_TIKTOK_PIXEL_ID ?? "";
+// Les identifiants (META_PIXEL_ID, TIKTOK_PIXEL_ID) sont lus par app/layout.tsx et passés à <Pixels>.
 
 type PixelWindow = Window & {
   fbq?: (...args: unknown[]) => void;

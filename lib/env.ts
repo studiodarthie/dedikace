@@ -36,6 +36,10 @@ const schema = z.object({
   INNGEST_EVENT_KEY: optional,
   INNGEST_SIGNING_KEY: optional,
 
+  // Identifiants publics des pixels publicitaires (pas des secrets). L'ancien nom NEXT_PUBLIC_* reste accepté.
+  META_PIXEL_ID: optional,
+  TIKTOK_PIXEL_ID: optional,
+
   PRICE_MOMO_XAF: xaf.default(3000),
   PRICE_CARD_XAF: xaf.default(4000),
 });
@@ -49,6 +53,9 @@ const raw: Record<string, string | undefined> = Object.fromEntries(
 if (!raw.NEXT_PUBLIC_APP_URL && process.env.VERCEL_PROJECT_PRODUCTION_URL) {
   raw.NEXT_PUBLIC_APP_URL = `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}`;
 }
+
+raw.META_PIXEL_ID ??= raw.NEXT_PUBLIC_META_PIXEL_ID;
+raw.TIKTOK_PIXEL_ID ??= raw.NEXT_PUBLIC_TIKTOK_PIXEL_ID;
 
 const parsed = schema.safeParse(raw);
 

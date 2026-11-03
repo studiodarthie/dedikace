@@ -130,7 +130,7 @@ Les clés Cloudflare R2 sont nécessaires au jour 4, Resend au jour 4 (alertes) 
 
   Événements standard : InitiateCheckout (début de création) et Purchase / CompletePayment (paiement réussi,
   une fois par commande). Pixels absents du back-office. Pixel Meta renseigné dans Vercel. TikTok Ads Manager
-  n'accepte pas encore les entreprises du Cameroun : NEXT_PUBLIC_TIKTOK_PIXEL_ID à ajouter plus tard (agence partenaire).
+  n'accepte pas encore les entreprises du Cameroun : TIKTOK_PIXEL_ID à ajouter plus tard (agence partenaire).
   Reste à faire : faire relire les pages légales (éditeur : Darthie Studios).
 
 ## Jour 7 — Mise en production
