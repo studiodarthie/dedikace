@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { clearDraft } from "@/app/creer/CreateWizard";
+import { clearDraft } from "@/app/(site)/creer/CreateWizard";
 import type { OrderStatus } from "@/lib/db/schema";
 import { whatsappLink } from "@/lib/format";
 import { trackPurchaseOnce } from "@/lib/pixels";

@@ -3,6 +3,7 @@ import { Outfit } from "next/font/google";
 import Link from "next/link";
 import { Suspense } from "react";
 import { env } from "@/lib/env";
+import { HeaderCta } from "@/components/HeaderCta";
 import { Pixels } from "@/components/Pixels";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
 import "./globals.css";
@@ -28,14 +29,30 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     // suppressHydrationWarning : certaines extensions de navigateur ajoutent des attributs à <html>.
     <html lang="fr" className={`${outfit.variable} h-full antialiased`} suppressHydrationWarning>
       <body className="flex min-h-full flex-col">
-        <header className="mx-auto flex w-full max-w-xl items-center justify-between px-4 py-3">
-          <Link href="/" className="text-xl font-extrabold tracking-tight text-brand">
-            Dédikace<span className="text-gold">.</span>
-          </Link>
+        <header className="sticky top-0 z-40 border-b border-sand/60 bg-cream/85 backdrop-blur">
+          <div className="mx-auto flex h-16 w-full max-w-6xl items-center justify-between gap-4 px-4 md:px-8">
+            <Link href="/" className="text-xl font-extrabold tracking-tight text-brand md:text-2xl">
+              Dédikace<span className="text-gold">.</span>
+            </Link>
+            <nav aria-label="Navigation principale" className="hidden items-center gap-1 rounded-full bg-white/70 p-1 text-sm font-medium ring-1 ring-sand md:flex">
+              {[
+                ["/#exemples", "Exemples"],
+                ["/#etapes", "Comment ça marche"],
+                ["/#faq", "Questions"],
+              ].map(([href, label]) => (
+                <Link key={href} href={href} className="rounded-full px-4 py-2 text-muted transition hover:bg-sand/60 hover:text-ink">
+                  {label}
+                </Link>
+              ))}
+            </nav>
+            <Suspense fallback={null}>
+              <HeaderCta />
+            </Suspense>
+          </div>
         </header>
-        <main className="mx-auto flex w-full max-w-xl flex-1 flex-col px-4 pb-10">{children}</main>
-        <footer className="mx-auto w-full max-w-xl px-4 pt-4 pb-24 text-sm text-muted">
-          <nav aria-label="Informations légales" className="flex flex-wrap gap-x-4 gap-y-2">
+        <main className="flex w-full flex-1 flex-col">{children}</main>
+        <footer className="mx-auto w-full max-w-6xl px-4 pt-6 pb-24 text-sm text-muted md:px-8">
+          <nav aria-label="Informations légales" className="flex flex-wrap gap-x-4 gap-y-2 border-t border-sand pt-6">
             <Link href="/cgu" className="underline">
               Conditions
             </Link>
@@ -45,6 +62,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
             <Link href="/remboursement" className="underline">
               Remboursement
             </Link>
+            <span className="ml-auto">© Darthie Studios</span>
           </nav>
         </footer>
         <WhatsAppButton />

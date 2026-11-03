@@ -9,7 +9,7 @@ export default function PageError({ error, retry }: { error: unknown; retry: () 
   }, [error]);
 
   return (
-    <div role="alert" className="flex flex-1 flex-col items-center justify-center gap-4 py-20 text-center">
+    <div role="alert" className="mx-auto flex w-full max-w-xl flex-1 flex-col items-center justify-center gap-4 px-4 py-20 text-center">
       <p className="text-5xl" aria-hidden="true">
         😕
       </p>

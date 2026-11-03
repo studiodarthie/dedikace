@@ -54,17 +54,17 @@ export function ExamplePlayer({ tracks }: { tracks: ExampleTrack[] }) {
   }
 
   return (
-    <div className="flex flex-col gap-3">
-      <div className="overflow-hidden rounded-3xl bg-white shadow-lg shadow-ink/5 ring-1 ring-sand">
+    <div className="grid grid-cols-1 gap-4 md:grid-cols-[1.15fr_1fr] md:items-center md:gap-10">
+      <div className="min-w-0 overflow-hidden rounded-3xl bg-white shadow-lg shadow-ink/5 ring-1 ring-sand">
         <div className={`relative flex aspect-[16/10] items-end bg-gradient-to-br p-5 ${track.cover}`}>
-          <span className="absolute top-4 right-4 rotate-6 text-6xl drop-shadow-md" aria-hidden="true">
+          <span className="absolute top-4 right-4 rotate-6 text-6xl drop-shadow-md md:text-8xl" aria-hidden="true">
             {track.emoji}
           </span>
           <span className="rounded-full bg-white/90 px-3 py-1 text-sm font-semibold text-ink">{track.occasion}</span>
         </div>
         <div className="flex flex-col gap-3 p-5">
           <div>
-            <p className="text-xl font-extrabold">{track.title}</p>
+            <p className="text-xl font-extrabold md:text-2xl">{track.title}</p>
             <p className="text-muted">Style {track.style} · extrait</p>
           </div>
           <div className="flex items-center gap-3">
@@ -130,8 +130,9 @@ export function ExamplePlayer({ tracks }: { tracks: ExampleTrack[] }) {
         />
       </div>
 
-      <p className="pt-2 text-sm font-semibold text-muted">4 chansons, 4 moments de vie</p>
-      <ul className="flex flex-col gap-2">
+      <div className="flex min-w-0 flex-col gap-2">
+      <p className="pt-2 text-sm font-semibold text-muted md:pt-0">4 chansons, 4 moments de vie</p>
+      <ul className="flex flex-col gap-2 md:gap-3">
         {tracks.map((t, i) => {
           const active = i === index;
           return (
@@ -140,7 +141,7 @@ export function ExamplePlayer({ tracks }: { tracks: ExampleTrack[] }) {
                 type="button"
                 onClick={() => select(i)}
                 aria-current={active ? "true" : undefined}
-                className={`flex w-full items-center gap-3 rounded-2xl p-2 pr-4 text-left transition ${
+                className={`flex w-full items-center gap-3 rounded-2xl p-2 pr-4 text-left transition md:p-3 md:pr-5 ${
                   active ? "bg-white shadow-sm ring-2 ring-brand/60" : "bg-white/60 ring-1 ring-sand active:bg-white"
                 }`}
               >
@@ -164,6 +165,7 @@ export function ExamplePlayer({ tracks }: { tracks: ExampleTrack[] }) {
           );
         })}
       </ul>
+      </div>
     </div>
   );
 }
