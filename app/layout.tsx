@@ -23,7 +23,8 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html lang="fr" className={`${outfit.variable} h-full antialiased`}>
+    // suppressHydrationWarning : certaines extensions de navigateur ajoutent des attributs à <html>.
+    <html lang="fr" className={`${outfit.variable} h-full antialiased`} suppressHydrationWarning>
       <body className="flex min-h-full flex-col">
         <header className="mx-auto flex w-full max-w-xl items-center justify-between px-4 py-3">
           <Link href="/" className="text-xl font-extrabold tracking-tight text-brand">

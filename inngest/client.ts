@@ -2,7 +2,9 @@ import { eventType, Inngest } from "inngest";
 import { z } from "zod";
 
 // En local, INNGEST_DEV=1 (dans .env.local) envoie les événements au serveur `npx inngest-cli dev`.
-export const inngest = new Inngest({ id: "dedikace" });
+// Sur Vercel (maxDuration 300 s) : au-delà de 60 s, on rend la main entre deux étapes,
+// pour qu'une étape de création (≤ 200 s) ne dépasse jamais la limite.
+export const inngest = new Inngest({ id: "dedikace", checkpointing: { maxRuntime: "60s" } });
 
 /** Commande payée (ou régénération gratuite) : déclenche la création des 2 versions. */
 export const orderPaid = eventType("order/paid", {

@@ -9,7 +9,7 @@ import { getOrderByPublicCode } from "@/lib/orders";
 import { getDeliveredSongs } from "@/lib/songs";
 import { getSignedSongUrl } from "@/lib/storage";
 import { getStyle } from "@/lib/styles";
-import { AutoRefresh, RegenerateButton } from "./SongActions";
+import { AutoRefresh, RegenerateButton, SongPlayer } from "./SongActions";
 
 const APP_URL = env.NEXT_PUBLIC_APP_URL;
 const SUPPORT_PHONE = process.env.NEXT_PUBLIC_SUPPORT_WHATSAPP ?? "";
@@ -110,9 +110,7 @@ async function SongContent({ params }: { params: PageProps<"/s/[code]">["params"
         {players.map((p) => (
           <li key={p.version} className="rounded-2xl bg-white p-4 shadow-sm ring-1 ring-sand">
             <p className="mb-3 font-bold">Version {p.version}</p>
-            <audio controls preload="metadata" src={p.listen} className="w-full">
-              Ton navigateur ne peut pas lire ce fichier.
-            </audio>
+            <SongPlayer src={p.listen} />
             <a href={p.download} className="mt-3 inline-block font-semibold text-brand">
               ⬇ Télécharger le MP3
             </a>

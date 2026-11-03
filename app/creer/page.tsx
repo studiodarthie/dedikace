@@ -8,5 +8,5 @@ export const metadata: Metadata = {
 };
 
 export default function CreatePage() {
-  return <CreateWizard priceMomo={env.PRICE_MOMO_XAF} />;
+  return <CreateWizard priceMomo={env.PRICE_MOMO_XAF} priceCard={env.PRICE_CARD_XAF} />;
 }

@@ -66,7 +66,7 @@ Les clés Cloudflare R2 sont nécessaires au jour 4, Resend au jour 4 (alertes) 
 
 ## Jour 4 — Génération musicale
 
-- [ ] **Prompt 6 — Moteur musical et stockage** (code prêt, R2 et Resend testés ; essai ElevenLabs en attente d'une offre payante)
+- [x] **Prompt 6 — Moteur musical et stockage** (testé : chanson de 3 min générée en 54 s, offre Creator)
   > Implémente `lib/elevenlabs.ts` en suivant la documentation officielle ElevenLabs Music (consulte-la,
   > n'invente pas d'endpoint). Une fonction generateSong({stylePrompt, lyrics, voice, durationSeconds: 180})
   > qui renvoie un Buffer MP3. Applique `lib/phonetics.ts` aux paroles avant l'envoi.
@@ -90,26 +90,28 @@ Les clés Cloudflare R2 sont nécessaires au jour 4, Resend au jour 4 (alertes) 
 
 ## Jour 5 — Paiement Tranzak
 
-- [ ] **Prompt 9 — Initialisation du paiement**
+- [x] **Prompt 9 — Initialisation du paiement** (API REST : le SDK tranzak-node ne suit plus la doc)
   > Implémente `lib/tranzak.ts` avec le SDK tranzak-node (mode lu dans TRANZAK_MODE ; si le SDK est
   > inutilisable, appelle l'API REST documentée) et `app/api/pay/route.ts`. Mobile Money : débit direct sur
   > le numéro saisi. Carte : redirection web vers l'URL de paiement Tranzak, retour vers /commande/[id].
   > Crée une ligne `payments` avec un `merchant_ref` unique avant l'appel. Prix depuis PRICE_MOMO_XAF /
   > PRICE_CARD_XAF. Enregistre l'événement `payment_started`.
 
-- [ ] **Prompt 10 — Notification et vérification**
+- [x] **Prompt 10 — Notification et vérification** (testé : npm run test:payments)
   > Implémente `app/api/tranzak/webhook/route.ts` pour recevoir les notifications TPN. Vérifie
   > l'authenticité de la notification, puis REVÉRIFIE le statut de la transaction via l'API Tranzak.
   > Seulement si le paiement est confirmé et le montant correct : payments → successful, order → paid,
   > événement `payment_succeeded`, puis envoie l'événement Inngest `order/paid`.
   > Idempotent (CLAUDE.md règle 2). Réponds 200 rapidement.
 
-- [ ] **Prompt 11 — Page d'attente**
+- [x] **Prompt 11 — Page d'attente** (vérifie aussi chez Tranzak : marche sans webhook)
   > Construis `/commande/[id]` : statut mis à jour toutes les 5 s (polling), messages en français pour chaque
   > statut, redirection automatique vers /s/[code] quand la commande est `delivered`.
 
-  Vérification : en sandbox Tranzak, tester succès, échec, solde insuffisant, abandon, et une notification
-  reçue deux fois. Puis un vrai paiement de 3 000 FCFA en production.
+  Vérification : succès, échec, solde insuffisant, abandon et notification reçue deux fois testés par simulation
+  (npm run test:payments ; pas de sandbox, Tranzak en mode production par choix).
+- [x] Vrai paiement de 100 FCFA en local (Orange Money), commande livrée de bout en bout.
+- [ ] Vrai paiement de 3 000 FCFA en ligne (après Inngest sur Vercel).
 
 ## Jour 6 — Back-office et pages légales
 

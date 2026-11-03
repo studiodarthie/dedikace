@@ -35,13 +35,14 @@ app/
   admin/                   back-office (protégé)
   api/lyrics/route.ts      génération / réécriture des paroles
   api/pay/route.ts         initialisation du paiement Tranzak
+  api/commande/[id]/       statut lu par la page d'attente (revérifie chez Tranzak)
   api/tranzak/webhook/     réception des notifications TPN
   api/inngest/route.ts     endpoint Inngest
   api/auth/[...nextauth]/  Auth.js
 lib/
   db/index.ts  db/schema.ts
   claude.ts  elevenlabs.ts  tranzak.ts  storage.ts  auth.ts  email.ts
-  moderation.ts  phonetics.ts  styles.ts  occasions.ts  orders.ts  songs.ts  format.ts  env.ts
+  moderation.ts  phonetics.ts  styles.ts  occasions.ts  orders.ts  payments.ts  songs.ts  format.ts  env.ts
 inngest/
   client.ts  generate-song.ts
 db/schema.sql              référence fonctionnelle du schéma (la source exécutable est lib/db/schema.ts)

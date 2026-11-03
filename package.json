@@ -12,6 +12,8 @@
     "db:migrate": "drizzle-kit migrate",
     "db:studio": "drizzle-kit studio",
     "test:orders": "tsx --env-file=.env.local --conditions=react-server scripts/test-orders.ts",
+    "check:tranzak": "tsx --env-file=.env.local --conditions=react-server scripts/check-tranzak.ts",
+    "test:payments": "tsx --env-file=.env.local --conditions=react-server scripts/test-payments.ts",
     "test:lyrics": "tsx --env-file=.env.local --conditions=react-server scripts/test-lyrics.ts",
     "check:services": "tsx --env-file=.env.local scripts/check-services.ts",
     "test:music": "tsx --env-file=.env.local --conditions=react-server scripts/test-music.ts",

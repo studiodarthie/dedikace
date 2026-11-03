@@ -118,7 +118,8 @@ export async function generateSong(request: SongRequest): Promise<GeneratedSong>
       method: "POST",
       headers: { "xi-api-key": requireEnv("ELEVENLABS_API_KEY"), "content-type": "application/json" },
       body: JSON.stringify({ model_id: MODEL_ID, composition_plan: plan }),
-      signal: AbortSignal.timeout(280_000),
+      // Une chanson de 3 min prend ~1 min ; 200 s laisse de la marge sous la limite Vercel de 300 s.
+      signal: AbortSignal.timeout(200_000),
     });
   } catch (error) {
     throw new MusicError(`Connexion à ElevenLabs impossible : ${(error as Error).message}`, true);

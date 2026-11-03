@@ -61,7 +61,8 @@ function saveDraft(draft: Draft) {
   }
 }
 
-function clearDraft() {
+/** Aussi appelée par la page d'attente une fois le paiement reçu. */
+export function clearDraft() {
   try {
     window.localStorage.removeItem(STORAGE_KEY);
   } catch {}
@@ -94,17 +95,19 @@ function stepError(step: number, f: Form): string | null {
 
 // ---------- Composant principal ----------
 
-export function CreateWizard({ priceMomo }: { priceMomo: number }) {
+type Prices = { priceMomo: number; priceCard: number };
+
+export function CreateWizard(prices: Prices) {
   const isClient = useIsClient();
   if (!isClient) {
     return <div className="mt-6 h-64 animate-pulse rounded-3xl bg-sand/60" aria-label="Chargement" />;
   }
-  return <Wizard initial={loadDraft()} priceMomo={priceMomo} />;
+  return <Wizard initial={loadDraft()} {...prices} />;
 }
 
 const STEP_TITLES = ["L'occasion", "La personne", "La musique", "Ton contact", "Tes paroles"];
 
-function Wizard({ initial, priceMomo }: { initial: Draft; priceMomo: number }) {
+function Wizard({ initial, priceMomo, priceCard }: { initial: Draft } & Prices) {
   const [step, setStep] = useState(initial.step);
   const [form, setForm] = useState<Form>(initial.form);
   const [saved, setSaved] = useState<Lyrics | undefined>(initial.saved);
@@ -113,7 +116,9 @@ function Wizard({ initial, priceMomo }: { initial: Draft; priceMomo: number }) {
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState<null | "create" | "rewrite" | "save">(null);
   const [notice, setNotice] = useState<string | null>(null);
+  const [checkout, setCheckout] = useState(false);
   const topRef = useRef<HTMLDivElement>(null);
+  const checkoutRef = useRef<HTMLDivElement>(null);
 
   // Sauvegarde du brouillon à chaque changement.
   useEffect(() => {
@@ -142,6 +147,7 @@ function Wizard({ initial, priceMomo }: { initial: Draft; priceMomo: number }) {
   const goTo = (next: number) => {
     setError(null);
     setNotice(null);
+    setCheckout(false);
     setStep(next);
     topRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
   };
@@ -221,10 +227,10 @@ function Wizard({ initial, priceMomo }: { initial: Draft; priceMomo: number }) {
     return !!result;
   }
 
-  async function pay() {
+  async function openCheckout() {
     if (!(await saveEdits())) return;
-    // Le paiement Tranzak arrive au jour 5 (docs/PLAN_DEV.md, prompt 9).
-    setNotice("Tes paroles sont enregistrées. Le paiement sera bientôt disponible.");
+    setCheckout(true);
+    requestAnimationFrame(() => checkoutRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }));
   }
 
   function restart() {
@@ -437,9 +443,18 @@ function Wizard({ initial, priceMomo }: { initial: Draft; priceMomo: number }) {
       <div className="flex flex-col gap-3">
         {step < 4 ? (
           <PrimaryButton onClick={next}>{step === 3 ? "Écrire mes paroles gratuites" : "Continuer"}</PrimaryButton>
+        ) : checkout && saved && !dirty ? (
+          <div ref={checkoutRef} className="scroll-mt-4">
+            <Checkout
+              orderId={saved.orderId}
+              whatsappPhone={cleanPhone(form.whatsappPhone)}
+              priceMomo={priceMomo}
+              priceCard={priceCard}
+            />
+          </div>
         ) : (
-          <PrimaryButton onClick={pay} disabled={!!busy}>
-            Payer {formatXaf(priceMomo)} et créer ma chanson
+          <PrimaryButton onClick={openCheckout} disabled={!!busy}>
+            Créer ma chanson pour {formatXaf(priceMomo)}
           </PrimaryButton>
         )}
         <div className="flex items-center justify-between">
@@ -458,6 +473,99 @@ function Wizard({ initial, priceMomo }: { initial: Draft; priceMomo: number }) {
         </div>
       </div>
     </div>
+  );
+}
+
+// ---------- Paiement (Tranzak) ----------
+
+type PayChannel = "mtn" | "orange" | "card";
+
+const CHANNELS: { id: PayChannel; label: string; hint: string }[] = [
+  { id: "mtn", label: "MTN MoMo", hint: "Validation sur ton téléphone" },
+  { id: "orange", label: "Orange Money", hint: "Validation sur ton téléphone" },
+  { id: "card", label: "Carte bancaire", hint: "Visa, Mastercard — idéal depuis l'étranger" },
+];
+
+function Checkout({ orderId, whatsappPhone, priceMomo, priceCard }: { orderId: string; whatsappPhone: string } & Prices) {
+  const [channel, setChannel] = useState<PayChannel>("mtn");
+  // Le numéro WhatsApp camerounais sert souvent aussi pour le Mobile Money.
+  const [phone, setPhone] = useState(whatsappPhone.startsWith("+237") ? whatsappPhone.slice(4) : "");
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const price = channel === "card" ? priceCard : priceMomo;
+  const label = CHANNELS.find((c) => c.id === channel)!.label;
+
+  async function submit() {
+    const local = phone.replace(/[\s.\-()]/g, "").replace(/^(\+|00)?237/, "");
+    if (channel !== "card" && !/^6\d{8}$/.test(local)) {
+      return setError("Écris ton numéro Mobile Money à 9 chiffres, par exemple 6XX XX XX XX.");
+    }
+    setBusy(true);
+    setError(null);
+    try {
+      const res = await fetch("/api/pay", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        body: JSON.stringify(channel === "card" ? { orderId, channel } : { orderId, channel, phone: local }),
+      });
+      const data = (await res.json()) as { redirectUrl?: string; error?: string };
+      if (!res.ok) {
+        setError(data.error ?? "Le paiement n'a pas pu démarrer. Réessaie.");
+        setBusy(false);
+        return;
+      }
+      window.location.assign(data.redirectUrl ?? `/commande/${orderId}`);
+    } catch {
+      setError("Pas de connexion internet. Vérifie ton réseau et réessaie.");
+      setBusy(false);
+    }
+  }
+
+  return (
+    <section className="flex flex-col gap-4 rounded-3xl bg-white p-4 shadow-sm ring-1 ring-sand" aria-label="Paiement">
+      <h2 className="text-2xl font-extrabold">Comment veux-tu payer ?</h2>
+      <div className="flex flex-col gap-2" role="group" aria-label="Moyen de paiement">
+        {CHANNELS.map((c) => (
+          <Choice key={c.id} selected={channel === c.id} onClick={() => setChannel(c.id)} align="left">
+            <span className="flex items-center justify-between gap-3">
+              <span>
+                <span className="block font-bold">{c.label}</span>
+                <span className="block text-sm font-normal text-muted">{c.hint}</span>
+              </span>
+              <span className="shrink-0 font-bold">{formatXaf(c.id === "card" ? priceCard : priceMomo)}</span>
+            </span>
+          </Choice>
+        ))}
+      </div>
+      {channel !== "card" && (
+        <Field label={`Ton numéro ${label}`} hint="Tu recevras une demande de paiement à valider avec ton code secret.">
+          <div className="flex items-center gap-2">
+            <span className="rounded-xl bg-sand px-3 py-3 font-semibold">+237</span>
+            <input
+              className={inputClass}
+              type="tel"
+              inputMode="numeric"
+              autoComplete="tel-national"
+              value={phone}
+              onChange={(e) => {
+                setPhone(e.target.value);
+                setError(null);
+              }}
+              placeholder="6XX XX XX XX"
+            />
+          </div>
+        </Field>
+      )}
+      {error && (
+        <p role="alert" className="rounded-2xl bg-red-50 p-4 font-medium text-red-800 ring-1 ring-red-200">
+          {error}
+        </p>
+      )}
+      <PrimaryButton onClick={submit} disabled={busy}>
+        {busy ? "Un instant…" : `Payer ${formatXaf(price)}`}
+      </PrimaryButton>
+      <p className="text-center text-sm text-muted">Paiement sécurisé par Tranzak. 2 versions de ta chanson en 2 minutes environ.</p>
+    </section>
   );
 }
 
