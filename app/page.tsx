@@ -42,13 +42,25 @@ const EXAMPLES: ExampleTrack[] = [
   },
 ];
 
-// Autocollants autour du titre (décoratifs) : près du titre sur téléphone, sur les côtés sur ordinateur.
+// Autocollants décoratifs. Ordinateur : sur les côtés de l'écran. Téléphone : collés aux coins du titre.
 const STICKERS = [
-  { emoji: "🎂", label: "Anniversaire", className: "top-[3%] left-[3%] -rotate-6 md:top-[22%] md:left-[8%]" },
-  { emoji: "💍", label: "Dot", className: "top-[7%] right-[3%] rotate-6 [animation-delay:1.2s] md:top-[26%] md:right-[9%]" },
-  { emoji: "🎓", label: "Bac", className: "bottom-[30%] left-[1%] rotate-3 [animation-delay:2.4s] max-md:hidden md:bottom-[30%] md:left-[12%]" },
-  { emoji: "❤️", label: "Mariage", className: "bottom-[34%] right-[2%] -rotate-3 [animation-delay:3.1s] max-md:hidden md:bottom-[38%] md:right-[6%]" },
+  { emoji: "🎂", label: "Anniversaire", desktop: "top-[22%] left-[8%] -rotate-6", mobile: "top-1 left-0 -rotate-6" },
+  { emoji: "💍", label: "Dot", desktop: "top-[26%] right-[9%] rotate-6 [animation-delay:1.2s]", mobile: "top-1 right-1 rotate-6 [animation-delay:1.2s]" },
+  { emoji: "🎓", label: "Bac", desktop: "bottom-[30%] left-[12%] rotate-3 [animation-delay:2.4s]", mobile: "-bottom-1 left-3 rotate-3 [animation-delay:2.4s]" },
+  { emoji: "❤️", label: "Mariage", desktop: "bottom-[38%] right-[6%] -rotate-3 [animation-delay:3.1s]", mobile: "bottom-0 -right-1 -rotate-3 [animation-delay:3.1s]" },
 ];
+
+function Sticker({ emoji, label, className }: { emoji: string; label: string; className: string }) {
+  return (
+    <span
+      aria-hidden="true"
+      className={`absolute z-10 flex animate-float items-center gap-1 rounded-xl bg-white px-2 py-1 text-xs font-extrabold shadow-md ring-1 shadow-ink/10 ring-sand motion-reduce:animate-none md:gap-1.5 md:rounded-2xl md:px-4 md:py-2 md:text-xl md:shadow-lg ${className}`}
+    >
+      <span className="text-sm md:text-2xl">{emoji}</span>
+      {label}
+    </span>
+  );
+}
 
 const OCCASIONS = [
   "Anniversaire",
@@ -134,51 +146,54 @@ export default function Home() {
   const tracks = EXAMPLES.filter((ex) => hasExample(ex.file));
 
   return (
-    <div className="flex flex-col gap-20 md:gap-32">
-      {/* Accroche : occupe tout l'écran, bandeau d'occasions en bas */}
-      <section className="relative flex min-h-[calc(100svh-4rem)] flex-col">
+    <div className="flex flex-col gap-16 md:gap-32">
+      {/* Accroche : tout l'écran sur ordinateur, compacte sur téléphone (le bandeau reste visible) */}
+      <section className="relative flex flex-col md:min-h-[calc(100svh-4rem)]">
         <div
-          className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(60%_50%_at_50%_40%,color-mix(in_oklab,var(--color-gold)_30%,transparent)_0%,transparent_70%),radial-gradient(40%_40%_at_85%_70%,color-mix(in_oklab,var(--color-brand)_14%,transparent)_0%,transparent_70%)]"
+          className="pointer-events-none absolute inset-0 -z-10 bg-[radial-gradient(70%_45%_at_50%_45%,color-mix(in_oklab,var(--color-gold)_30%,transparent)_0%,transparent_70%),radial-gradient(40%_40%_at_85%_70%,color-mix(in_oklab,var(--color-brand)_14%,transparent)_0%,transparent_70%)]"
           aria-hidden="true"
         />
         {STICKERS.map((s) => (
-          <span
-            key={s.label}
-            aria-hidden="true"
-            className={`absolute z-10 flex animate-float items-center gap-1.5 rounded-2xl bg-white px-3 py-1.5 text-sm font-extrabold shadow-lg ring-1 shadow-ink/10 ring-sand motion-reduce:animate-none md:px-4 md:py-2 md:text-xl ${s.className}`}
-          >
-            <span className="text-lg md:text-2xl">{s.emoji}</span>
-            {s.label}
-          </span>
+          <Sticker key={s.label} emoji={s.emoji} label={s.label} className={`max-md:hidden ${s.desktop}`} />
         ))}
 
-        <Container className="flex flex-1 flex-col items-center justify-center gap-6 pt-24 pb-12 text-center md:gap-8 md:py-16">
-          <p className="flex items-center gap-2 rounded-full bg-white px-4 py-1.5 text-xs font-bold tracking-wide text-muted uppercase shadow-sm ring-1 ring-sand">
+        <Container className="flex flex-1 flex-col items-center justify-center gap-5 pt-6 pb-8 text-center md:gap-8 md:py-16">
+          <p className="flex items-center gap-2 rounded-full bg-white px-3 py-1 text-[11px] font-bold tracking-wide text-muted uppercase shadow-sm ring-1 ring-sand md:px-4 md:py-1.5 md:text-xs">
             <span className="h-2 w-2 rounded-full bg-brand" aria-hidden="true" />
             Makossa · Bikutsi · Afrobeats · Rumba
           </p>
-          <h1 className="text-[2.9rem] leading-[1] font-extrabold tracking-tight md:text-7xl lg:text-8xl">
-            Ton nom dans
-            <br />
-            <span className="bg-gradient-to-r from-brand to-gold bg-clip-text text-transparent">une chanson.</span>
-          </h1>
-          <p className="max-w-xl text-lg text-muted md:text-2xl md:leading-relaxed">
-            Anniversaire, dot, mariage, hommage… Raconte tes souvenirs, on en fait une vraie chanson sur des rythmes
-            d&apos;Afrique centrale.
+          <div className="relative w-full py-10 md:py-0">
+            {STICKERS.map((s) => (
+              <Sticker key={s.label} emoji={s.emoji} label={s.label} className={`md:hidden ${s.mobile}`} />
+            ))}
+            <h1 className="text-[3.1rem] leading-[0.98] font-extrabold tracking-tight min-[400px]:text-[3.4rem] md:text-7xl lg:text-8xl">
+              Ton nom dans
+              <br />
+              <span className="bg-gradient-to-r from-brand to-gold bg-clip-text text-transparent">une chanson.</span>
+            </h1>
+          </div>
+          <p className="max-w-xl text-base text-muted md:text-2xl md:leading-relaxed">
+            Raconte tes souvenirs, on en fait une vraie chanson sur des rythmes d&apos;Afrique centrale.
           </p>
           <CreateButton className="w-full max-w-sm md:w-auto" />
-          <ul className="flex flex-wrap justify-center gap-x-5 gap-y-1 text-sm font-medium text-muted md:text-base">
+          <ul className="flex flex-wrap justify-center gap-x-4 gap-y-1 text-[13px] font-medium text-muted md:gap-x-5 md:text-base">
             <li>✓ Paroles gratuites</li>
             <li>✓ Prête en 2 min</li>
             <li>✓ MoMo · Orange Money · carte</li>
           </ul>
+          <a href="#exemples" className="flex items-center gap-2 font-semibold text-brand-dark md:text-lg">
+            <span className="flex h-8 w-8 items-center justify-center rounded-full bg-white text-xs text-brand shadow-sm ring-1 ring-sand" aria-hidden="true">
+              ▶
+            </span>
+            Écouter un exemple
+          </a>
         </Container>
 
         {/* Bandeau d'occasions */}
-        <div className="overflow-hidden border-y border-sand bg-white/70 py-4" aria-hidden="true">
+        <div className="overflow-hidden border-y border-sand bg-white/70 py-3 md:py-4" aria-hidden="true">
           <div className="flex w-max animate-marquee gap-8 motion-reduce:animate-none">
             {[...OCCASIONS, ...OCCASIONS].map((o, i) => (
-              <span key={i} className="flex items-center gap-8 text-base font-extrabold tracking-[0.2em] text-ink/70 uppercase md:text-xl">
+              <span key={i} className="flex items-center gap-8 text-sm font-extrabold tracking-[0.2em] text-ink/70 uppercase md:text-xl">
                 {o}
                 <span className="text-brand">✦</span>
               </span>
