@@ -31,3 +31,27 @@ body {
   outline: 3px solid var(--color-gold);
   outline-offset: 2px;
 }
+
+/* Accueil : bandeau d'occasions qui défile et autocollants qui flottent. */
+@theme {
+  --animate-marquee: marquee 28s linear infinite;
+  --animate-float: float 5s ease-in-out infinite;
+
+  @keyframes marquee {
+    from {
+      transform: translateX(0);
+    }
+    to {
+      transform: translateX(-50%);
+    }
+  }
+  @keyframes float {
+    0%,
+    100% {
+      translate: 0 0;
+    }
+    50% {
+      translate: 0 -8px;
+    }
+  }
+}
