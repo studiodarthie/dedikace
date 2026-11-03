@@ -2,7 +2,15 @@ import { NonRetriableError } from "inngest";
 import { sendAdminAlert } from "@/lib/email";
 import { generateSong, MusicError } from "@/lib/elevenlabs";
 import { getOrderById, setStatus } from "@/lib/orders";
-import { failUnfinishedSongs, markSongError, markSongGenerating, markSongReady, queueSongs, VERSIONS } from "@/lib/songs";
+import {
+  failUnfinishedSongs,
+  getReadyVersions,
+  markSongError,
+  markSongGenerating,
+  markSongReady,
+  queueSongs,
+  VERSIONS,
+} from "@/lib/songs";
 import { songKey, uploadSong } from "@/lib/storage";
 import { stylePromptFor, type StyleId } from "@/lib/styles";
 import { inngest, orderPaid } from "./client";
@@ -59,7 +67,10 @@ export const generateSongFunction = inngest.createFunction(
       if (!current.lyrics) throw new NonRetriableError("Pas de paroles enregistrées.");
       if (current.status !== "generating") await setStatus(orderId, "generating");
       await queueSongs(orderId, generation);
+      // Relance : les versions déjà prêtes ne sont pas recréées (pas de crédit ElevenLabs gaspillé).
+      const ready = await getReadyVersions(orderId, generation);
       return {
+        readyVersions: ready,
         lyrics: current.lyrics,
         styleId: current.styleId as StyleId,
         voice: current.voice,
@@ -69,7 +80,7 @@ export const generateSongFunction = inngest.createFunction(
 
     // Les 2 versions en parallèle, chacune dans sa propre étape (réessayée indépendamment).
     await Promise.all(
-      VERSIONS.map((version) =>
+      VERSIONS.filter((version) => !order.readyVersions.includes(version)).map((version) =>
         step.run(`créer la version ${version}`, async () => {
           await markSongGenerating(orderId, version, generation);
           try {

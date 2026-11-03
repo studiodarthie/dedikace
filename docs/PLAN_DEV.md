@@ -115,15 +115,22 @@ Les clés Cloudflare R2 sont nécessaires au jour 4, Resend au jour 4 (alertes) 
 
 ## Jour 6 — Back-office et pages légales
 
-- [ ] **Prompt 12 — Admin**
+- [x] **Prompt 12 — Admin**
   > Installe next-auth et @auth/drizzle-adapter. Ajoute les tables de l'adaptateur à `lib/db/schema.ts`
   > et migre. Configure `lib/auth.ts` : connexion par lien magique envoyé avec Resend, refusée pour tout
   > e-mail absent de ADMIN_EMAILS. Construis `/admin` selon le PRD §7, chaque page et action vérifiant la
   > session côté serveur. Actions : relancer la génération, marquer remboursée, valider un paiement manuel.
 
-- [ ] **Prompt 13 — Légal et suivi**
+  Vérification : npm run test:admin (accès refusé sans session ou hors liste, pages, 3 actions).
+  Une relance garde les versions déjà prêtes. Reste à faire : une vraie connexion par e-mail en ligne.
+
+- [x] **Prompt 13 — Légal et suivi**
   > Ajoute les pages /cgu, /confidentialite et /remboursement (textes simples, marqués « à faire relire »),
   > le Meta Pixel et le TikTok Pixel (événements : début de création, paiement réussi).
+
+  Événements standard : InitiateCheckout (début de création) et Purchase / CompletePayment (paiement réussi,
+  une fois par commande). Pixels absents du back-office. Reste à faire : renseigner NEXT_PUBLIC_META_PIXEL_ID
+  et NEXT_PUBLIC_TIKTOK_PIXEL_ID, faire relire les pages légales (éditeur : Darthie Studios).
 
 ## Jour 7 — Mise en production
 

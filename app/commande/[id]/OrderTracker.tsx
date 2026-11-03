@@ -6,6 +6,7 @@ import { useEffect, useState } from "react";
 import { clearDraft } from "@/app/creer/CreateWizard";
 import type { OrderStatus } from "@/lib/db/schema";
 import { whatsappLink } from "@/lib/format";
+import { trackPurchaseOnce } from "@/lib/pixels";
 
 type Snapshot = {
   status: OrderStatus;
@@ -19,7 +20,17 @@ const SLOW_PAYMENT_MS = 3 * 60_000;
 const PAID_STATUSES: OrderStatus[] = ["paid", "generating", "delivered", "generation_failed"];
 
 /** Prompt 11 : suit la commande toutes les 5 s et ouvre la chanson dès qu'elle est prête. */
-export function OrderTracker({ orderId, initial, supportPhone }: { orderId: string; initial: Snapshot; supportPhone: string }) {
+export function OrderTracker({
+  orderId,
+  initial,
+  priceXaf,
+  supportPhone,
+}: {
+  orderId: string;
+  initial: Snapshot;
+  priceXaf: number;
+  supportPhone: string;
+}) {
   const router = useRouter();
   const [snap, setSnap] = useState(initial);
   const [offline, setOffline] = useState(false);
@@ -44,10 +55,12 @@ export function OrderTracker({ orderId, initial, supportPhone }: { orderId: stri
     return () => clearInterval(id);
   }, [orderId, done, snap.publicCode]);
 
-  // Paiement reçu : le brouillon du formulaire ne sert plus.
+  // Paiement reçu (vérifié chez Tranzak côté serveur) : le brouillon ne sert plus, et on prévient les pixels.
   useEffect(() => {
-    if (PAID_STATUSES.includes(snap.status)) clearDraft();
-  }, [snap.status]);
+    if (!PAID_STATUSES.includes(snap.status)) return;
+    clearDraft();
+    trackPurchaseOnce(orderId, priceXaf);
+  }, [snap.status, orderId, priceXaf]);
 
   useEffect(() => {
     if (snap.publicCode) router.replace(`/s/${snap.publicCode}`);

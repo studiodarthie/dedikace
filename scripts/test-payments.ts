@@ -127,6 +127,8 @@ async function main() {
     check("identifiant invalide → 404", (await fetch(`${APP}/api/commande/pas-un-id`)).status === 404);
     check("page /commande/[id] s'affiche", (await fetch(`${APP}/commande/${o1.id}`)).status === 200);
   } finally {
+    // Les événements de test ne doivent pas gonfler les compteurs du jour.
+    if (created.length) await db.delete(events).where(inArray(events.orderId, created));
     if (created.length) await db.delete(orders).where(inArray(orders.id, created));
   }
 }

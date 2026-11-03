@@ -18,7 +18,9 @@ export const orderPaid = eventType("order/paid", {
 /**
  * Envoie l'événement avec un identifiant fixe par commande et par génération :
  * Inngest ignore un doublon reçu dans les 24 h (CLAUDE.md règle 2).
+ * `relaunch` (relance depuis le back-office) donne un identifiant nouveau, sinon la relance serait ignorée.
  */
-export async function sendOrderPaid(orderId: string, generation: 1 | 2) {
-  await inngest.send(orderPaid.create({ orderId, generation }, { id: `order-paid-${orderId}-g${generation}` }));
+export async function sendOrderPaid(orderId: string, generation: 1 | 2, relaunch?: string) {
+  const id = `order-paid-${orderId}-g${generation}${relaunch ? `-r${relaunch}` : ""}`;
+  await inngest.send(orderPaid.create({ orderId, generation }, { id }));
 }

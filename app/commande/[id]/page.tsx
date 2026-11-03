@@ -32,6 +32,7 @@ async function OrderContent({ params }: { params: PageProps<"/commande/[id]">["p
         channel: payment?.channel,
         publicCode: order.status === "delivered" ? order.publicCode : undefined,
       }}
+      priceXaf={order.priceXaf}
       supportPhone={process.env.NEXT_PUBLIC_SUPPORT_WHATSAPP ?? ""}
     />
   );

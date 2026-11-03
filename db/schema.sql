@@ -1,8 +1,8 @@
 -- Dédikace — schéma de référence (Neon / Postgres)
 -- Source exécutable : lib/db/schema.ts (Drizzle). Ce fichier décrit le modèle attendu ;
 -- toute modification se fait ici d'abord, puis dans lib/db/schema.ts.
--- Les tables d'Auth.js (users, accounts, sessions, verification_tokens) sont ajoutées
--- via l'adaptateur Drizzle au prompt 12.
+-- Les tables d'Auth.js (users, accounts, sessions, verification_tokens) servent uniquement
+-- à la connexion au back-office (prompt 12), en fin de fichier.
 
 create type order_status as enum (
   'draft', 'lyrics_ready', 'pending_payment', 'paid',
@@ -71,6 +71,44 @@ create table events (
   type text not null check (type in ('form_started', 'lyrics_generated', 'payment_started', 'payment_succeeded')),
   order_id uuid references orders(id) on delete set null,
   created_at timestamptz not null default now()
+);
+
+-- Auth.js (adaptateur Drizzle) : connexion au back-office par lien magique.
+-- Seules les adresses de ADMIN_EMAILS peuvent se connecter (vérifié côté serveur).
+create table users (
+  id text primary key,
+  name text,
+  email text unique,
+  email_verified timestamptz,
+  image text
+);
+
+create table accounts (
+  user_id text not null references users(id) on delete cascade,
+  type text not null,
+  provider text not null,
+  provider_account_id text not null,
+  refresh_token text,
+  access_token text,
+  expires_at int,
+  token_type text,
+  scope text,
+  id_token text,
+  session_state text,
+  primary key (provider, provider_account_id)
+);
+
+create table sessions (
+  session_token text primary key,
+  user_id text not null references users(id) on delete cascade,
+  expires timestamptz not null
+);
+
+create table verification_tokens (
+  identifier text not null,
+  token text not null,
+  expires timestamptz not null,
+  primary key (identifier, token)
 );
 
 create index on orders (status, created_at desc);

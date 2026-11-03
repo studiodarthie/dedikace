@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState, useSyncExternalStore, type ReactNode } from "react";
 import { formatXaf } from "@/lib/format";
 import { CHORUS_LANGUAGES, OCCASIONS } from "@/lib/occasions";
+import { trackPixel } from "@/lib/pixels";
 import { STYLE_TAGLINES, STYLES } from "@/lib/styles";
 
 // ---------- Brouillon (localStorage) ----------
@@ -125,12 +126,13 @@ function Wizard({ initial, priceMomo, priceCard }: { initial: Draft } & Prices) 
     saveDraft({ step, form, saved, editTitle: title, editLyrics: lyrics });
   }, [step, form, saved, title, lyrics]);
 
-  // « Formulaire commencé » : une fois par session, pour les compteurs du back-office.
+  // « Formulaire commencé » : une fois par session, pour les compteurs du back-office et les pixels.
   useEffect(() => {
     try {
       if (sessionStorage.getItem("dedikace:form_started")) return;
       sessionStorage.setItem("dedikace:form_started", "1");
     } catch {}
+    trackPixel("start");
     fetch("/api/events", {
       method: "POST",
       headers: { "content-type": "application/json" },

@@ -32,7 +32,8 @@ app/
   creer/                   parcours de création en 4 étapes
   commande/[id]/           attente de paiement puis de génération
   s/[code]/                page publique de la chanson
-  admin/                   back-office (protégé)
+  admin/                   back-office (protégé ; admin/connexion : lien magique)
+  cgu/  confidentialite/  remboursement/   pages légales
   api/lyrics/route.ts      génération / réécriture des paroles
   api/pay/route.ts         initialisation du paiement Tranzak
   api/commande/[id]/       statut lu par la page d'attente (revérifie chez Tranzak)
@@ -43,6 +44,9 @@ lib/
   db/index.ts  db/schema.ts
   claude.ts  elevenlabs.ts  tranzak.ts  storage.ts  auth.ts  email.ts
   moderation.ts  phonetics.ts  styles.ts  occasions.ts  orders.ts  payments.ts  songs.ts  format.ts  env.ts
+  admin.ts (requêtes et actions du back-office)  pixels.ts (Meta / TikTok, code navigateur)
+components/
+  WhatsAppButton.tsx  Pixels.tsx  LegalPage.tsx
 inngest/
   client.ts  generate-song.ts
 db/schema.sql              référence fonctionnelle du schéma (la source exécutable est lib/db/schema.ts)

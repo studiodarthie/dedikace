@@ -60,6 +60,14 @@ export async function getDeliveredSongs(orderId: string): Promise<Song[]> {
   return complete === undefined ? [] : ready.filter((s) => s.generation === complete);
 }
 
+export async function getReadyVersions(orderId: string, generation: number): Promise<number[]> {
+  const rows = await db
+    .select({ version: songs.version })
+    .from(songs)
+    .where(and(eq(songs.orderId, orderId), eq(songs.generation, generation), eq(songs.status, "ready")));
+  return rows.map((r) => r.version);
+}
+
 export async function getSongsForOrders(orderIds: string[]): Promise<Song[]> {
   if (orderIds.length === 0) return [];
   return db.select().from(songs).where(inArray(songs.orderId, orderIds));
