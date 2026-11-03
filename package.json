@@ -19,7 +19,8 @@
     "test:music": "tsx --env-file=.env.local --conditions=react-server scripts/test-music.ts",
     "test:generate": "tsx --env-file=.env.local --conditions=react-server scripts/test-generate.ts",
     "seed:song": "tsx --env-file=.env.local --conditions=react-server scripts/seed-song.ts",
-    "test:admin": "tsx --env-file=.env.local --conditions=react-server scripts/test-admin.ts"
+    "test:admin": "tsx --env-file=.env.local --conditions=react-server scripts/test-admin.ts",
+    "db:migrate:prod": "MIGRATE_TARGET=prod drizzle-kit migrate"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^1.3.0",

@@ -84,6 +84,8 @@ drizzle/                   migrations générées par drizzle-kit
 - `npm run dev` — développement local
 - `npm run lint && npm run typecheck` — avant chaque commit
 - `npm run db:generate` puis `npm run db:migrate` — après toute modification de `lib/db/schema.ts`
+  (`.env.local` pointe sur la branche Neon `dev` ; appliquer ensuite à la vraie base avec `npm run db:migrate:prod`,
+  avant de pousser le code qui en dépend)
 - `npx inngest-cli@latest dev` — serveur Inngest local
 
 ## Définition de « terminé »
