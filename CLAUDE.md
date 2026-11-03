@@ -28,7 +28,8 @@ manuelle est nécessaire (créer un compte, copier une clé, cliquer dans un tab
 
 ```
 app/
-  page.tsx                 accueil + exemples audio
+  page.tsx                 accueil pleine largeur + exemples audio
+  (site)/                  groupe sans effet sur les adresses : toutes les autres pages, en colonne étroite
   creer/                   parcours de création en 4 étapes
   commande/[id]/           attente de paiement puis de génération
   s/[code]/                page publique de la chanson
