@@ -168,6 +168,11 @@ function Wizard({ initial, priceMomo, priceCard }: { initial: Draft } & Prices) 
         headers: { "content-type": "application/json" },
         body: JSON.stringify(body),
       });
+      // Limite anti-abus du pare-feu Vercel (réponse sans JSON).
+      if (res.status === 429) {
+        setError("Trop d’essais d’un coup. Attends une minute et réessaie.");
+        return null;
+      }
       const data = (await res.json()) as Partial<Lyrics> & { error?: string };
       if (!res.ok) {
         setError(data.error ?? "Une erreur est survenue. Réessaie.");
