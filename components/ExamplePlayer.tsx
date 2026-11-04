@@ -1,13 +1,14 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { ExampleCover, type CoverScene } from "@/components/ExampleCover";
 
 export type ExampleTrack = {
   file: string;
   title: string;
   occasion: string;
   style: string;
-  emoji: string;
+  scene: CoverScene;
   /** Classes Tailwind du dégradé de la pochette. */
   cover: string;
 };
@@ -56,11 +57,20 @@ export function ExamplePlayer({ tracks }: { tracks: ExampleTrack[] }) {
   return (
     <div className="grid grid-cols-1 gap-4 md:grid-cols-[1.15fr_1fr] md:items-center md:gap-10">
       <div className="min-w-0 overflow-hidden rounded-3xl bg-white shadow-lg shadow-ink/5 ring-1 ring-sand">
-        <div className={`relative flex aspect-[16/10] items-end bg-gradient-to-br p-5 ${track.cover}`}>
-          <span className="absolute top-4 right-4 rotate-6 text-6xl drop-shadow-md md:text-8xl" aria-hidden="true">
-            {track.emoji}
-          </span>
-          <span className="rounded-full bg-white/90 px-3 py-1 text-sm font-semibold text-ink">{track.occasion}</span>
+        <div className={`relative flex aspect-[16/10] items-end justify-between overflow-hidden bg-gradient-to-br p-5 ${track.cover}`}>
+          <ExampleCover key={track.scene} scene={track.scene} className="absolute inset-0 h-full w-full" />
+          <span className="relative rounded-full bg-white/90 px-3 py-1 text-sm font-semibold text-ink">{track.occasion}</span>
+          {playing && (
+            <span className="relative flex h-6 items-end gap-1 rounded-full bg-ink/40 px-2.5 py-1" aria-hidden="true">
+              {[0, 0.3, 0.15, 0.45].map((d) => (
+                <span
+                  key={d}
+                  className="w-1 rounded-full bg-white [animation:cv-eq_0.9s_ease-in-out_infinite]"
+                  style={{ animationDelay: `${d}s` }}
+                />
+              ))}
+            </span>
+          )}
         </div>
         <div className="flex flex-col gap-3 p-5">
           <div>
@@ -145,11 +155,8 @@ export function ExamplePlayer({ tracks }: { tracks: ExampleTrack[] }) {
                   active ? "bg-white shadow-sm ring-2 ring-brand/60" : "bg-white/60 ring-1 ring-sand active:bg-white"
                 }`}
               >
-                <span
-                  className={`flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br text-2xl ${t.cover}`}
-                  aria-hidden="true"
-                >
-                  {t.emoji}
+                <span className={`h-12 w-12 shrink-0 overflow-hidden rounded-xl bg-gradient-to-br ${t.cover}`} aria-hidden="true">
+                  <ExampleCover scene={t.scene} still className="h-full w-full" />
                 </span>
                 <span className="min-w-0 flex-1">
                   <span className="block truncate font-semibold">{t.title}</span>

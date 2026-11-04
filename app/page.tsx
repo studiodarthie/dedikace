@@ -13,7 +13,7 @@ const EXAMPLES: ExampleTrack[] = [
     title: "Maman Mireille en fête",
     occasion: "Anniversaire",
     style: "Makossa",
-    emoji: "🎂",
+    scene: "anniversaire",
     cover: "from-gold to-brand",
   },
   {
@@ -21,7 +21,7 @@ const EXAMPLES: ExampleTrack[] = [
     title: "Ngono, ma reine de la dot",
     occasion: "Dot",
     style: "Bikutsi",
-    emoji: "💍",
+    scene: "dot",
     cover: "from-brand to-brand-dark",
   },
   {
@@ -29,7 +29,7 @@ const EXAMPLES: ExampleTrack[] = [
     title: "Brenda la Docteur",
     occasion: "Réussite au Bac",
     style: "Afrobeats · refrain en pidgin",
-    emoji: "🎓",
+    scene: "bac",
     cover: "from-leaf to-gold",
   },
   {
@@ -37,7 +37,7 @@ const EXAMPLES: ExampleTrack[] = [
     title: "Papa Emmanuel, ta lumière",
     occasion: "Hommage",
     style: "Acoustique",
-    emoji: "🕊️",
+    scene: "hommage",
     cover: "from-muted to-ink",
   },
 ];
