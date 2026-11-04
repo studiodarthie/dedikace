@@ -7,36 +7,44 @@ import { env } from "@/lib/env";
 import { formatXaf } from "@/lib/format";
 
 // Exemples audio de l'accueil : extraits de 80 s créés par npm run make:examples (public/examples/).
-const EXAMPLES: ExampleTrack[] = [
+const EXAMPLES: Omit<ExampleTrack, "image">[] = [
   {
     file: "anniversaire-makossa.mp3",
     title: "Maman Mireille en fête",
-    occasion: "Anniversaire",
     style: "Makossa",
+    emoji: "🎂",
+    tags: ["Anniversaire", "Fête"],
+    length: "1:20",
     scene: "anniversaire",
     cover: "from-gold to-brand",
   },
   {
     file: "dot-bikutsi.mp3",
     title: "Ngono, ma reine de la dot",
-    occasion: "Dot",
     style: "Bikutsi",
+    emoji: "💍",
+    tags: ["Dot", "Mariage"],
+    length: "1:20",
     scene: "dot",
     cover: "from-brand to-brand-dark",
   },
   {
     file: "bac-afrobeats.mp3",
     title: "Brenda la Docteur",
-    occasion: "Réussite au Bac",
     style: "Afrobeats · refrain en pidgin",
+    emoji: "🎓",
+    tags: ["Réussite", "Bac"],
+    length: "1:20",
     scene: "bac",
     cover: "from-leaf to-gold",
   },
   {
     file: "hommage-acoustique.mp3",
     title: "Papa Emmanuel, ta lumière",
-    occasion: "Hommage",
     style: "Acoustique",
+    emoji: "🕊️",
+    tags: ["Hommage", "Souvenir"],
+    length: "1:20",
     scene: "hommage",
     cover: "from-muted to-ink",
   },
@@ -143,7 +151,11 @@ function Container({ children, className = "" }: { children: ReactNode; classNam
 }
 
 export default function Home() {
-  const tracks = EXAMPLES.filter((ex) => hasExample(ex.file));
+  // Photo de pochette facultative : public/examples/<scene>.jpg (sinon, illustration animée).
+  const tracks: ExampleTrack[] = EXAMPLES.filter((ex) => hasExample(ex.file)).map((ex) => ({
+    ...ex,
+    image: hasExample(`${ex.scene}.jpg`) ? `/examples/${ex.scene}.jpg` : undefined,
+  }));
 
   return (
     <div className="flex flex-col gap-16 md:gap-32">
@@ -204,19 +216,30 @@ export default function Home() {
 
       {/* Exemples */}
       <Container>
-        <section className="flex flex-col gap-8 md:gap-12" aria-labelledby="exemples">
-          <SectionTitle
-            id="exemples"
-            kicker="Écoute"
-            title="Créées avec Dédikace"
-            text="Des chansons d’exemple, faites exactement comme la tienne le sera."
-          />
+        <section aria-labelledby="exemples">
           {tracks.length > 0 ? (
-            <ExamplePlayer tracks={tracks} />
+            <ExamplePlayer
+              tracks={tracks}
+              header={
+                <div className="flex flex-col gap-3 text-center md:text-left">
+                  <p className="text-sm font-bold tracking-wide text-brand uppercase">Écoute</p>
+                  <h2 id="exemples" className="scroll-mt-24 text-4xl leading-[1.02] font-extrabold tracking-tight md:text-5xl lg:text-6xl">
+                    Elles ont été créées avec{" "}
+                    <span className="bg-gradient-to-r from-brand-dark via-brand to-gold bg-clip-text text-transparent">Dédikace</span>
+                  </h2>
+                  <p className="text-muted md:text-lg">
+                    Des chansons d’exemple, faites exactement comme la tienne le sera : un prénom, des souvenirs, un rythme d’ici.
+                  </p>
+                </div>
+              }
+              cta={<CreateButton label="Créer la mienne" className="w-full md:w-fit" />}
+            />
           ) : (
-            <p className="rounded-2xl bg-sand/60 p-4 text-center text-muted">Les extraits arrivent bientôt.</p>
+            <div className="flex flex-col gap-6">
+              <SectionTitle id="exemples" kicker="Écoute" title="Créées avec Dédikace" />
+              <p className="rounded-2xl bg-sand/60 p-4 text-center text-muted">Les extraits arrivent bientôt.</p>
+            </div>
           )}
-          <CreateButton label="Créer la mienne" className="w-full max-w-sm self-center md:w-auto" />
         </section>
       </Container>
 
