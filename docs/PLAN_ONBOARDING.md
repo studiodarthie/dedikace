@@ -8,6 +8,7 @@ avant les paroles, paroles gratuites avant paiement, bouton WhatsApp flottant.
 
 ## Phase 1 — Moins écrire, plus toucher (fait le 5 novembre 2026)
 
+- [x] Refrain en anglais en plus du français, du pidgin et du lingala.
 - [x] Occasions en grosses cartes avec emoji (`lib/occasions.ts` : champ `emoji`).
 - [x] « Pour qui ? » en gros boutons emoji avant le prénom (Maman, Papa, Ma chérie…), remplit `relation`.
 - [x] Idées de souvenirs à toucher, propres à chaque occasion (`lib/occasions.ts` : `MEMORY_IDEAS`),
@@ -25,14 +26,18 @@ avant les paroles, paroles gratuites avant paiement, bouton WhatsApp flottant.
 - [ ] « On refait ta chanson si elle ne te plaît pas » : à décider par le porteur du projet (coût d'une
       génération supplémentaire) avant de l'afficher.
 
-## Phase 2 — Raconter en vocal (à faire)
+## Phase 2 — Raconter en vocal (fait le 5 novembre 2026)
 
-- [ ] Vérifier dans la doc ElevenLabs (Speech to Text / Scribe) l'API, le prix et la qualité sur l'accent
-      camerounais et le pidgin (tester avec 5 vocaux réels).
-- [ ] Bouton 🎤 « Raconte en vocal » : enregistrement dans le navigateur (MediaRecorder, 60 s max),
-      envoi à une route serveur `api/transcribe`, texte placé dans les souvenirs, modifiable.
+- [x] API ElevenLabs Speech to Text (`scribe_v2`, langue détectée automatiquement) : `transcribeVoice` dans
+      `lib/elevenlabs.ts`. La clé ElevenLabs doit avoir la permission « Speech to Text ». Moins d'un centime
+      d'euro par vocal d'une minute.
+- [x] Bouton 🎤 « Raconte en vocal » (`app/(site)/creer/VoiceNote.tsx`) : MediaRecorder, 60 s max, envoi à
+      `app/api/transcribe/route.ts` (3 Mo max), texte placé dans une case souvenir et modifiable.
+      Caché si le navigateur ne sait pas enregistrer.
+- [x] Testé avec un vocal en français : « ndolè », « makossa », « Douala » bien reconnus.
+- [ ] Tester avec 5 vrais vocaux à l'accent camerounais, dont un en pidgin.
+- [x] Règle anti-abus du pare-feu Vercel sur `/api/transcribe` (10 requêtes / minute / IP).
 - [ ] Bouton 🎤 « Comment se prononce le prénom ? » → aide `lib/phonetics.ts`.
-- [ ] Limite anti-abus Vercel sur `api/transcribe` comme pour `api/lyrics`.
 
 ## Phase 3 — WhatsApp au centre (à faire)
 

@@ -137,3 +137,35 @@ export async function generateSong(request: SongRequest): Promise<GeneratedSong>
   const durationSeconds = Math.round(plan.chunks.reduce((n, c) => n + c.duration_ms, 0) / 1000);
   return { audio, songId: res.headers.get("song-id"), durationSeconds };
 }
+
+// ---------- Transcription des vocaux (Scribe) ----------
+// Référence : https://elevenlabs.io/docs/api-reference/speech-to-text/convert
+const STT_URL = "https://api.elevenlabs.io/v1/speech-to-text";
+
+/** Transcrit un vocal (souvenirs racontés à l'oral). Langue détectée automatiquement : français, anglais, pidgin… */
+export async function transcribeVoice(audio: Blob, filename: string): Promise<string> {
+  const body = new FormData();
+  body.append("model_id", "scribe_v2");
+  body.append("file", audio, filename);
+  body.append("tag_audio_events", "false"); // pas de « (rires) » dans le texte
+  body.append("no_verbatim", "true"); // sans « euh », faux départs ni bruits
+  body.append("timestamps_granularity", "none");
+
+  let res: Response;
+  try {
+    res = await fetch(STT_URL, {
+      method: "POST",
+      headers: { "xi-api-key": requireEnv("ELEVENLABS_API_KEY") },
+      body,
+      signal: AbortSignal.timeout(45_000),
+    });
+  } catch (error) {
+    throw new MusicError(`Connexion à ElevenLabs impossible : ${(error as Error).message}`, true);
+  }
+  if (!res.ok) {
+    const detail = (await res.text()).slice(0, 300);
+    throw new MusicError(`Transcription : ElevenLabs a répondu ${res.status} : ${detail}`, res.status >= 500 || res.status === 429, res.status);
+  }
+  const data = (await res.json()) as { text?: string };
+  return (data.text ?? "").replace(/\s+/g, " ").trim();
+}

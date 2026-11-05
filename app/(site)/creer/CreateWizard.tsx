@@ -5,6 +5,7 @@ import { formatXaf, whatsappLink } from "@/lib/format";
 import { CHORUS_LANGUAGES, MEMORY_IDEAS, OCCASIONS, type OccasionId } from "@/lib/occasions";
 import { trackPixel } from "@/lib/pixels";
 import { STYLE_TAGLINES, STYLES } from "@/lib/styles";
+import { VoiceNote } from "./VoiceNote";
 
 // ---------- Brouillon (localStorage) ----------
 
@@ -172,6 +173,18 @@ function Wizard({ initial, priceMomo, priceCard }: { initial: Draft } & Prices) 
     setError("3 souvenirs au maximum. Retire-en un pour en ajouter un autre.");
   };
 
+  // Texte d'un vocal : première case vide, sinon nouvelle case, sinon à la suite de la dernière.
+  const addVoiceText = (text: string) => {
+    const list = form.anecdotes;
+    const room = MAX_ANECDOTES_CHARS - anecdotesLength(list);
+    if (room <= 0) return setError("Tes souvenirs dépassent déjà 500 caractères. Raccourcis-les avant d'ajouter un vocal.");
+    const clip = text.slice(0, room);
+    const empty = list.findIndex((a) => !a.trim());
+    if (empty >= 0) return update("anecdotes", list.map((a, i) => (i === empty ? clip : a)));
+    if (list.length < MAX_ANECDOTES) return update("anecdotes", [...list, clip]);
+    update("anecdotes", list.map((a, i) => (i === list.length - 1 ? `${a.trim()} ${clip}`.slice(0, MAX_ANECDOTES_CHARS) : a)));
+  };
+
   const goTo = (next: number) => {
     setError(null);
     setNotice(null);
@@ -335,9 +348,10 @@ function Wizard({ initial, priceMomo, priceCard }: { initial: Draft } & Prices) 
             label="Ce qui rend cette personne unique"
             hint={`${anecdotesLength(form.anecdotes)}/${MAX_ANECDOTES_CHARS} caractères. Plus c'est précis (un plat, un surnom, un lieu), plus la chanson est belle.`}
           >
+            <VoiceNote onText={addVoiceText} />
             {form.occasion && (
               <div className="flex flex-col gap-2">
-                <p className="text-sm text-muted">Touche une idée, puis complète-la si tu veux :</p>
+                <p className="text-sm text-muted">Ou touche une idée, puis complète-la si tu veux :</p>
                 <div className="flex flex-wrap gap-2">
                   {MEMORY_IDEAS[form.occasion as OccasionId]?.map((idea) => {
                     const picked = form.anecdotes.some((a) => a.trim() === idea);
