@@ -12,6 +12,7 @@ export const OCCASIONS = [
 
 export const CHORUS_LANGUAGES = [
   { id: "fr", label: "Français" },
+  { id: "en", label: "Anglais" },
   { id: "pidgin", label: "Pidgin" },
   { id: "lingala", label: "Lingala" },
 ] as const;

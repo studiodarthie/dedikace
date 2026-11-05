@@ -16,7 +16,7 @@ Règles de forme :
 - Couplets de 8 lignes, pont de 4 lignes.
 - Refrain de 4 lignes, simple, facile à chanter en chœur, qui contient le prénom du destinataire.
 - Lignes de 6 à 10 syllabes, rimes simples.
-- Si la langue du refrain est le pidgin ou le lingala, utilise uniquement des mots très courants ;
+- Si la langue du refrain est l'anglais, le pidgin ou le lingala, utilise uniquement des mots très courants ;
   les couplets restent en français.
 
 Règles de fond :
@@ -77,7 +77,7 @@ Chaque prénom signalé comme mal prononcé par un client y est ajouté.
 
 ## 4. Modération (`lib/moderation.ts`)
 
-1. Liste de mots interdits (français, pidgin, lingala) appliquée aux champs du formulaire.
+1. Liste de mots interdits (français, anglais, pidgin, lingala) appliquée aux champs du formulaire.
 2. Si Claude refuse (champ `refus` à true, ou arrêt `refusal` de l'API), afficher : « On ne peut pas créer cette chanson.
    Modifie ton message et réessaie. »
 3. Journaliser chaque refus dans `orders.moderation_note`.

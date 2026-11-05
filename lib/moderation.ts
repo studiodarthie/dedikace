@@ -14,6 +14,7 @@ const INSULTS_FR = [
 ];
 const SEXUAL_FR = ["sexe", "bite", "chatte", "couille", "baise", "sodomie", "porno", "fellation", "branler"];
 const INSULTS_PIDGIN = ["ashawo", "mumu", "tif man", "nyash", "kpuff", "wuna mami"];
+const INSULTS_EN = ["fuck", "fucking", "bitch", "motherfucker", "asshole", "bastard", "whore", "slut", "dick", "pussy", "nigga", "nigger"];
 const INSULTS_LINGALA = ["ndumba", "zoba", "liboma", "nyoko"];
 const POLITICS = [
   "biya", "kamto", "rdpc", "mrc", "ambazonie", "ambazonia", "boko haram", "parti politique",
@@ -26,7 +27,7 @@ const ARTISTS = [
   "dadju", "gims", "innoss b", "burna boy", "wizkid", "davido", "dj arafat", "serge beynaud",
 ];
 
-const BLOCKLIST = [...INSULTS_FR, ...SEXUAL_FR, ...INSULTS_PIDGIN, ...INSULTS_LINGALA, ...POLITICS, ...ARTISTS];
+const BLOCKLIST = [...INSULTS_FR, ...SEXUAL_FR, ...INSULTS_PIDGIN, ...INSULTS_EN, ...INSULTS_LINGALA, ...POLITICS, ...ARTISTS];
 
 /** Minuscules, sans accents, ponctuation remplacée par des espaces. */
 function normalize(text: string): string {

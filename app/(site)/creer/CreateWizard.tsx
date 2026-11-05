@@ -416,7 +416,7 @@ function Wizard({ initial, priceMomo, priceCard }: { initial: Draft } & Prices) 
             ))}
           </div>
           <Field group label="Langue du refrain" hint="Les couplets restent en français.">
-            <div className="grid grid-cols-3 gap-2">
+            <div className="grid grid-cols-2 gap-2">
               {CHORUS_LANGUAGES.map((l) => (
                 <Choice key={l.id} selected={form.chorusLanguage === l.id} onClick={() => update("chorusLanguage", l.id)}>
                   {l.label}

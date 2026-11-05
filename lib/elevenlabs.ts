@@ -37,6 +37,7 @@ const SECTION_NAMES: Record<string, string> = {
 };
 
 const CHORUS_LANGUAGE_STYLE: Record<string, string | undefined> = {
+  en: "chorus sung in English",
   pidgin: "chorus sung in Cameroonian Pidgin English",
   lingala: "chorus sung in Lingala",
 };
