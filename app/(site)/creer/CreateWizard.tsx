@@ -1,8 +1,8 @@
 "use client";
 
 import { useEffect, useRef, useState, useSyncExternalStore, type ReactNode } from "react";
-import { formatXaf } from "@/lib/format";
-import { CHORUS_LANGUAGES, OCCASIONS } from "@/lib/occasions";
+import { formatXaf, whatsappLink } from "@/lib/format";
+import { CHORUS_LANGUAGES, MEMORY_IDEAS, OCCASIONS, type OccasionId } from "@/lib/occasions";
 import { trackPixel } from "@/lib/pixels";
 import { STYLE_TAGLINES, STYLES } from "@/lib/styles";
 
@@ -10,7 +10,20 @@ import { STYLE_TAGLINES, STYLES } from "@/lib/styles";
 
 const STORAGE_KEY = "dedikace:brouillon:v1";
 const MAX_ANECDOTES_CHARS = 500;
-const RELATIONS = ["Mère", "Père", "Épouse", "Mari", "Ami(e)", "Sœur", "Frère", "Enfant", "Collègue"];
+const MAX_ANECDOTES = 3;
+const SUPPORT_PHONE = process.env.NEXT_PUBLIC_SUPPORT_WHATSAPP ?? "";
+// « Pour qui ? » : libellé affiché → valeur envoyée aux paroles (champ relation).
+const RELATIONS = [
+  { emoji: "👩🏾", label: "Maman", value: "ma mère" },
+  { emoji: "👨🏾", label: "Papa", value: "mon père" },
+  { emoji: "❤️", label: "Ma chérie", value: "ma chérie" },
+  { emoji: "💙", label: "Mon chéri", value: "mon chéri" },
+  { emoji: "👧🏾", label: "Ma sœur", value: "ma sœur" },
+  { emoji: "👦🏾", label: "Mon frère", value: "mon frère" },
+  { emoji: "🧒🏾", label: "Mon enfant", value: "mon enfant" },
+  { emoji: "🤝🏾", label: "Mon ami(e)", value: "mon ami(e)" },
+  { emoji: "💼", label: "Collègue", value: "mon collègue" },
+];
 
 type Form = {
   occasion: string;
@@ -146,6 +159,19 @@ function Wizard({ initial, priceMomo, priceCard }: { initial: Draft } & Prices) 
     setError(null);
   };
 
+  // Une idée touchée prend la première case vide ; touchée à nouveau, elle est retirée.
+  const toggleIdea = (idea: string) => {
+    const list = form.anecdotes;
+    if (list.some((a) => a.trim() === idea)) {
+      const rest = list.filter((a) => a.trim() !== idea);
+      return update("anecdotes", rest.length ? rest : [""]);
+    }
+    const empty = list.findIndex((a) => !a.trim());
+    if (empty >= 0) return update("anecdotes", list.map((a, i) => (i === empty ? idea : a)));
+    if (list.length < MAX_ANECDOTES) return update("anecdotes", [...list, idea]);
+    setError("3 souvenirs au maximum. Retire-en un pour en ajouter un autre.");
+  };
+
   const goTo = (next: number) => {
     setError(null);
     setNotice(null);
@@ -258,10 +284,14 @@ function Wizard({ initial, priceMomo, priceCard }: { initial: Draft } & Prices) 
 
       {step === 0 && (
         <Step title="C'est pour quelle occasion ?">
+          <TrustBanner price={priceMomo} />
           <div className="grid grid-cols-2 gap-3">
             {OCCASIONS.map((o) => (
               <Choice key={o.id} selected={form.occasion === o.id} onClick={() => update("occasion", o.id)}>
-                {o.label}
+                <span className="block text-3xl" aria-hidden="true">
+                  {o.emoji}
+                </span>
+                <span className="mt-1 block leading-tight">{o.label}</span>
               </Choice>
             ))}
           </div>
@@ -270,6 +300,26 @@ function Wizard({ initial, priceMomo, priceCard }: { initial: Draft } & Prices) 
 
       {step === 1 && (
         <Step title="Pour qui est la chanson ?">
+          <Field group label="C'est pour…">
+            <div className="grid grid-cols-3 gap-2">
+              {RELATIONS.map((r) => (
+                <Choice key={r.value} selected={form.relation === r.value} onClick={() => update("relation", r.value)} compact>
+                  <span className="block text-2xl" aria-hidden="true">
+                    {r.emoji}
+                  </span>
+                  <span className="block text-sm leading-tight">{r.label}</span>
+                </Choice>
+              ))}
+            </div>
+            <input
+              className={`${inputClass} mt-1`}
+              value={RELATIONS.some((r) => r.value === form.relation) ? "" : form.relation}
+              onChange={(e) => update("relation", e.target.value)}
+              maxLength={40}
+              aria-label="Autre lien avec la personne"
+              placeholder="Autre ? Ex. ma tante, mon parrain"
+            />
+          </Field>
           <Field label="Son prénom" hint="Il sera chanté dans le refrain.">
             <input
               className={inputClass}
@@ -280,39 +330,44 @@ function Wizard({ initial, priceMomo, priceCard }: { initial: Draft } & Prices) 
               placeholder="Ex. Mireille"
             />
           </Field>
-          <Field label="Qui est-ce pour toi ?" optional>
-            <input
-              className={inputClass}
-              value={form.relation}
-              onChange={(e) => update("relation", e.target.value)}
-              maxLength={40}
-              placeholder="Ex. ma mère"
-            />
-            <div className="mt-2 flex flex-wrap gap-2">
-              {RELATIONS.map((r) => (
-                <button
-                  key={r}
-                  type="button"
-                  onClick={() => update("relation", r.toLowerCase())}
-                  className="rounded-full bg-sand px-3 py-1.5 text-sm font-medium active:scale-95"
-                >
-                  {r}
-                </button>
-              ))}
-            </div>
-          </Field>
           <Field
-            label="Raconte 1 à 3 souvenirs ou détails"
-            hint={`${anecdotesLength(form.anecdotes)}/${MAX_ANECDOTES_CHARS} caractères. Ce qui la rend unique : une habitude, un plat, un moment.`}
+            group
+            label="Ce qui rend cette personne unique"
+            hint={`${anecdotesLength(form.anecdotes)}/${MAX_ANECDOTES_CHARS} caractères. Plus c'est précis (un plat, un surnom, un lieu), plus la chanson est belle.`}
           >
-            <div className="flex flex-col gap-2">
+            {form.occasion && (
+              <div className="flex flex-col gap-2">
+                <p className="text-sm text-muted">Touche une idée, puis complète-la si tu veux :</p>
+                <div className="flex flex-wrap gap-2">
+                  {MEMORY_IDEAS[form.occasion as OccasionId]?.map((idea) => {
+                    const picked = form.anecdotes.some((a) => a.trim() === idea);
+                    return (
+                      <button
+                        key={idea}
+                        type="button"
+                        aria-pressed={picked}
+                        onClick={() => toggleIdea(idea)}
+                        className={`rounded-full px-3 py-2 text-left text-sm font-medium transition active:scale-95 ${
+                          picked ? "bg-brand text-white" : "bg-white ring-1 ring-sand"
+                        }`}
+                      >
+                        {picked ? "✓ " : "+ "}
+                        {idea}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+            <div className="mt-1 flex flex-col gap-2">
               {form.anecdotes.map((a, i) => (
                 <div key={i} className="flex gap-2">
                   <textarea
                     className={`${inputClass} min-h-20`}
                     value={a}
                     onChange={(e) => update("anecdotes", form.anecdotes.map((x, j) => (j === i ? e.target.value : x)))}
-                    placeholder={i === 0 ? "Ex. Elle prépare le meilleur ndolé de Douala" : "Un autre souvenir"}
+                    aria-label={`Souvenir ${i + 1}`}
+                    placeholder={i === 0 ? "Ou écris ton propre souvenir. Ex. Tu prépares le meilleur ndolé de Douala" : "Un autre souvenir"}
                     maxLength={MAX_ANECDOTES_CHARS}
                   />
                   {form.anecdotes.length > 1 && (
@@ -327,7 +382,7 @@ function Wizard({ initial, priceMomo, priceCard }: { initial: Draft } & Prices) 
                   )}
                 </div>
               ))}
-              {form.anecdotes.length < 3 && (
+              {form.anecdotes.length < MAX_ANECDOTES && (
                 <button
                   type="button"
                   onClick={() => update("anecdotes", [...form.anecdotes, ""])}
@@ -460,9 +515,12 @@ function Wizard({ initial, priceMomo, priceCard }: { initial: Draft } & Prices) 
             />
           </div>
         ) : (
-          <PrimaryButton onClick={openCheckout} disabled={!!busy}>
-            Créer ma chanson pour {formatXaf(priceMomo)}
-          </PrimaryButton>
+          <>
+            <PrimaryButton onClick={openCheckout} disabled={!!busy}>
+              Créer ma chanson pour {formatXaf(priceMomo)}
+            </PrimaryButton>
+            <PayBadges className="justify-center" />
+          </>
         )}
         <div className="flex items-center justify-between">
           {step > 0 ? (
@@ -571,7 +629,18 @@ function Checkout({ orderId, whatsappPhone, priceMomo, priceCard }: { orderId: s
       <PrimaryButton onClick={submit} disabled={busy}>
         {busy ? "Un instant…" : `Payer ${formatXaf(price)}`}
       </PrimaryButton>
-      <p className="text-center text-sm text-muted">Paiement sécurisé par Tranzak. 2 versions de ta chanson en 2 minutes environ.</p>
+      <ul className="flex flex-col gap-1.5 text-sm text-muted">
+        <li>🔒 Paiement sécurisé par Tranzak, tu valides avec ton code secret.</li>
+        <li>🎶 2 versions de ta chanson en 2 minutes environ, envoyées sur WhatsApp.</li>
+        <li>
+          ↩️ Un problème avec ta chanson ?{" "}
+          <a href="/remboursement" target="_blank" className="font-semibold text-ink underline">
+            On te rembourse
+          </a>
+          .
+        </li>
+        <SupportLine />
+      </ul>
     </section>
   );
 }
@@ -643,23 +712,68 @@ function Choice({
   onClick,
   children,
   align = "center",
+  compact,
 }: {
   selected: boolean;
   onClick: () => void;
   children: ReactNode;
   align?: "center" | "left";
+  /** Petites cartes (grille de 3) : moins de marge intérieure. */
+  compact?: boolean;
 }) {
   return (
     <button
       type="button"
       aria-pressed={selected}
       onClick={onClick}
-      className={`min-h-14 rounded-2xl px-4 py-3 font-semibold transition active:scale-[0.98] ${
+      className={`min-h-14 rounded-2xl ${compact ? "px-1 py-2.5" : "px-4 py-3"} font-semibold transition active:scale-[0.98] ${
         align === "left" ? "text-left" : "text-center"
       } ${selected ? "bg-brand text-white shadow-md shadow-brand/30 [&_.text-muted]:text-white/80" : "bg-white ring-1 ring-sand"}`}
     >
       {children}
     </button>
+  );
+}
+
+/** Pastilles des moyens de paiement (texte coloré, pas de logos officiels). */
+function PayBadges({ className = "" }: { className?: string }) {
+  return (
+    <div className={`flex flex-wrap items-center gap-1.5 text-xs font-bold ${className}`} aria-label="Moyens de paiement acceptés">
+      <span className="rounded-md bg-[#ffcc00] px-2 py-1 text-ink">MTN MoMo</span>
+      <span className="rounded-md bg-[#ff7900] px-2 py-1 text-white">Orange Money</span>
+      <span className="rounded-md bg-ink px-2 py-1 text-white">Visa · Mastercard</span>
+    </div>
+  );
+}
+
+function TrustBanner({ price }: { price: number }) {
+  return (
+    <div className="flex flex-col gap-2.5 rounded-2xl bg-white p-4 ring-1 ring-sand">
+      <p className="font-semibold">
+        ✍🏾 Tes paroles sont <span className="text-leaf">gratuites</span>.
+      </p>
+      <p className="-mt-1.5 text-sm text-muted">
+        Tu paies seulement si elles te plaisent : {formatXaf(price)} pour 2 versions de ta chanson.
+      </p>
+      <PayBadges />
+    </div>
+  );
+}
+
+function SupportLine() {
+  if (!/^\+\d{8,15}$/.test(SUPPORT_PHONE)) return null;
+  return (
+    <li>
+      💬 Une question ?{" "}
+      <a
+        href={whatsappLink(SUPPORT_PHONE, "Bonjour Dédikace, j'ai une question avant de payer :")}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="font-semibold text-leaf underline"
+      >
+        Écris-nous sur WhatsApp
+      </a>
+    </li>
   );
 }
 
