@@ -22,6 +22,7 @@ create table orders (
   sender_name text,
   anecdotes text,
   style_id text not null,
+  song_language text not null default 'fr',   -- couplets et pont
   chorus_language text not null default 'fr',
   voice text not null default 'male' check (voice in ('male', 'female')),
   title text,

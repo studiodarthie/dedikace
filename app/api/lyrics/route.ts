@@ -2,7 +2,7 @@ import { z } from "zod";
 import { generateLyrics, LyricsError, type LyricsBrief } from "@/lib/claude";
 import type { Order } from "@/lib/db/schema";
 import { MODERATION_MESSAGE, moderateText } from "@/lib/moderation";
-import { CHORUS_LANGUAGE_IDS, OCCASION_IDS } from "@/lib/occasions";
+import { LANGUAGE_IDS, OCCASION_IDS } from "@/lib/occasions";
 import {
   addModerationNote,
   createDraftOrder,
@@ -38,7 +38,9 @@ const CreateInput = z.object({
     .pipe(z.array(z.string()).min(1).max(3))
     .refine((list) => list.join("").length <= 500, "500 caractères maximum au total"),
   styleId: z.enum(STYLE_IDS),
-  chorusLanguage: z.enum(CHORUS_LANGUAGE_IDS),
+  // Valeur par défaut : brouillons ouverts avant l'ajout du choix de langue.
+  songLanguage: z.enum(LANGUAGE_IDS).default("fr"),
+  chorusLanguage: z.enum(LANGUAGE_IDS),
   voice: z.enum(["male", "female"]),
   whatsappPhone: z
     .string()
@@ -82,6 +84,7 @@ function briefFromOrder(order: Order): LyricsBrief {
     senderName: order.senderName,
     anecdotes: (order.anecdotes ?? "").split("\n"),
     styleId: order.styleId,
+    songLanguage: order.songLanguage,
     chorusLanguage: order.chorusLanguage,
   };
 }
@@ -130,6 +133,7 @@ export async function POST(request: Request) {
         senderName: input.senderName,
         anecdotes: input.anecdotes.join("\n"),
         styleId: input.styleId,
+        songLanguage: input.songLanguage,
         chorusLanguage: input.chorusLanguage,
         voice: input.voice,
         whatsappPhone: input.whatsappPhone,

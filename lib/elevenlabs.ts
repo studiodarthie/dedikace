@@ -1,6 +1,7 @@
 import "server-only";
 import { requireEnv } from "@/lib/env";
 import { moderateText } from "@/lib/moderation";
+import { sungLanguage } from "@/lib/occasions";
 import { applyPhonetics } from "@/lib/phonetics";
 
 // API officielle Eleven Music : POST /v1/music avec un `composition_plan` (modèle music_v2_5).
@@ -36,12 +37,6 @@ const SECTION_NAMES: Record<string, string> = {
   pont: "Bridge",
 };
 
-const CHORUS_LANGUAGE_STYLE: Record<string, string | undefined> = {
-  en: "chorus sung in English",
-  pidgin: "chorus sung in Cameroonian Pidgin English",
-  lingala: "chorus sung in Lingala",
-};
-
 /** « [Couplet 1]\nligne\nligne\n\n[Refrain]… » → sections. Les lignes avant toute étiquette sont ignorées. */
 export function parseLyrics(lyrics: string): Section[] {
   const sections: Section[] = [];
@@ -64,19 +59,20 @@ export type SongRequest = {
   /** Description du style (lib/styles.ts → stylePromptFor), en anglais. */
   stylePrompt: string;
   lyrics: string;
+  songLanguage: string;
   chorusLanguage: string;
   durationSeconds: number;
 };
 
 /** Construit le plan de composition : une intro instrumentale puis un morceau par section des paroles. */
-export function buildCompositionPlan({ stylePrompt, lyrics, chorusLanguage, durationSeconds }: SongRequest) {
+export function buildCompositionPlan({ stylePrompt, lyrics, songLanguage, chorusLanguage, durationSeconds }: SongRequest) {
   const sections = parseLyrics(applyPhonetics(lyrics));
   if (sections.length === 0) throw new MusicError("Paroles vides ou sans sections.", false);
 
   const baseStyles = [
     ...stylePrompt.split(",").map((s) => s.trim()).filter(Boolean),
     "clear and intelligible lead vocals",
-    "verses sung in French",
+    `verses sung in ${sungLanguage(songLanguage)}`,
     "warm, celebratory African production",
     "great production quality",
   ];
@@ -87,7 +83,8 @@ export function buildCompositionPlan({ stylePrompt, lyrics, chorusLanguage, dura
   const scale = target / raw.reduce((a, b) => a + b, 0);
   const durations = raw.map((ms) => clamp(Math.round(ms * scale), MIN_CHUNK_MS, MAX_CHUNK_MS));
 
-  const chorusStyle = CHORUS_LANGUAGE_STYLE[chorusLanguage];
+  // Refrain dans une autre langue que les couplets : on le précise sur chaque refrain.
+  const chorusStyle = chorusLanguage !== songLanguage ? `chorus sung in ${sungLanguage(chorusLanguage)}` : undefined;
   const chunks = [
     { text: "[Intro]", duration_ms: INTRO_MS, positive_styles: baseStyles, negative_styles: [] },
     ...sections.map((s, i) => {

@@ -16,8 +16,10 @@ Règles de forme :
 - Couplets de 8 lignes, pont de 4 lignes.
 - Refrain de 4 lignes, simple, facile à chanter en chœur, qui contient le prénom du destinataire.
 - Lignes de 6 à 10 syllabes, rimes simples.
-- Si la langue du refrain est l'anglais, le pidgin ou le lingala, utilise uniquement des mots très courants ;
-  les couplets restent en français.
+- Écris les couplets et le pont dans la langue de la chanson, et le refrain dans la langue du refrain.
+  Le titre est dans la langue de la chanson.
+- Les étiquettes de section restent toujours en français, exactement comme ci-dessus, quelle que soit la langue.
+- En anglais, en pidgin ou en lingala, utilise uniquement des mots très courants.
 
 Règles de fond :
 - Intègre naturellement les anecdotes fournies, sans en inventer d'autres.
@@ -45,6 +47,7 @@ Destinataire : {recipient_name} ({relation})
 Expéditeur : {sender_name | "non précisé"}
 Anecdotes : {anecdotes}
 Style musical : {style_label}
+Langue de la chanson : {song_language}
 Langue du refrain : {chorus_language}
 ```
 
@@ -54,8 +57,8 @@ Langue du refrain : {chorus_language}
 
 ```json
 [
-  { "id": "makossa", "label": "Makossa", "prompt": "Cameroonian makossa, bright clean electric guitar, bouncing bass, 118 bpm, joyful {voice} vocals in French" },
-  { "id": "bikutsi", "label": "Bikutsi", "prompt": "Fast Cameroonian bikutsi, 6/8 feel, rapid guitar ostinato, 140 bpm, energetic {voice} vocals in French" },
+  { "id": "makossa", "label": "Makossa", "prompt": "Cameroonian makossa, bright clean electric guitar, bouncing bass, 118 bpm, joyful {voice} vocals" },
+  { "id": "bikutsi", "label": "Bikutsi", "prompt": "Fast Cameroonian bikutsi, 6/8 feel, rapid guitar ostinato, 140 bpm, energetic {voice} vocals" },
   { "id": "rumba", "label": "Rumba congolaise", "prompt": "Congolese rumba, smooth crooning {voice} vocals, interlocking clean guitars, sebene ending" },
   { "id": "ndombolo", "label": "Ndombolo", "prompt": "High-energy ndombolo, fast sebene guitar, festive dance calls, 135 bpm, {voice} vocals" },
   { "id": "gospel", "label": "Gospel africain", "prompt": "African gospel praise, choir backing, keys and bass, uplifting {voice} lead vocals" },

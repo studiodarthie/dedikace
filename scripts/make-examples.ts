@@ -80,7 +80,7 @@ async function main() {
   for (let i = 0; i < todo.length; i += 2) {
     await Promise.all(
       todo.slice(i, i + 2).map(async (ex) => {
-        const lyrics = await generateLyrics({ ...ex.brief, anecdotes: [...ex.brief.anecdotes], styleId: ex.styleId });
+        const lyrics = await generateLyrics({ songLanguage: "fr", ...ex.brief, anecdotes: [...ex.brief.anecdotes], styleId: ex.styleId });
         if (!lyrics.ok) throw new Error(`${ex.file} : paroles refusées (${lyrics.note})`);
         const check = moderateText(lyrics.title, lyrics.lyrics);
         if (!check.ok) throw new Error(`${ex.file} : modération (${check.matches.join(", ")})`);
@@ -88,6 +88,7 @@ async function main() {
         const song = await generateSong({
           stylePrompt: stylePromptFor(ex.styleId, ex.voice),
           lyrics: lyrics.lyrics,
+          songLanguage: "fr",
           chorusLanguage: ex.brief.chorusLanguage,
           durationSeconds: 180,
         });

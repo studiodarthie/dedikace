@@ -1,8 +1,19 @@
 "use client";
 
-import { useEffect, useRef, useState, useSyncExternalStore, type ReactNode } from "react";
+import {
+  useEffect,
+  useRef,
+  useState,
+  useSyncExternalStore,
+  type ReactNode,
+} from "react";
 import { formatXaf, whatsappLink } from "@/lib/format";
-import { CHORUS_LANGUAGES, MEMORY_IDEAS, OCCASIONS, type OccasionId } from "@/lib/occasions";
+import {
+  LANGUAGES,
+  MEMORY_IDEAS,
+  OCCASIONS,
+  type OccasionId,
+} from "@/lib/occasions";
 import { trackPixel } from "@/lib/pixels";
 import { STYLE_TAGLINES, STYLES } from "@/lib/styles";
 import { VoiceNote } from "./VoiceNote";
@@ -33,14 +44,26 @@ type Form = {
   senderName: string;
   anecdotes: string[];
   styleId: string;
+  songLanguage: string;
   chorusLanguage: string;
   voice: "male" | "female";
   whatsappPhone: string;
 };
 
-type Lyrics = { orderId: string; title: string; lyrics: string; rewritesLeft: number };
+type Lyrics = {
+  orderId: string;
+  title: string;
+  lyrics: string;
+  rewritesLeft: number;
+};
 
-type Draft = { step: number; form: Form; saved?: Lyrics; editTitle?: string; editLyrics?: string };
+type Draft = {
+  step: number;
+  form: Form;
+  saved?: Lyrics;
+  editTitle?: string;
+  editLyrics?: string;
+};
 
 const EMPTY_FORM: Form = {
   occasion: "",
@@ -49,6 +72,7 @@ const EMPTY_FORM: Form = {
   senderName: "",
   anecdotes: [""],
   styleId: "",
+  songLanguage: "fr",
   chorusLanguage: "fr",
   voice: "female",
   whatsappPhone: "+237 ",
@@ -86,20 +110,27 @@ export function clearDraft() {
 // Le brouillon n'existe que dans le navigateur : on attend d'y être pour l'afficher.
 const noopSubscribe = () => () => {};
 function useIsClient() {
-  return useSyncExternalStore(noopSubscribe, () => true, () => false);
+  return useSyncExternalStore(
+    noopSubscribe,
+    () => true,
+    () => false,
+  );
 }
 
 // ---------- Validation (mêmes règles que /api/lyrics) ----------
 
 const cleanPhone = (v: string) => v.replace(/[\s.\-()]/g, "");
-const anecdotesLength = (list: string[]) => list.reduce((n, a) => n + a.trim().length, 0);
+const anecdotesLength = (list: string[]) =>
+  list.reduce((n, a) => n + a.trim().length, 0);
 
 function stepError(step: number, f: Form): string | null {
   if (step === 0 && !f.occasion) return "Choisis une occasion.";
   if (step === 1) {
     if (!f.recipientName.trim()) return "Écris le prénom de la personne.";
-    if (!f.anecdotes.some((a) => a.trim())) return "Ajoute au moins un souvenir ou un détail.";
-    if (anecdotesLength(f.anecdotes) > MAX_ANECDOTES_CHARS) return "Tes souvenirs dépassent 500 caractères.";
+    if (!f.anecdotes.some((a) => a.trim()))
+      return "Ajoute au moins un souvenir ou un détail.";
+    if (anecdotesLength(f.anecdotes) > MAX_ANECDOTES_CHARS)
+      return "Tes souvenirs dépassent 500 caractères.";
   }
   if (step === 2 && !f.styleId) return "Choisis un style de musique.";
   if (step === 3 && !/^\+[1-9]\d{7,14}$/.test(cleanPhone(f.whatsappPhone))) {
@@ -115,19 +146,38 @@ type Prices = { priceMomo: number; priceCard: number };
 export function CreateWizard(prices: Prices) {
   const isClient = useIsClient();
   if (!isClient) {
-    return <div className="mt-6 h-64 animate-pulse rounded-3xl bg-sand/60" aria-label="Chargement" />;
+    return (
+      <div
+        className="mt-6 h-64 animate-pulse rounded-3xl bg-sand/60"
+        aria-label="Chargement"
+      />
+    );
   }
   return <Wizard initial={loadDraft()} {...prices} />;
 }
 
-const STEP_TITLES = ["L'occasion", "La personne", "La musique", "Ton contact", "Tes paroles"];
+const STEP_TITLES = [
+  "L'occasion",
+  "La personne",
+  "La musique",
+  "Ton contact",
+  "Tes paroles",
+];
 
-function Wizard({ initial, priceMomo, priceCard }: { initial: Draft } & Prices) {
+function Wizard({
+  initial,
+  priceMomo,
+  priceCard,
+}: { initial: Draft } & Prices) {
   const [step, setStep] = useState(initial.step);
   const [form, setForm] = useState<Form>(initial.form);
   const [saved, setSaved] = useState<Lyrics | undefined>(initial.saved);
-  const [title, setTitle] = useState(initial.editTitle ?? initial.saved?.title ?? "");
-  const [lyrics, setLyrics] = useState(initial.editLyrics ?? initial.saved?.lyrics ?? "");
+  const [title, setTitle] = useState(
+    initial.editTitle ?? initial.saved?.title ?? "",
+  );
+  const [lyrics, setLyrics] = useState(
+    initial.editLyrics ?? initial.saved?.lyrics ?? "",
+  );
   const [error, setError] = useState<string | null>(null);
   const [busy, setBusy] = useState<null | "create" | "rewrite" | "save">(null);
   const [notice, setNotice] = useState<string | null>(null);
@@ -168,8 +218,13 @@ function Wizard({ initial, priceMomo, priceCard }: { initial: Draft } & Prices) 
       return update("anecdotes", rest.length ? rest : [""]);
     }
     const empty = list.findIndex((a) => !a.trim());
-    if (empty >= 0) return update("anecdotes", list.map((a, i) => (i === empty ? idea : a)));
-    if (list.length < MAX_ANECDOTES) return update("anecdotes", [...list, idea]);
+    if (empty >= 0)
+      return update(
+        "anecdotes",
+        list.map((a, i) => (i === empty ? idea : a)),
+      );
+    if (list.length < MAX_ANECDOTES)
+      return update("anecdotes", [...list, idea]);
     setError("3 souvenirs au maximum. Retire-en un pour en ajouter un autre.");
   };
 
@@ -177,12 +232,27 @@ function Wizard({ initial, priceMomo, priceCard }: { initial: Draft } & Prices) 
   const addVoiceText = (text: string) => {
     const list = form.anecdotes;
     const room = MAX_ANECDOTES_CHARS - anecdotesLength(list);
-    if (room <= 0) return setError("Tes souvenirs dépassent déjà 500 caractères. Raccourcis-les avant d'ajouter un vocal.");
+    if (room <= 0)
+      return setError(
+        "Tes souvenirs dépassent déjà 500 caractères. Raccourcis-les avant d'ajouter un vocal.",
+      );
     const clip = text.slice(0, room);
     const empty = list.findIndex((a) => !a.trim());
-    if (empty >= 0) return update("anecdotes", list.map((a, i) => (i === empty ? clip : a)));
-    if (list.length < MAX_ANECDOTES) return update("anecdotes", [...list, clip]);
-    update("anecdotes", list.map((a, i) => (i === list.length - 1 ? `${a.trim()} ${clip}`.slice(0, MAX_ANECDOTES_CHARS) : a)));
+    if (empty >= 0)
+      return update(
+        "anecdotes",
+        list.map((a, i) => (i === empty ? clip : a)),
+      );
+    if (list.length < MAX_ANECDOTES)
+      return update("anecdotes", [...list, clip]);
+    update(
+      "anecdotes",
+      list.map((a, i) =>
+        i === list.length - 1
+          ? `${a.trim()} ${clip}`.slice(0, MAX_ANECDOTES_CHARS)
+          : a,
+      ),
+    );
   };
 
   const goTo = (next: number) => {
@@ -200,7 +270,9 @@ function Wizard({ initial, priceMomo, priceCard }: { initial: Draft } & Prices) 
     goTo(step + 1);
   };
 
-  async function callLyrics(body: Record<string, unknown>): Promise<Lyrics | null> {
+  async function callLyrics(
+    body: Record<string, unknown>,
+  ): Promise<Lyrics | null> {
     try {
       const res = await fetch("/api/lyrics", {
         method: "POST",
@@ -250,11 +322,20 @@ function Wizard({ initial, priceMomo, priceCard }: { initial: Draft } & Prices) 
 
   async function rewrite() {
     if (!saved) return;
-    if (dirty && !window.confirm("Tes modifications seront remplacées par de nouvelles paroles. Continuer ?")) return;
+    if (
+      dirty &&
+      !window.confirm(
+        "Tes modifications seront remplacées par de nouvelles paroles. Continuer ?",
+      )
+    )
+      return;
     setBusy("rewrite");
     setError(null);
     setNotice(null);
-    const result = await callLyrics({ action: "rewrite", orderId: saved.orderId });
+    const result = await callLyrics({
+      action: "rewrite",
+      orderId: saved.orderId,
+    });
     setBusy(null);
     if (result) applyLyrics(result);
   }
@@ -267,7 +348,12 @@ function Wizard({ initial, priceMomo, priceCard }: { initial: Draft } & Prices) 
     }
     setBusy("save");
     setError(null);
-    const result = await callLyrics({ action: "edit", orderId: saved.orderId, title, lyrics });
+    const result = await callLyrics({
+      action: "edit",
+      orderId: saved.orderId,
+      title,
+      lyrics,
+    });
     setBusy(null);
     if (result) applyLyrics(result);
     return !!result;
@@ -276,7 +362,12 @@ function Wizard({ initial, priceMomo, priceCard }: { initial: Draft } & Prices) 
   async function openCheckout() {
     if (!(await saveEdits())) return;
     setCheckout(true);
-    requestAnimationFrame(() => checkoutRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }));
+    requestAnimationFrame(() =>
+      checkoutRef.current?.scrollIntoView({
+        behavior: "smooth",
+        block: "start",
+      }),
+    );
   }
 
   function restart() {
@@ -300,7 +391,11 @@ function Wizard({ initial, priceMomo, priceCard }: { initial: Draft } & Prices) 
           <TrustBanner price={priceMomo} />
           <div className="grid grid-cols-2 gap-3">
             {OCCASIONS.map((o) => (
-              <Choice key={o.id} selected={form.occasion === o.id} onClick={() => update("occasion", o.id)}>
+              <Choice
+                key={o.id}
+                selected={form.occasion === o.id}
+                onClick={() => update("occasion", o.id)}
+              >
                 <span className="block text-3xl" aria-hidden="true">
                   {o.emoji}
                 </span>
@@ -316,7 +411,12 @@ function Wizard({ initial, priceMomo, priceCard }: { initial: Draft } & Prices) 
           <Field group label="C'est pour…">
             <div className="grid grid-cols-3 gap-2">
               {RELATIONS.map((r) => (
-                <Choice key={r.value} selected={form.relation === r.value} onClick={() => update("relation", r.value)} compact>
+                <Choice
+                  key={r.value}
+                  selected={form.relation === r.value}
+                  onClick={() => update("relation", r.value)}
+                  compact
+                >
                   <span className="block text-2xl" aria-hidden="true">
                     {r.emoji}
                   </span>
@@ -326,7 +426,11 @@ function Wizard({ initial, priceMomo, priceCard }: { initial: Draft } & Prices) 
             </div>
             <input
               className={`${inputClass} mt-1`}
-              value={RELATIONS.some((r) => r.value === form.relation) ? "" : form.relation}
+              value={
+                RELATIONS.some((r) => r.value === form.relation)
+                  ? ""
+                  : form.relation
+              }
               onChange={(e) => update("relation", e.target.value)}
               maxLength={40}
               aria-label="Autre lien avec la personne"
@@ -351,10 +455,14 @@ function Wizard({ initial, priceMomo, priceCard }: { initial: Draft } & Prices) 
             <VoiceNote onText={addVoiceText} />
             {form.occasion && (
               <div className="flex flex-col gap-2">
-                <p className="text-sm text-muted">Ou touche une idée, puis complète-la si tu veux :</p>
+                <p className="text-sm text-muted">
+                  Ou touche une idée, puis complète-la si tu veux :
+                </p>
                 <div className="flex flex-wrap gap-2">
                   {MEMORY_IDEAS[form.occasion as OccasionId]?.map((idea) => {
-                    const picked = form.anecdotes.some((a) => a.trim() === idea);
+                    const picked = form.anecdotes.some(
+                      (a) => a.trim() === idea,
+                    );
                     return (
                       <button
                         key={idea}
@@ -362,7 +470,9 @@ function Wizard({ initial, priceMomo, priceCard }: { initial: Draft } & Prices) 
                         aria-pressed={picked}
                         onClick={() => toggleIdea(idea)}
                         className={`rounded-full px-3 py-2 text-left text-sm font-medium transition active:scale-95 ${
-                          picked ? "bg-brand text-white" : "bg-white ring-1 ring-sand"
+                          picked
+                            ? "bg-brand text-white"
+                            : "bg-white ring-1 ring-sand"
                         }`}
                       >
                         {picked ? "✓ " : "+ "}
@@ -379,16 +489,32 @@ function Wizard({ initial, priceMomo, priceCard }: { initial: Draft } & Prices) 
                   <textarea
                     className={`${inputClass} min-h-20`}
                     value={a}
-                    onChange={(e) => update("anecdotes", form.anecdotes.map((x, j) => (j === i ? e.target.value : x)))}
+                    onChange={(e) =>
+                      update(
+                        "anecdotes",
+                        form.anecdotes.map((x, j) =>
+                          j === i ? e.target.value : x,
+                        ),
+                      )
+                    }
                     aria-label={`Souvenir ${i + 1}`}
-                    placeholder={i === 0 ? "Ou écris ton propre souvenir. Ex. Tu prépares le meilleur ndolé de Douala" : "Un autre souvenir"}
+                    placeholder={
+                      i === 0
+                        ? "Ou écris ton propre souvenir. Ex. Tu prépares le meilleur ndolé de Douala"
+                        : "Un autre souvenir"
+                    }
                     maxLength={MAX_ANECDOTES_CHARS}
                   />
                   {form.anecdotes.length > 1 && (
                     <button
                       type="button"
                       aria-label="Retirer ce souvenir"
-                      onClick={() => update("anecdotes", form.anecdotes.filter((_, j) => j !== i))}
+                      onClick={() =>
+                        update(
+                          "anecdotes",
+                          form.anecdotes.filter((_, j) => j !== i),
+                        )
+                      }
                       className="h-12 w-12 shrink-0 rounded-xl bg-sand text-xl"
                     >
                       ×
@@ -421,29 +547,71 @@ function Wizard({ initial, priceMomo, priceCard }: { initial: Draft } & Prices) 
 
       {step === 2 && (
         <Step title="Quelle musique ?">
-          <div className="flex flex-col gap-2">
-            {STYLES.map((s) => (
-              <Choice key={s.id} selected={form.styleId === s.id} onClick={() => update("styleId", s.id)} align="left">
-                <span className="block font-bold">{s.label}</span>
-                <span className="block text-sm font-normal text-muted">{STYLE_TAGLINES[s.id]}</span>
-              </Choice>
-            ))}
-          </div>
-          <Field group label="Langue du refrain" hint="Les couplets restent en français.">
+          <Field group label="Langue de la chanson">
             <div className="grid grid-cols-2 gap-2">
-              {CHORUS_LANGUAGES.map((l) => (
-                <Choice key={l.id} selected={form.chorusLanguage === l.id} onClick={() => update("chorusLanguage", l.id)}>
+              {LANGUAGES.map((l) => (
+                <Choice
+                  key={l.id}
+                  selected={form.songLanguage === l.id}
+                  onClick={() =>
+                    setForm((f) => ({
+                      ...f,
+                      songLanguage: l.id,
+                      chorusLanguage: l.id,
+                    }))
+                  }
+                >
                   {l.label}
+                </Choice>
+              ))}
+            </div>
+          </Field>
+          <Field
+            group
+            label="Langue du refrain"
+            hint="Garde la même, ou mélange : couplets en français, refrain en pidgin…"
+          >
+            <div className="grid grid-cols-2 gap-2">
+              {LANGUAGES.map((l) => (
+                <Choice
+                  key={l.id}
+                  selected={form.chorusLanguage === l.id}
+                  onClick={() => update("chorusLanguage", l.id)}
+                >
+                  {l.id === form.songLanguage ? `${l.label} (même)` : l.label}
+                </Choice>
+              ))}
+            </div>
+          </Field>
+          <Field group label="Style">
+            <div className="flex flex-col gap-2">
+              {STYLES.map((s) => (
+                <Choice
+                  key={s.id}
+                  selected={form.styleId === s.id}
+                  onClick={() => update("styleId", s.id)}
+                  align="left"
+                >
+                  <span className="block font-bold">{s.label}</span>
+                  <span className="block text-sm font-normal text-muted">
+                    {STYLE_TAGLINES[s.id]}
+                  </span>
                 </Choice>
               ))}
             </div>
           </Field>
           <Field group label="Voix">
             <div className="grid grid-cols-2 gap-2">
-              <Choice selected={form.voice === "female"} onClick={() => update("voice", "female")}>
+              <Choice
+                selected={form.voice === "female"}
+                onClick={() => update("voice", "female")}
+              >
                 Femme
               </Choice>
-              <Choice selected={form.voice === "male"} onClick={() => update("voice", "male")}>
+              <Choice
+                selected={form.voice === "male"}
+                onClick={() => update("voice", "male")}
+              >
                 Homme
               </Choice>
             </div>
@@ -453,7 +621,10 @@ function Wizard({ initial, priceMomo, priceCard }: { initial: Draft } & Prices) 
 
       {step === 3 && (
         <Step title="Où t'envoyer la chanson ?">
-          <Field label="Ton numéro WhatsApp" hint="Avec l'indicatif du pays : +237 au Cameroun, +33 en France…">
+          <Field
+            label="Ton numéro WhatsApp"
+            hint="Avec l'indicatif du pays : +237 au Cameroun, +33 en France…"
+          >
             <input
               className={inputClass}
               type="tel"
@@ -465,16 +636,24 @@ function Wizard({ initial, priceMomo, priceCard }: { initial: Draft } & Prices) 
             />
           </Field>
           <p className="rounded-2xl bg-sand/60 p-4 text-sm text-muted">
-            Les paroles sont <strong className="text-ink">gratuites</strong>. Tu ne paies que si elles te plaisent.
+            Les paroles sont <strong className="text-ink">gratuites</strong>. Tu
+            ne paies que si elles te plaisent.
           </p>
         </Step>
       )}
 
       {step === 4 && saved && (
         <Step title="Voici tes paroles">
-          <p className="-mt-2 text-muted">Lis-les, modifie ce que tu veux, ou demande une autre version.</p>
+          <p className="-mt-2 text-muted">
+            Lis-les, modifie ce que tu veux, ou demande une autre version.
+          </p>
           <Field label="Titre">
-            <input className={inputClass} value={title} onChange={(e) => setTitle(e.target.value)} maxLength={120} />
+            <input
+              className={inputClass}
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              maxLength={120}
+            />
           </Field>
           <Field label="Paroles">
             <textarea
@@ -491,7 +670,9 @@ function Wizard({ initial, priceMomo, priceCard }: { initial: Draft } & Prices) 
               disabled={!!busy || saved.rewritesLeft === 0}
               className="h-12 rounded-2xl bg-white font-semibold ring-1 ring-sand disabled:opacity-50"
             >
-              {busy === "rewrite" ? "Réécriture…" : `Réécrire (${saved.rewritesLeft})`}
+              {busy === "rewrite"
+                ? "Réécriture…"
+                : `Réécrire (${saved.rewritesLeft})`}
             </button>
             <button
               type="button"
@@ -499,26 +680,38 @@ function Wizard({ initial, priceMomo, priceCard }: { initial: Draft } & Prices) 
               disabled={!!busy || !dirty}
               className="h-12 rounded-2xl bg-white font-semibold ring-1 ring-sand disabled:opacity-50"
             >
-              {busy === "save" ? "Enregistrement…" : dirty ? "Enregistrer" : "Enregistré ✓"}
+              {busy === "save"
+                ? "Enregistrement…"
+                : dirty
+                  ? "Enregistrer"
+                  : "Enregistré ✓"}
             </button>
           </div>
         </Step>
       )}
 
       {error && (
-        <p role="alert" className="rounded-2xl bg-red-50 p-4 font-medium text-red-800 ring-1 ring-red-200">
+        <p
+          role="alert"
+          className="rounded-2xl bg-red-50 p-4 font-medium text-red-800 ring-1 ring-red-200"
+        >
           {error}
         </p>
       )}
       {notice && (
-        <p role="status" className="rounded-2xl bg-green-50 p-4 font-medium text-leaf ring-1 ring-green-200">
+        <p
+          role="status"
+          className="rounded-2xl bg-green-50 p-4 font-medium text-leaf ring-1 ring-green-200"
+        >
           {notice}
         </p>
       )}
 
       <div className="flex flex-col gap-3">
         {step < 4 ? (
-          <PrimaryButton onClick={next}>{step === 3 ? "Écrire mes paroles gratuites" : "Continuer"}</PrimaryButton>
+          <PrimaryButton onClick={next}>
+            {step === 3 ? "Écrire mes paroles gratuites" : "Continuer"}
+          </PrimaryButton>
         ) : checkout && saved && !dirty ? (
           <div ref={checkoutRef} className="scroll-mt-4">
             <Checkout
@@ -538,14 +731,22 @@ function Wizard({ initial, priceMomo, priceCard }: { initial: Draft } & Prices) 
         )}
         <div className="flex items-center justify-between">
           {step > 0 ? (
-            <button type="button" onClick={() => goTo(step - 1)} className="px-2 py-2 font-semibold text-muted">
+            <button
+              type="button"
+              onClick={() => goTo(step - 1)}
+              className="px-2 py-2 font-semibold text-muted"
+            >
               ← {step === 4 ? "Modifier mes infos" : "Retour"}
             </button>
           ) : (
             <span />
           )}
           {(step > 0 || form.occasion) && (
-            <button type="button" onClick={restart} className="px-2 py-2 text-sm text-muted underline">
+            <button
+              type="button"
+              onClick={restart}
+              className="px-2 py-2 text-sm text-muted underline"
+            >
               Recommencer
             </button>
           )}
@@ -562,13 +763,24 @@ type PayChannel = "mtn" | "orange" | "card";
 const CHANNELS: { id: PayChannel; label: string; hint: string }[] = [
   { id: "mtn", label: "MTN MoMo", hint: "Validation sur ton téléphone" },
   { id: "orange", label: "Orange Money", hint: "Validation sur ton téléphone" },
-  { id: "card", label: "Carte bancaire", hint: "Visa, Mastercard — idéal depuis l'étranger" },
+  {
+    id: "card",
+    label: "Carte bancaire",
+    hint: "Visa, Mastercard — idéal depuis l'étranger",
+  },
 ];
 
-function Checkout({ orderId, whatsappPhone, priceMomo, priceCard }: { orderId: string; whatsappPhone: string } & Prices) {
+function Checkout({
+  orderId,
+  whatsappPhone,
+  priceMomo,
+  priceCard,
+}: { orderId: string; whatsappPhone: string } & Prices) {
   const [channel, setChannel] = useState<PayChannel>("mtn");
   // Le numéro WhatsApp camerounais sert souvent aussi pour le Mobile Money.
-  const [phone, setPhone] = useState(whatsappPhone.startsWith("+237") ? whatsappPhone.slice(4) : "");
+  const [phone, setPhone] = useState(
+    whatsappPhone.startsWith("+237") ? whatsappPhone.slice(4) : "",
+  );
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const price = channel === "card" ? priceCard : priceMomo;
@@ -577,7 +789,9 @@ function Checkout({ orderId, whatsappPhone, priceMomo, priceCard }: { orderId: s
   async function submit() {
     const local = phone.replace(/[\s.\-()]/g, "").replace(/^(\+|00)?237/, "");
     if (channel !== "card" && !/^6\d{8}$/.test(local)) {
-      return setError("Écris ton numéro Mobile Money à 9 chiffres, par exemple 6XX XX XX XX.");
+      return setError(
+        "Écris ton numéro Mobile Money à 9 chiffres, par exemple 6XX XX XX XX.",
+      );
     }
     setBusy(true);
     setError(null);
@@ -585,9 +799,16 @@ function Checkout({ orderId, whatsappPhone, priceMomo, priceCard }: { orderId: s
       const res = await fetch("/api/pay", {
         method: "POST",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify(channel === "card" ? { orderId, channel } : { orderId, channel, phone: local }),
+        body: JSON.stringify(
+          channel === "card"
+            ? { orderId, channel }
+            : { orderId, channel, phone: local },
+        ),
       });
-      const data = (await res.json()) as { redirectUrl?: string; error?: string };
+      const data = (await res.json()) as {
+        redirectUrl?: string;
+        error?: string;
+      };
       if (!res.ok) {
         setError(data.error ?? "Le paiement n'a pas pu démarrer. Réessaie.");
         setBusy(false);
@@ -601,25 +822,46 @@ function Checkout({ orderId, whatsappPhone, priceMomo, priceCard }: { orderId: s
   }
 
   return (
-    <section className="flex flex-col gap-4 rounded-3xl bg-white p-4 shadow-sm ring-1 ring-sand" aria-label="Paiement">
+    <section
+      className="flex flex-col gap-4 rounded-3xl bg-white p-4 shadow-sm ring-1 ring-sand"
+      aria-label="Paiement"
+    >
       <h2 className="text-2xl font-extrabold">Comment veux-tu payer ?</h2>
-      <div className="flex flex-col gap-2" role="group" aria-label="Moyen de paiement">
+      <div
+        className="flex flex-col gap-2"
+        role="group"
+        aria-label="Moyen de paiement"
+      >
         {CHANNELS.map((c) => (
-          <Choice key={c.id} selected={channel === c.id} onClick={() => setChannel(c.id)} align="left">
+          <Choice
+            key={c.id}
+            selected={channel === c.id}
+            onClick={() => setChannel(c.id)}
+            align="left"
+          >
             <span className="flex items-center justify-between gap-3">
               <span>
                 <span className="block font-bold">{c.label}</span>
-                <span className="block text-sm font-normal text-muted">{c.hint}</span>
+                <span className="block text-sm font-normal text-muted">
+                  {c.hint}
+                </span>
               </span>
-              <span className="shrink-0 font-bold">{formatXaf(c.id === "card" ? priceCard : priceMomo)}</span>
+              <span className="shrink-0 font-bold">
+                {formatXaf(c.id === "card" ? priceCard : priceMomo)}
+              </span>
             </span>
           </Choice>
         ))}
       </div>
       {channel !== "card" && (
-        <Field label={`Ton numéro ${label}`} hint="Tu recevras une demande de paiement à valider avec ton code secret.">
+        <Field
+          label={`Ton numéro ${label}`}
+          hint="Tu recevras une demande de paiement à valider avec ton code secret."
+        >
           <div className="flex items-center gap-2">
-            <span className="rounded-xl bg-sand px-3 py-3 font-semibold">+237</span>
+            <span className="rounded-xl bg-sand px-3 py-3 font-semibold">
+              +237
+            </span>
             <input
               className={inputClass}
               type="tel"
@@ -636,7 +878,10 @@ function Checkout({ orderId, whatsappPhone, priceMomo, priceCard }: { orderId: s
         </Field>
       )}
       {error && (
-        <p role="alert" className="rounded-2xl bg-red-50 p-4 font-medium text-red-800 ring-1 ring-red-200">
+        <p
+          role="alert"
+          className="rounded-2xl bg-red-50 p-4 font-medium text-red-800 ring-1 ring-red-200"
+        >
           {error}
         </p>
       )}
@@ -644,11 +889,20 @@ function Checkout({ orderId, whatsappPhone, priceMomo, priceCard }: { orderId: s
         {busy ? "Un instant…" : `Payer ${formatXaf(price)}`}
       </PrimaryButton>
       <ul className="flex flex-col gap-1.5 text-sm text-muted">
-        <li>🔒 Paiement sécurisé par Tranzak, tu valides avec ton code secret.</li>
-        <li>🎶 2 versions de ta chanson en 2 minutes environ, envoyées sur WhatsApp.</li>
+        <li>
+          🔒 Paiement sécurisé par Tranzak, tu valides avec ton code secret.
+        </li>
+        <li>
+          🎶 2 versions de ta chanson en 2 minutes environ, envoyées sur
+          WhatsApp.
+        </li>
         <li>
           ↩️ Un problème avec ta chanson ?{" "}
-          <a href="/remboursement" target="_blank" className="font-semibold text-ink underline">
+          <a
+            href="/remboursement"
+            target="_blank"
+            className="font-semibold text-ink underline"
+          >
             On te rembourse
           </a>
           .
@@ -680,7 +934,10 @@ function Progress({ step }: { step: number }) {
         aria-valuemax={STEP_TITLES.length}
         aria-valuenow={step + 1}
       >
-        <div className="h-full rounded-full bg-brand transition-all" style={{ width: `${((step + 1) / STEP_TITLES.length) * 100}%` }} />
+        <div
+          className="h-full rounded-full bg-brand transition-all"
+          style={{ width: `${((step + 1) / STEP_TITLES.length) * 100}%` }}
+        />
       </div>
     </div>
   );
@@ -689,7 +946,9 @@ function Progress({ step }: { step: number }) {
 function Step({ title, children }: { title: string; children: ReactNode }) {
   return (
     <section className="flex flex-col gap-5">
-      <h1 className="text-3xl leading-tight font-extrabold tracking-tight">{title}</h1>
+      <h1 className="text-3xl leading-tight font-extrabold tracking-tight">
+        {title}
+      </h1>
       {children}
     </section>
   );
@@ -711,9 +970,15 @@ function Field({
 }) {
   const Tag = group ? "div" : "label";
   return (
-    <Tag className="flex flex-col gap-1.5" {...(group && { role: "group", "aria-label": label })}>
+    <Tag
+      className="flex flex-col gap-1.5"
+      {...(group && { role: "group", "aria-label": label })}
+    >
       <span className="font-semibold">
-        {label} {optional && <span className="font-normal text-muted">(facultatif)</span>}
+        {label}{" "}
+        {optional && (
+          <span className="font-normal text-muted">(facultatif)</span>
+        )}
       </span>
       {children}
       {hint && <span className="text-sm text-muted">{hint}</span>}
@@ -752,10 +1017,19 @@ function Choice({
 /** Pastilles des moyens de paiement (texte coloré, pas de logos officiels). */
 function PayBadges({ className = "" }: { className?: string }) {
   return (
-    <div className={`flex flex-wrap items-center gap-1.5 text-xs font-bold ${className}`} aria-label="Moyens de paiement acceptés">
-      <span className="rounded-md bg-[#ffcc00] px-2 py-1 text-ink">MTN MoMo</span>
-      <span className="rounded-md bg-[#ff7900] px-2 py-1 text-white">Orange Money</span>
-      <span className="rounded-md bg-ink px-2 py-1 text-white">Visa · Mastercard</span>
+    <div
+      className={`flex flex-wrap items-center gap-1.5 text-xs font-bold ${className}`}
+      aria-label="Moyens de paiement acceptés"
+    >
+      <span className="rounded-md bg-[#ffcc00] px-2 py-1 text-ink">
+        MTN MoMo
+      </span>
+      <span className="rounded-md bg-[#ff7900] px-2 py-1 text-white">
+        Orange Money
+      </span>
+      <span className="rounded-md bg-ink px-2 py-1 text-white">
+        Visa · Mastercard
+      </span>
     </div>
   );
 }
@@ -767,7 +1041,8 @@ function TrustBanner({ price }: { price: number }) {
         ✍🏾 Tes paroles sont <span className="text-leaf">gratuites</span>.
       </p>
       <p className="-mt-1.5 text-sm text-muted">
-        Tu paies seulement si elles te plaisent : {formatXaf(price)} pour 2 versions de ta chanson.
+        Tu paies seulement si elles te plaisent : {formatXaf(price)} pour 2
+        versions de ta chanson.
       </p>
       <PayBadges />
     </div>
@@ -780,7 +1055,10 @@ function SupportLine() {
     <li>
       💬 Une question ?{" "}
       <a
-        href={whatsappLink(SUPPORT_PHONE, "Bonjour Dédikace, j'ai une question avant de payer :")}
+        href={whatsappLink(
+          SUPPORT_PHONE,
+          "Bonjour Dédikace, j'ai une question avant de payer :",
+        )}
         target="_blank"
         rel="noopener noreferrer"
         className="font-semibold text-leaf underline"
@@ -791,7 +1069,15 @@ function SupportLine() {
   );
 }
 
-function PrimaryButton({ onClick, disabled, children }: { onClick: () => void; disabled?: boolean; children: ReactNode }) {
+function PrimaryButton({
+  onClick,
+  disabled,
+  children,
+}: {
+  onClick: () => void;
+  disabled?: boolean;
+  children: ReactNode;
+}) {
   return (
     <button
       type="button"
@@ -804,22 +1090,39 @@ function PrimaryButton({ onClick, disabled, children }: { onClick: () => void; d
   );
 }
 
-const WRITING_MESSAGES = ["On cherche les bons mots…", "On trouve les rimes…", "On prépare le refrain…", "Presque fini…"];
+const WRITING_MESSAGES = [
+  "On cherche les bons mots…",
+  "On trouve les rimes…",
+  "On prépare le refrain…",
+  "Presque fini…",
+];
 
 function Writing({ name }: { name: string }) {
   const [i, setI] = useState(0);
   useEffect(() => {
-    const id = setInterval(() => setI((n) => Math.min(n + 1, WRITING_MESSAGES.length - 1)), 2500);
+    const id = setInterval(
+      () => setI((n) => Math.min(n + 1, WRITING_MESSAGES.length - 1)),
+      2500,
+    );
     return () => clearInterval(id);
   }, []);
   return (
-    <div className="flex flex-1 flex-col items-center justify-center gap-6 py-20 text-center" role="status">
+    <div
+      className="flex flex-1 flex-col items-center justify-center gap-6 py-20 text-center"
+      role="status"
+    >
       <div className="flex gap-2" aria-hidden="true">
         {[0, 1, 2].map((d) => (
-          <span key={d} className="h-4 w-4 animate-bounce rounded-full bg-brand" style={{ animationDelay: `${d * 150}ms` }} />
+          <span
+            key={d}
+            className="h-4 w-4 animate-bounce rounded-full bg-brand"
+            style={{ animationDelay: `${d * 150}ms` }}
+          />
         ))}
       </div>
-      <p className="text-2xl font-bold">On écrit la chanson de {name.trim() || "ton proche"}</p>
+      <p className="text-2xl font-bold">
+        On écrit la chanson de {name.trim() || "ton proche"}
+      </p>
       <p className="text-muted">{WRITING_MESSAGES[i]} (environ 10 secondes)</p>
     </div>
   );

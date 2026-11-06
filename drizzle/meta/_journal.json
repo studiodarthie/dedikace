@@ -15,6 +15,13 @@
       "when": 1793719993858,
       "tag": "0001_wandering_korg",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1793922920803,
+      "tag": "0002_stormy_pixie",
+      "breakpoints": true
     }
   ]
 }

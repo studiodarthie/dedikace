@@ -1,0 +1,1 @@
+ALTER TABLE "orders" ADD COLUMN "song_language" text DEFAULT 'fr' NOT NULL;

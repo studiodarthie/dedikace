@@ -3,7 +3,7 @@ import Anthropic from "@anthropic-ai/sdk";
 import { betaZodOutputFormat } from "@anthropic-ai/sdk/helpers/beta/zod";
 import { z } from "zod";
 import { env } from "@/lib/env";
-import { chorusLanguageLabel, occasionLabel } from "@/lib/occasions";
+import { languageLabel, occasionLabel } from "@/lib/occasions";
 import { getStyle } from "@/lib/styles";
 
 // Prompt système exact de docs/PROMPTS.md §1 : toute modification se fait là-bas d'abord.
@@ -17,8 +17,10 @@ Règles de forme :
 - Couplets de 8 lignes, pont de 4 lignes.
 - Refrain de 4 lignes, simple, facile à chanter en chœur, qui contient le prénom du destinataire.
 - Lignes de 6 à 10 syllabes, rimes simples.
-- Si la langue du refrain est l'anglais, le pidgin ou le lingala, utilise uniquement des mots très courants ;
-  les couplets restent en français.
+- Écris les couplets et le pont dans la langue de la chanson, et le refrain dans la langue du refrain.
+  Le titre est dans la langue de la chanson.
+- Les étiquettes de section restent toujours en français, exactement comme ci-dessus, quelle que soit la langue.
+- En anglais, en pidgin ou en lingala, utilise uniquement des mots très courants.
 
 Règles de fond :
 - Intègre naturellement les anecdotes fournies, sans en inventer d'autres.
@@ -46,6 +48,7 @@ export type LyricsBrief = {
   senderName?: string | null;
   anecdotes: string[];
   styleId: string;
+  songLanguage: string;
   chorusLanguage: string;
 };
 
@@ -76,7 +79,8 @@ function buildUserMessage(brief: LyricsBrief): string {
     `Expéditeur : ${brief.senderName?.trim() || "non précisé"}`,
     `Anecdotes : ${anecdotes.length ? anecdotes.map((a) => `- ${a}`).join("\n") : "aucune"}`,
     `Style musical : ${getStyle(brief.styleId)?.label ?? brief.styleId}`,
-    `Langue du refrain : ${chorusLanguageLabel(brief.chorusLanguage)}`,
+    `Langue de la chanson : ${languageLabel(brief.songLanguage)}`,
+    `Langue du refrain : ${languageLabel(brief.chorusLanguage)}`,
   ].join("\n");
 }
 

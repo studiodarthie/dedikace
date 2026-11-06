@@ -52,6 +52,7 @@ export const orders = pgTable(
     senderName: text("sender_name"),
     anecdotes: text("anecdotes"),
     styleId: text("style_id").notNull(),
+    songLanguage: text("song_language").notNull().default("fr"),
     chorusLanguage: text("chorus_language").notNull().default("fr"),
     voice: text("voice", { enum: ["male", "female"] }).notNull().default("male"),
     title: text("title"),

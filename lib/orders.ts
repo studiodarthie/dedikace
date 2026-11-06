@@ -54,6 +54,7 @@ type DraftInput = Pick<
   | "senderName"
   | "anecdotes"
   | "styleId"
+  | "songLanguage"
   | "chorusLanguage"
   | "voice"
 >;

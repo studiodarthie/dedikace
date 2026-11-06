@@ -6,7 +6,7 @@ import { z } from "zod";
 import { canRelaunch, getOrderDetail } from "@/lib/admin";
 import { requireAdmin } from "@/lib/auth";
 import { formatXaf, whatsappLink } from "@/lib/format";
-import { occasionLabel } from "@/lib/occasions";
+import { languageLabel, occasionLabel } from "@/lib/occasions";
 import { getSignedSongUrl } from "@/lib/storage";
 import { getStyle } from "@/lib/styles";
 import { CHANNEL_LABELS, formatDate, STATUS_COLORS, STATUS_LABELS } from "../../labels";
@@ -86,8 +86,8 @@ async function OrderDetail({ params }: { params: PageProps<"/admin/commandes/[id
           <dd>{occasionLabel(order.occasion)}</dd>
           <dt className="text-muted">Style</dt>
           <dd>
-            {getStyle(order.styleId)?.label ?? order.styleId} · voix {order.voice === "female" ? "féminine" : "masculine"} · refrain{" "}
-            {order.chorusLanguage}
+            {getStyle(order.styleId)?.label ?? order.styleId} · voix {order.voice === "female" ? "féminine" : "masculine"} · chanson {languageLabel(order.songLanguage)} · refrain{" "}
+            {languageLabel(order.chorusLanguage)}
           </dd>
           <dt className="text-muted">De la part de</dt>
           <dd>{order.senderName ?? "—"}</dd>

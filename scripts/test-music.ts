@@ -67,6 +67,7 @@ async function main() {
   const song = await generateSong({
     stylePrompt: stylePromptFor("makossa", "female"),
     lyrics: full ? FULL : SHORT,
+    songLanguage: "fr",
     chorusLanguage: "fr",
     durationSeconds: full ? 180 : 30,
   });

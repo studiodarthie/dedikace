@@ -28,7 +28,7 @@ Exclu : comptes utilisateurs, abonnements, crédits, extrait audio avant paiemen
    déclaration d'amour, excuses, encouragement.
 3. **Étape 2 — Destinataire** : prénom (obligatoire), relation (mère, ami, épouse…), 1 à 3 anecdotes
    (500 caractères max au total), prénom de l'expéditeur (facultatif).
-4. **Étape 3 — Musique** : style (10 choix, voir `PROMPTS.md`), langue du refrain (français, anglais, pidgin, lingala),
+4. **Étape 3 — Musique** : style (10 choix, voir `PROMPTS.md`), langue de la chanson et langue du refrain, au choix parmi français, anglais, pidgin, lingala (par défaut le refrain suit la chanson ; on peut mélanger, ex. couplets en français et refrain en pidgin),
    voix (homme / femme).
 5. **Étape 4 — Contact** : numéro WhatsApp au format international (+237…).
 6. **Aperçu des paroles** : paroles générées en moins de 15 s, modifiables à la main, bouton « Réécrire »

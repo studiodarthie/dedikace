@@ -1,8 +1,8 @@
 // Copie exacte de docs/PROMPTS.md §2 : toute modification se fait là-bas d'abord.
 // Retirer d'ici tout style jugé faux à l'écoute (Jour 0).
 export const STYLES = [
-  { id: "makossa", label: "Makossa", prompt: "Cameroonian makossa, bright clean electric guitar, bouncing bass, 118 bpm, joyful {voice} vocals in French" },
-  { id: "bikutsi", label: "Bikutsi", prompt: "Fast Cameroonian bikutsi, 6/8 feel, rapid guitar ostinato, 140 bpm, energetic {voice} vocals in French" },
+  { id: "makossa", label: "Makossa", prompt: "Cameroonian makossa, bright clean electric guitar, bouncing bass, 118 bpm, joyful {voice} vocals" },
+  { id: "bikutsi", label: "Bikutsi", prompt: "Fast Cameroonian bikutsi, 6/8 feel, rapid guitar ostinato, 140 bpm, energetic {voice} vocals" },
   { id: "rumba", label: "Rumba congolaise", prompt: "Congolese rumba, smooth crooning {voice} vocals, interlocking clean guitars, sebene ending" },
   { id: "ndombolo", label: "Ndombolo", prompt: "High-energy ndombolo, fast sebene guitar, festive dance calls, 135 bpm, {voice} vocals" },
   { id: "gospel", label: "Gospel africain", prompt: "African gospel praise, choir backing, keys and bass, uplifting {voice} lead vocals" },

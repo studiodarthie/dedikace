@@ -1,4 +1,4 @@
-// Occasions et langues du refrain (PRD §4, étapes 1 et 3).
+// Occasions et langues des chansons (PRD §4, étapes 1 et 3).
 export const OCCASIONS = [
   { id: "anniversaire", label: "Anniversaire", emoji: "🎂" },
   { id: "mariage", label: "Mariage", emoji: "💒" },
@@ -10,25 +10,31 @@ export const OCCASIONS = [
   { id: "encouragement", label: "Encouragement", emoji: "💪🏾" },
 ] as const;
 
-export const CHORUS_LANGUAGES = [
-  { id: "fr", label: "Français" },
-  { id: "en", label: "Anglais" },
-  { id: "pidgin", label: "Pidgin" },
-  { id: "lingala", label: "Lingala" },
+/** Langues proposées pour la chanson et pour le refrain. `sung` est envoyé au moteur musical (en anglais). */
+export const LANGUAGES = [
+  { id: "fr", label: "Français", sung: "French" },
+  { id: "en", label: "Anglais", sung: "English" },
+  { id: "pidgin", label: "Pidgin", sung: "Cameroonian Pidgin English" },
+  { id: "lingala", label: "Lingala", sung: "Lingala" },
 ] as const;
 
 export type OccasionId = (typeof OCCASIONS)[number]["id"];
-export type ChorusLanguageId = (typeof CHORUS_LANGUAGES)[number]["id"];
+export type LanguageId = (typeof LANGUAGES)[number]["id"];
 
 export const OCCASION_IDS = OCCASIONS.map((o) => o.id) as [OccasionId, ...OccasionId[]];
-export const CHORUS_LANGUAGE_IDS = CHORUS_LANGUAGES.map((l) => l.id) as [ChorusLanguageId, ...ChorusLanguageId[]];
+export const LANGUAGE_IDS = LANGUAGES.map((l) => l.id) as [LanguageId, ...LanguageId[]];
 
 export function occasionLabel(id: string): string {
   return OCCASIONS.find((o) => o.id === id)?.label ?? id;
 }
 
-export function chorusLanguageLabel(id: string): string {
-  return CHORUS_LANGUAGES.find((l) => l.id === id)?.label ?? id;
+export function languageLabel(id: string): string {
+  return LANGUAGES.find((l) => l.id === id)?.label ?? id;
+}
+
+/** Nom de la langue en anglais pour le moteur musical (« French », « Lingala »…). */
+export function sungLanguage(id: string): string {
+  return LANGUAGES.find((l) => l.id === id)?.sung ?? "French";
 }
 
 /**

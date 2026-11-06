@@ -74,6 +74,7 @@ export const generateSongFunction = inngest.createFunction(
         lyrics: current.lyrics,
         styleId: current.styleId as StyleId,
         voice: current.voice,
+        songLanguage: current.songLanguage,
         chorusLanguage: current.chorusLanguage,
       };
     });
@@ -87,6 +88,7 @@ export const generateSongFunction = inngest.createFunction(
             const song = await generateSong({
               stylePrompt: stylePromptFor(order.styleId, order.voice),
               lyrics: order.lyrics,
+              songLanguage: order.songLanguage,
               chorusLanguage: order.chorusLanguage,
               durationSeconds: SONG_SECONDS,
             });
