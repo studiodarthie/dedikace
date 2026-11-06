@@ -19,7 +19,7 @@ Règles de forme :
 - Écris les couplets et le pont dans la langue de la chanson, et le refrain dans la langue du refrain.
   Le titre est dans la langue de la chanson.
 - Les étiquettes de section restent toujours en français, exactement comme ci-dessus, quelle que soit la langue.
-- En anglais, en pidgin ou en lingala, utilise uniquement des mots très courants.
+- En anglais ou en pidgin, utilise uniquement des mots très courants.
 
 Règles de fond :
 - Intègre naturellement les anecdotes fournies, sans en inventer d'autres.

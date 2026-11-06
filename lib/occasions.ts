@@ -15,7 +15,6 @@ export const LANGUAGES = [
   { id: "fr", label: "Français", sung: "French" },
   { id: "en", label: "Anglais", sung: "English" },
   { id: "pidgin", label: "Pidgin", sung: "Cameroonian Pidgin English" },
-  { id: "lingala", label: "Lingala", sung: "Lingala" },
 ] as const;
 
 export type OccasionId = (typeof OCCASIONS)[number]["id"];
@@ -32,7 +31,7 @@ export function languageLabel(id: string): string {
   return LANGUAGES.find((l) => l.id === id)?.label ?? id;
 }
 
-/** Nom de la langue en anglais pour le moteur musical (« French », « Lingala »…). */
+/** Nom de la langue en anglais pour le moteur musical (« French », « English »…). */
 export function sungLanguage(id: string): string {
   return LANGUAGES.find((l) => l.id === id)?.sung ?? "French";
 }

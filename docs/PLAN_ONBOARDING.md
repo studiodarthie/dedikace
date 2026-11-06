@@ -8,9 +8,10 @@ avant les paroles, paroles gratuites avant paiement, bouton WhatsApp flottant.
 
 ## Phase 1 — Moins écrire, plus toucher (fait le 5 novembre 2026)
 
-- [x] Refrain en anglais en plus du français, du pidgin et du lingala.
-- [x] Chanson entière dans la langue choisie (français, anglais, pidgin, lingala), refrain dans la même
-      langue ou une autre (colonne `song_language`, fait le 6 novembre 2026).
+- [x] Refrain en anglais en plus du français et du pidgin.
+- [x] Chanson entière dans la langue choisie (français, anglais, pidgin), refrain dans la même
+      langue ou une autre (colonne `song_language`, fait le 6 novembre 2026). Lingala retiré le 6 novembre 2026
+      (qualité des paroles insuffisante).
 - [x] Occasions en grosses cartes avec emoji (`lib/occasions.ts` : champ `emoji`).
 - [x] « Pour qui ? » en gros boutons emoji avant le prénom (Maman, Papa, Ma chérie…), remplit `relation`.
 - [x] Idées de souvenirs à toucher, propres à chaque occasion (`lib/occasions.ts` : `MEMORY_IDEAS`),

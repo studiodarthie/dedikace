@@ -84,7 +84,12 @@ function loadDraft(): Draft {
     if (raw) {
       const draft = JSON.parse(raw) as Draft;
       const step = draft.step === 4 && !draft.saved ? 3 : draft.step;
-      return { ...draft, step, form: { ...EMPTY_FORM, ...draft.form } };
+      const form = { ...EMPTY_FORM, ...draft.form };
+      // Langue retirée depuis (ex. lingala) : on revient au français.
+      const known = (id: string) => LANGUAGES.some((l) => l.id === id);
+      if (!known(form.songLanguage)) form.songLanguage = "fr";
+      if (!known(form.chorusLanguage)) form.chorusLanguage = form.songLanguage;
+      return { ...draft, step, form };
     }
   } catch {
     // localStorage indisponible (navigation privée) ou brouillon illisible : on repart de zéro.
@@ -548,7 +553,7 @@ function Wizard({
       {step === 2 && (
         <Step title="Quelle musique ?">
           <Field group label="Langue de la chanson">
-            <div className="grid grid-cols-2 gap-2">
+            <div className="grid grid-cols-3 gap-2">
               {LANGUAGES.map((l) => (
                 <Choice
                   key={l.id}
@@ -571,14 +576,19 @@ function Wizard({
             label="Langue du refrain"
             hint="Garde la même, ou mélange : couplets en français, refrain en pidgin…"
           >
-            <div className="grid grid-cols-2 gap-2">
+            <div className="grid grid-cols-3 gap-2">
               {LANGUAGES.map((l) => (
                 <Choice
                   key={l.id}
                   selected={form.chorusLanguage === l.id}
                   onClick={() => update("chorusLanguage", l.id)}
                 >
-                  {l.id === form.songLanguage ? `${l.label} (même)` : l.label}
+                  {l.label}
+                  {l.id === form.songLanguage && (
+                    <span className="block text-xs font-normal opacity-80">
+                      même
+                    </span>
+                  )}
                 </Choice>
               ))}
             </div>
