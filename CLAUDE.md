@@ -16,7 +16,8 @@ manuelle est nécessaire (créer un compte, copier une clé, cliquer dans un tab
 - Next.js (App Router, TypeScript strict) + Tailwind CSS, déployé sur Vercel
 - Neon (Postgres serverless) via Drizzle ORM et le driver `@neondatabase/serverless` ; migrations avec `drizzle-kit`
 - Cloudflare R2 (API compatible S3, `@aws-sdk/client-s3` + `@aws-sdk/s3-request-presigner`) : bucket privé `songs`
-- Auth.js (`next-auth`, adaptateur Drizzle) avec lien magique par e-mail, uniquement pour le back-office
+- Auth.js (`next-auth`, adaptateur Drizzle) : Google ou lien magique par e-mail, pour l'espace client facultatif
+  (`/compte`, voir `docs/PLAN_COMPTES.md`) et le back-office (réservé à `ADMIN_EMAILS`)
 - Resend pour les e-mails (lien magique admin, alertes d'échec)
 - Inngest pour les tâches longues (génération musicale, relances)
 - API Claude (`@anthropic-ai/sdk`, modèle `claude-sonnet-5-5`) pour les paroles
@@ -33,7 +34,9 @@ app/
   creer/                   parcours de création en 4 étapes
   commande/[id]/           attente de paiement puis de génération
   s/[code]/                page publique de la chanson
-  admin/                   back-office (protégé ; admin/connexion : lien magique)
+  connexion/               connexion commune (Google ou lien magique)
+  compte/                  espace client : Mes chansons, compte/parametres
+  admin/                   back-office (protégé, réservé à ADMIN_EMAILS)
   cgu/  confidentialite/  remboursement/   pages légales
   api/lyrics/route.ts      génération / réécriture des paroles
   api/pay/route.ts         initialisation du paiement Tranzak
@@ -45,7 +48,8 @@ lib/
   db/index.ts  db/schema.ts
   claude.ts  elevenlabs.ts  tranzak.ts  storage.ts  auth.ts  email.ts
   moderation.ts  phonetics.ts  styles.ts  occasions.ts  orders.ts  payments.ts  songs.ts  format.ts  env.ts
-  admin.ts (requêtes et actions du back-office)  pixels.ts (Meta / TikTok, code navigateur)
+  admin.ts (requêtes et actions du back-office)  account.ts (espace client)
+  pixels.ts (Meta / TikTok, code navigateur)  my-orders.ts (commandes faites sur ce téléphone, navigateur)
 components/
   WhatsAppButton.tsx  Pixels.tsx  LegalPage.tsx
 inngest/

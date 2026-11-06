@@ -1,8 +1,8 @@
 -- Dédikace — schéma de référence (Neon / Postgres)
 -- Source exécutable : lib/db/schema.ts (Drizzle). Ce fichier décrit le modèle attendu ;
 -- toute modification se fait ici d'abord, puis dans lib/db/schema.ts.
--- Les tables d'Auth.js (users, accounts, sessions, verification_tokens) servent uniquement
--- à la connexion au back-office (prompt 12), en fin de fichier.
+-- Les tables d'Auth.js (users, accounts, sessions, verification_tokens) servent à la connexion
+-- des clients (espace « Mes chansons », docs/PLAN_COMPTES.md) et du back-office, en fin de fichier.
 
 create type order_status as enum (
   'draft', 'lyrics_ready', 'pending_payment', 'paid',
@@ -74,15 +74,21 @@ create table events (
   created_at timestamptz not null default now()
 );
 
--- Auth.js (adaptateur Drizzle) : connexion au back-office par lien magique.
--- Seules les adresses de ADMIN_EMAILS peuvent se connecter (vérifié côté serveur).
+-- Auth.js (adaptateur Drizzle) : connexion par Google ou lien magique, clients et back-office.
+-- Le back-office reste réservé aux adresses de ADMIN_EMAILS (vérifié côté serveur à chaque page).
 create table users (
   id text primary key,
   name text,
   email text unique,
   email_verified timestamptz,
-  image text
+  image text,
+  phone text                      -- numéro WhatsApp par défaut, prérempli dans /creer
 );
+
+-- Commande rattachée à un compte client (facultatif : on peut commander sans compte).
+-- Compte supprimé : la commande reste (comptabilité), le lien est effacé.
+alter table orders add column user_id text references users(id) on delete set null;
+create index orders_user_id_idx on orders (user_id, created_at desc);
 
 create table accounts (
   user_id text not null references users(id) on delete cascade,

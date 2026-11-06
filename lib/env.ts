@@ -21,6 +21,9 @@ const schema = z.object({
   R2_BUCKET: z.string().default("songs"),
 
   AUTH_SECRET: optional,
+  // Connexion « Continuer avec Google » (Google Cloud Console → Identifiants OAuth). Bouton caché si absentes.
+  AUTH_GOOGLE_ID: optional,
+  AUTH_GOOGLE_SECRET: optional,
   RESEND_API_KEY: optional,
   EMAIL_FROM: optional,
 

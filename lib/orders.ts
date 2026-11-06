@@ -57,6 +57,7 @@ type DraftInput = Pick<
   | "songLanguage"
   | "chorusLanguage"
   | "voice"
+  | "userId"
 >;
 
 export async function createDraftOrder(input: DraftInput): Promise<Order> {

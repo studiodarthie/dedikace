@@ -45,9 +45,22 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
                 </Link>
               ))}
             </nav>
-            <Suspense fallback={null}>
-              <HeaderCta />
-            </Suspense>
+            <div className="flex items-center gap-2">
+              <Link
+                href="/compte"
+                aria-label="Mon espace"
+                title="Mon espace"
+                className="flex h-10 w-10 items-center justify-center rounded-full bg-white text-ink ring-1 ring-sand transition active:scale-95 md:h-11 md:w-11"
+              >
+                <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true">
+                  <circle cx="12" cy="8" r="4" />
+                  <path d="M4 21c1.5-4 4.5-6 8-6s6.5 2 8 6" />
+                </svg>
+              </Link>
+              <Suspense fallback={null}>
+                <HeaderCta />
+              </Suspense>
+            </div>
           </div>
         </header>
         <main className="flex w-full flex-1 flex-col">{children}</main>

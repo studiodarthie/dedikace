@@ -22,18 +22,18 @@ export async function sendAdminAlert(subject: string, text: string): Promise<voi
   }
 }
 
-/** Lien magique de connexion au back-office (Auth.js). Lève une erreur si l'envoi échoue. */
+/** Lien magique de connexion (espace client et back-office, Auth.js). Lève une erreur si l'envoi échoue. */
 export async function sendMagicLink(to: string, url: string): Promise<void> {
   if (!env.RESEND_API_KEY || !env.EMAIL_FROM) {
-    throw new Error("RESEND_API_KEY et EMAIL_FROM doivent être renseignées pour se connecter au back-office.");
+    throw new Error("RESEND_API_KEY et EMAIL_FROM doivent être renseignées pour la connexion par e-mail.");
   }
   resend ??= new Resend(env.RESEND_API_KEY);
   const { error } = await resend.emails.send({
     from: env.EMAIL_FROM,
     to,
     subject: "Ton lien de connexion à Dédikace",
-    text: `Clique sur ce lien pour ouvrir le back-office Dédikace :\n${url}\n\nIl est valable 24 h et ne sert qu'une fois. Si tu n'as rien demandé, ignore cet e-mail.`,
-    html: `<p>Clique sur ce bouton pour ouvrir le back-office Dédikace :</p>
+    text: `Clique sur ce lien pour te connecter à ton espace Dédikace :\n${url}\n\nIl est valable 24 h et ne sert qu'une fois. Si tu n'as rien demandé, ignore cet e-mail.`,
+    html: `<p>Clique sur ce bouton pour te connecter à ton espace Dédikace :</p>
 <p><a href="${url}" style="display:inline-block;padding:12px 20px;background:#e0451b;color:#fff;border-radius:999px;text-decoration:none;font-weight:bold">Me connecter</a></p>
 <p style="color:#666;font-size:13px">Le lien est valable 24 h et ne sert qu'une fois. Si tu n'as rien demandé, ignore cet e-mail.</p>`,
   });

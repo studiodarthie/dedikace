@@ -6,7 +6,7 @@ export const metadata: Metadata = { title: "Confidentialité" };
 
 export default function PrivacyPage() {
   return (
-    <LegalPage title="Politique de confidentialité" updated="3 novembre 2026">
+    <LegalPage title="Politique de confidentialité" updated="6 novembre 2026">
       <p>
         Cette page explique quelles informations Dédikace collecte, pourquoi, et ce que tu peux faire. Le
         responsable est Darthie Studios, 413 rue Drouot, Douala, Cameroun,
@@ -24,6 +24,10 @@ export default function PrivacyPage() {
           les informations de paiement nécessaires au suivi (montant, moyen de paiement, numéro Mobile Money). Les
           données de carte bancaire sont saisies chez Tranzak : on ne les voit jamais ;
         </li>
+        <li>
+          si tu crées un espace (facultatif) : ton adresse e-mail, ton nom et ta photo de profil Google si tu te
+          connectes avec Google, et le prénom et le numéro que tu enregistres, pour retrouver tes chansons ;
+        </li>
         <li>des statistiques de visite anonymes (par exemple : combien de formulaires sont commencés).</li>
       </ul>
 
@@ -33,7 +37,8 @@ export default function PrivacyPage() {
         <li>Anthropic (écriture des paroles) et ElevenLabs (création de la musique) ;</li>
         <li>Tranzak (paiement) ;</li>
         <li>Vercel, Neon et Cloudflare (hébergement du site, de la base de données et des chansons) ;</li>
-        <li>Resend (e-mails internes) ;</li>
+        <li>Resend (e-mails de connexion et e-mails internes) ;</li>
+        <li>Google, seulement si tu choisis « Continuer avec Google » ;</li>
         <li>Meta et TikTok, si tu viens d’une de leurs publicités, pour mesurer son efficacité.</li>
       </ul>
       <p>Certains de ces prestataires sont situés hors du Cameroun. On ne vend jamais tes données.</p>
@@ -53,7 +58,8 @@ export default function PrivacyPage() {
       <h2>Tes droits</h2>
       <p>
         Tu peux demander à voir, corriger ou supprimer tes informations et ta chanson. Il suffit de{" "}
-        <SupportLink>nous écrire sur WhatsApp</SupportLink> avec le code de ta commande.
+        <SupportLink>nous écrire sur WhatsApp</SupportLink> avec le code de ta commande. Si tu as un espace, tu peux
+        aussi le supprimer toi-même dans Mon espace → Paramètres → Supprimer mon compte.
       </p>
     </LegalPage>
   );

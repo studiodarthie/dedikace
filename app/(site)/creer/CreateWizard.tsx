@@ -14,6 +14,7 @@ import {
   OCCASIONS,
   type OccasionId,
 } from "@/lib/occasions";
+import { rememberOrder } from "@/lib/my-orders";
 import { trackPixel } from "@/lib/pixels";
 import { STYLE_TAGLINES, STYLES } from "@/lib/styles";
 import { VoiceNote } from "./VoiceNote";
@@ -78,7 +79,7 @@ const EMPTY_FORM: Form = {
   whatsappPhone: "+237 ",
 };
 
-function loadDraft(): Draft {
+function loadDraft(defaults: Defaults = {}): Draft {
   try {
     const raw = window.localStorage.getItem(STORAGE_KEY);
     if (raw) {
@@ -94,7 +95,8 @@ function loadDraft(): Draft {
   } catch {
     // localStorage indisponible (navigation privée) ou brouillon illisible : on repart de zéro.
   }
-  return { step: 0, form: EMPTY_FORM };
+  const filled = Object.fromEntries(Object.entries(defaults).filter(([, v]) => v));
+  return { step: 0, form: { ...EMPTY_FORM, ...filled } };
 }
 
 function saveDraft(draft: Draft) {
@@ -148,7 +150,10 @@ function stepError(step: number, f: Form): string | null {
 
 type Prices = { priceMomo: number; priceCard: number };
 
-export function CreateWizard(prices: Prices) {
+/** Prérempli depuis le profil du client connecté, seulement pour une nouvelle chanson. */
+type Defaults = { senderName?: string; whatsappPhone?: string };
+
+export function CreateWizard({ defaults, ...prices }: Prices & { defaults?: Defaults }) {
   const isClient = useIsClient();
   if (!isClient) {
     return (
@@ -158,7 +163,7 @@ export function CreateWizard(prices: Prices) {
       />
     );
   }
-  return <Wizard initial={loadDraft()} {...prices} />;
+  return <Wizard initial={loadDraft(defaults)} {...prices} />;
 }
 
 const STEP_TITLES = [
@@ -302,6 +307,7 @@ function Wizard({
   }
 
   function applyLyrics(result: Lyrics) {
+    rememberOrder(result.orderId);
     setSaved(result);
     setTitle(result.title);
     setLyrics(result.lyrics);
@@ -780,7 +786,8 @@ const CHANNELS: { id: PayChannel; label: string; hint: string }[] = [
   },
 ];
 
-function Checkout({
+/** Bloc de paiement, réutilisé sur /commande/[id] pour finaliser une commande depuis « Mon espace ». */
+export function Checkout({
   orderId,
   whatsappPhone,
   priceMomo,

@@ -3,20 +3,12 @@
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { AdminError, markRefunded, relaunchGeneration, validateManualPayment } from "@/lib/admin";
-import { requireAdmin, signIn, signOut } from "@/lib/auth";
+import { requireAdmin, signOut } from "@/lib/auth";
 
 export type ActionState = { ok?: string; error?: string };
 
-export async function sendLoginLink(_: ActionState, formData: FormData): Promise<ActionState> {
-  const email = z.email().safeParse(String(formData.get("email") ?? "").trim().toLowerCase());
-  if (!email.success) return { error: "Cette adresse e-mail n'est pas valide." };
-  // Redirige vers la page « lien envoyé », ou vers l'erreur si l'adresse n'est pas autorisée.
-  await signIn("resend", { email: email.data, redirectTo: "/admin" });
-  return {};
-}
-
 export async function logout(): Promise<void> {
-  await signOut({ redirectTo: "/admin/connexion" });
+  await signOut({ redirectTo: "/connexion" });
 }
 
 /** Exécute une action admin après avoir vérifié la session, avec un message clair en cas d'échec. */

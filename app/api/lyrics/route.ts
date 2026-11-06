@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { auth } from "@/lib/auth";
 import { generateLyrics, LyricsError, type LyricsBrief } from "@/lib/claude";
 import type { Order } from "@/lib/db/schema";
 import { MODERATION_MESSAGE, moderateText } from "@/lib/moderation";
@@ -126,7 +127,10 @@ export async function POST(request: Request) {
 
   try {
     if (input.action === "create") {
+      // Client connecté : la commande apparaît tout de suite dans son espace.
+      const session = await auth();
       const order = await createDraftOrder({
+        userId: session?.user?.id ?? null,
         occasion: input.occasion,
         recipientName: input.recipientName,
         relation: input.relation,

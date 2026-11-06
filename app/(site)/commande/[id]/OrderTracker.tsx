@@ -3,9 +3,10 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { clearDraft } from "@/app/(site)/creer/CreateWizard";
+import { Checkout, clearDraft } from "@/app/(site)/creer/CreateWizard";
 import type { OrderStatus } from "@/lib/db/schema";
 import { whatsappLink } from "@/lib/format";
+import { rememberOrder } from "@/lib/my-orders";
 import { trackPurchaseOnce } from "@/lib/pixels";
 
 type Snapshot = {
@@ -25,11 +26,16 @@ export function OrderTracker({
   initial,
   priceXaf,
   supportPhone,
+  pay,
+  signedIn,
 }: {
   orderId: string;
   initial: Snapshot;
   priceXaf: number;
   supportPhone: string;
+  /** Paroles prêtes mais pas payées : de quoi finaliser ici (lien « Finaliser » de Mon espace). */
+  pay?: { title: string; lyrics: string; whatsappPhone: string; priceMomo: number; priceCard: number };
+  signedIn: boolean;
 }) {
   const router = useRouter();
   const [snap, setSnap] = useState(initial);
@@ -37,7 +43,11 @@ export function OrderTracker({
   const [startedAt] = useState(() => Date.now());
   const [now, setNow] = useState(startedAt);
 
-  const done = snap.status === "payment_failed" || snap.status === "generation_failed" || snap.status === "refunded";
+  const toPay = snap.status === "lyrics_ready" || snap.status === "payment_failed";
+  const done = toPay || snap.status === "generation_failed" || snap.status === "refunded";
+
+  // Pour la rattacher au compte à la prochaine connexion (Mon espace).
+  useEffect(() => rememberOrder(orderId), [orderId]);
 
   useEffect(() => {
     if (done || snap.publicCode) return;
@@ -105,7 +115,23 @@ export function OrderTracker({
       );
       break;
     }
+    case "lyrics_ready":
     case "payment_failed":
+      if (pay) {
+        content = (
+          <div className="flex flex-col gap-5 text-left">
+            <Panel icon={snap.status === "payment_failed" ? "😕" : "✍️"} title={snap.status === "payment_failed" ? "Le paiement n'a pas abouti" : `Les paroles pour ${name} sont prêtes`}>
+              {snap.status === "payment_failed" && <p>Aucun montant n’a été débité. Vérifie ton solde ou ton numéro, puis réessaie.</p>}
+            </Panel>
+            <details className="rounded-3xl bg-white p-4 shadow-sm ring-1 ring-sand">
+              <summary className="cursor-pointer font-bold">{pay.title || "Voir les paroles"}</summary>
+              <p className="mt-3 text-sm leading-relaxed whitespace-pre-line text-muted">{pay.lyrics}</p>
+            </details>
+            <Checkout orderId={orderId} whatsappPhone={pay.whatsappPhone} priceMomo={pay.priceMomo} priceCard={pay.priceCard} />
+          </div>
+        );
+        break;
+      }
       content = (
         <Panel icon="😕" title="Le paiement n'a pas abouti">
           <p>Aucun montant n’a été débité. Vérifie ton solde ou ton numéro, puis réessaie.</p>
@@ -162,6 +188,23 @@ export function OrderTracker({
     <div className="flex flex-col gap-6 py-10" role="status" aria-live="polite">
       {content}
       {offline && <p className="text-center text-sm text-muted">Connexion instable… on réessaie.</p>}
+      {!signedIn && (
+        <Link
+          href={`/connexion?suite=${encodeURIComponent("/compte")}`}
+          className="flex items-center gap-3 rounded-2xl bg-white p-4 text-left shadow-sm ring-1 ring-sand"
+        >
+          <span className="text-2xl" aria-hidden="true">
+            💾
+          </span>
+          <span className="min-w-0 flex-1">
+            <span className="block font-bold">Garde tes chansons dans ton espace</span>
+            <span className="block text-sm text-muted">Connexion en 1 clic avec Google ou ton e-mail.</span>
+          </span>
+          <span className="text-brand" aria-hidden="true">
+            ›
+          </span>
+        </Link>
+      )}
       {helpLink}
     </div>
   );

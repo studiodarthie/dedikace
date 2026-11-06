@@ -22,6 +22,13 @@
       "when": 1793922920803,
       "tag": "0002_stormy_pixie",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "7",
+      "when": 1793937524024,
+      "tag": "0003_kind_starjammers",
+      "breakpoints": true
     }
   ]
 }

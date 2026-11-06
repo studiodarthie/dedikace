@@ -63,6 +63,8 @@ export const orders = pgTable(
     priceXaf: integer("price_xaf").notNull().default(3000),
     country: text("country").notNull().default("CM"),
     moderationNote: text("moderation_note"),
+    // Compte client (facultatif). Compte supprimé : la commande reste, le lien est effacé.
+    userId: text("user_id").references(() => users.id, { onDelete: "set null" }),
     createdAt: createdAt(),
     updatedAt: timestamp("updated_at", { withTimezone: true })
       .notNull()
@@ -72,6 +74,7 @@ export const orders = pgTable(
   (t) => [
     check("orders_voice_check", sql`${t.voice} in ('male', 'female')`),
     index("orders_status_created_at_idx").on(t.status, t.createdAt.desc()),
+    index("orders_user_id_idx").on(t.userId, t.createdAt.desc()),
   ],
 );
 
@@ -142,7 +145,7 @@ export const events = pgTable(
   ],
 );
 
-// Auth.js (adaptateur Drizzle) : connexion au back-office uniquement.
+// Auth.js (adaptateur Drizzle) : connexion des clients (Google ou lien e-mail) et du back-office.
 export const users = pgTable("users", {
   id: text("id")
     .primaryKey()
@@ -151,6 +154,7 @@ export const users = pgTable("users", {
   email: text("email").unique(),
   emailVerified: timestamp("email_verified", { withTimezone: true, mode: "date" }),
   image: text("image"),
+  phone: text("phone"),
 });
 
 export const accounts = pgTable(

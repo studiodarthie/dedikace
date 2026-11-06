@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import { z } from "zod";
+import { getCurrentUser } from "@/lib/auth";
+import { env } from "@/lib/env";
 import { getOrderById } from "@/lib/orders";
 import { getLatestPayment } from "@/lib/payments";
 import { OrderTracker } from "./OrderTracker";
@@ -21,7 +23,8 @@ async function OrderContent({ params }: { params: PageProps<"/commande/[id]">["p
   if (!z.uuid().safeParse(id).success) notFound();
   const order = await getOrderById(id);
   if (!order) notFound();
-  const payment = await getLatestPayment(order.id);
+  const [payment, user] = await Promise.all([getLatestPayment(order.id), getCurrentUser()]);
+  const toPay = (order.status === "lyrics_ready" || order.status === "payment_failed") && order.lyrics;
 
   return (
     <OrderTracker
@@ -34,6 +37,18 @@ async function OrderContent({ params }: { params: PageProps<"/commande/[id]">["p
       }}
       priceXaf={order.priceXaf}
       supportPhone={process.env.NEXT_PUBLIC_SUPPORT_WHATSAPP ?? ""}
+      signedIn={!!user}
+      pay={
+        toPay
+          ? {
+              title: order.title ?? "",
+              lyrics: order.lyrics ?? "",
+              whatsappPhone: order.whatsappPhone,
+              priceMomo: env.PRICE_MOMO_XAF,
+              priceCard: env.PRICE_CARD_XAF,
+            }
+          : undefined
+      }
     />
   );
 }
