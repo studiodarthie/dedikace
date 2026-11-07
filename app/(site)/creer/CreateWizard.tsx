@@ -399,7 +399,7 @@ function Wizard({
 
       {step === 0 && (
         <Step title="C'est pour quelle occasion ?">
-          <TrustBanner price={priceMomo} />
+          <TrustBanner price={priceMomo} priceCard={priceCard} />
           <div className="grid grid-cols-2 gap-3">
             {OCCASIONS.map((o) => (
               <Choice
@@ -1051,7 +1051,7 @@ function PayBadges({ className = "" }: { className?: string }) {
   );
 }
 
-function TrustBanner({ price }: { price: number }) {
+function TrustBanner({ price, priceCard }: { price: number; priceCard: number }) {
   return (
     <div className="flex flex-col gap-2.5 rounded-2xl bg-white p-4 ring-1 ring-sand">
       <p className="font-semibold">
@@ -1059,7 +1059,8 @@ function TrustBanner({ price }: { price: number }) {
       </p>
       <p className="-mt-1.5 text-sm text-muted">
         Tu paies seulement si elles te plaisent : {formatXaf(price)} pour 2
-        versions de ta chanson.
+        versions de ta chanson
+        {priceCard !== price && <> ({formatXaf(priceCard)} par carte)</>}.
       </p>
       <PayBadges />
     </div>

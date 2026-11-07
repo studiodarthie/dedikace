@@ -83,11 +83,13 @@ const OCCASIONS = [
 
 const OCCASION_CARDS = [
   { emoji: "🎂", title: "Anniversaire", text: "Son prénom au refrain, toute la salle qui chante." },
-  { emoji: "💍", title: "Dot & mariage", text: "Pour l’entrée des mariés ou la remise de la dot." },
+  { emoji: "💍", title: "Dot", text: "Pour la remise de la dot, devant toute la famille." },
+  { emoji: "💒", title: "Mariage", text: "Pour l’entrée des mariés ou la première danse." },
   { emoji: "🎓", title: "Réussite", text: "BEPC, Bac, diplôme : fête le travail accompli." },
   { emoji: "🕊️", title: "Hommage", text: "Un chant doux pour honorer ceux qui sont partis." },
   { emoji: "❤️", title: "Déclaration", text: "Dis-lui enfin ce que tu ressens, en musique." },
   { emoji: "🤝", title: "Excuses", text: "Quand les mots seuls ne suffisent pas." },
+  { emoji: "💪🏾", title: "Encouragement", text: "Avant un examen, un nouveau départ ou un moment dur." },
 ];
 
 const STEPS = [
@@ -166,7 +168,7 @@ export default function Home() {
           aria-hidden="true"
         />
         {STICKERS.map((s) => (
-          <Sticker key={s.label} emoji={s.emoji} label={s.label} className={`max-md:hidden ${s.desktop}`} />
+          <Sticker key={s.label} emoji={s.emoji} label={s.label} className={`max-lg:hidden ${s.desktop}`} />
         ))}
 
         <Container className="flex flex-1 flex-col items-center justify-center gap-5 pt-6 pb-8 text-center md:gap-8 md:py-16">
@@ -174,9 +176,9 @@ export default function Home() {
             <span className="h-2 w-2 rounded-full bg-brand" aria-hidden="true" />
             Makossa · Bikutsi · Afrobeats · Rumba
           </p>
-          <div className="relative w-full py-10 md:py-0">
+          <div className="relative w-full py-10 lg:py-0">
             {STICKERS.map((s) => (
-              <Sticker key={s.label} emoji={s.emoji} label={s.label} className={`md:hidden ${s.mobile}`} />
+              <Sticker key={s.label} emoji={s.emoji} label={s.label} className={`lg:hidden ${s.mobile}`} />
             ))}
             <h1 className="text-[3.1rem] leading-[0.98] font-extrabold tracking-tight min-[400px]:text-[3.4rem] md:text-7xl lg:text-8xl">
               Ton nom dans
@@ -228,7 +230,8 @@ export default function Home() {
                     <span className="bg-gradient-to-r from-brand-dark via-brand to-gold bg-clip-text text-transparent">Dédikace</span>
                   </h2>
                   <p className="text-muted md:text-lg">
-                    Des chansons d’exemple, faites exactement comme la tienne le sera : un prénom, des souvenirs, un rythme d’ici.
+                    Des extraits d’1 min 20, faits exactement comme la tienne le sera : un prénom, des souvenirs, un rythme d’ici.
+                    Ta chanson complète dure environ 3 minutes.
                   </p>
                 </div>
               }
@@ -247,7 +250,7 @@ export default function Home() {
       <Container>
         <section className="flex flex-col gap-8 md:gap-12" aria-labelledby="occasions">
           <SectionTitle id="occasions" kicker="Pour qui ?" title="Pour tous les moments qui comptent" />
-          <ul className="grid grid-cols-2 gap-3 md:grid-cols-3 md:gap-5">
+          <ul className="grid grid-cols-2 gap-3 md:grid-cols-4 md:gap-5">
             {OCCASION_CARDS.map((o) => (
               <li
                 key={o.title}

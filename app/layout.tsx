@@ -4,7 +4,7 @@ import Link from "next/link";
 import { Suspense } from "react";
 import { env } from "@/lib/env";
 import { HeaderCta } from "@/components/HeaderCta";
-import { Pixels } from "@/components/Pixels";
+import { CookieSettingsLink, Pixels } from "@/components/Pixels";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
 import "./globals.css";
 
@@ -75,6 +75,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
             <Link href="/remboursement" className="underline">
               Remboursement
             </Link>
+            <CookieSettingsLink enabled={!!(env.META_PIXEL_ID || env.TIKTOK_PIXEL_ID)} />
             <span className="ml-auto">© Darthie Studios</span>
           </nav>
         </footer>

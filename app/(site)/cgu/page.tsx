@@ -8,7 +8,7 @@ export const metadata: Metadata = { title: "Conditions générales" };
 
 export default function CguPage() {
   return (
-    <LegalPage title="Conditions générales d’utilisation et de vente" updated="3 novembre 2026">
+    <LegalPage title="Conditions générales d’utilisation et de vente" updated="7 novembre 2026">
       <p>
         Dédikace est un service édité par Darthie Studios, 413 rue Drouot, Douala, Cameroun,
         joignable sur WhatsApp au {SUPPORT_PHONE}. En commandant une chanson, tu acceptes les conditions ci-dessous.
@@ -20,6 +20,10 @@ export default function CguPage() {
         que tu fournis (occasion, prénoms, souvenirs). Les paroles te sont proposées gratuitement ; tu peux les
         modifier ou les faire réécrire avant de payer. Après paiement, tu reçois 2 versions d’environ 3 minutes
         chacune, sur une page que tu peux partager.
+      </p>
+      <p>
+        Les paroles sont écrites avec Claude (Anthropic) et la musique est créée avec Eleven Music (ElevenLabs),
+        par leurs services officiels. Chaque chanson est relue automatiquement avant sa création (voir l’article 3).
       </p>
 
       <h2>2. Prix et paiement</h2>

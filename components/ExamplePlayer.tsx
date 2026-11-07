@@ -10,7 +10,7 @@ export type ExampleTrack = {
   style: string;
   emoji: string;
   tags: string[];
-  /** Durée affichée dans la liste (les extraits font 80 s). */
+  /** Durée affichée dans la liste (les extraits font 80 s, les vraies chansons environ 3 min). */
   length: string;
   scene: CoverScene;
   /** Classes Tailwind du dégradé, utilisé tant qu'il n'y a pas de photo. */
@@ -36,9 +36,10 @@ function waveform(seed: string, bars: number) {
   });
 }
 
-function Artwork({ track, still, sizes }: { track: ExampleTrack; still?: boolean; sizes: string }) {
+/** `alt` vide pour les vignettes de la liste (le bouton porte déjà le titre), descriptif pour la grande pochette. */
+function Artwork({ track, still, sizes, alt = "" }: { track: ExampleTrack; still?: boolean; sizes: string; alt?: string }) {
   if (track.image) {
-    return <Image src={track.image} alt="" fill sizes={sizes} className="object-cover" />;
+    return <Image src={track.image} alt={alt} fill sizes={sizes} className="object-cover" />;
   }
   return (
     <div className={`absolute inset-0 bg-gradient-to-br ${track.cover}`}>
@@ -100,7 +101,7 @@ export function ExamplePlayer({ tracks, header, cta }: { tracks: ExampleTrack[];
 
   const list = (
     <div className="flex min-w-0 flex-col gap-3">
-      <p className="text-xs font-bold tracking-[0.2em] text-muted uppercase">4 chansons, 4 moments de vie</p>
+      <p className="text-xs font-bold tracking-[0.2em] text-muted uppercase">4 extraits, 4 moments de vie</p>
       <ul className="flex flex-col gap-1.5">
         {tracks.map((t, i) => {
           const active = i === index;
@@ -127,7 +128,7 @@ export function ExamplePlayer({ tracks, header, cta }: { tracks: ExampleTrack[];
                   </span>
                 </span>
                 <span className="min-w-0 flex-1">
-                  <span className={`block truncate font-bold md:text-lg ${active ? "text-brand" : ""}`}>{t.title}</span>
+                  <span className={`line-clamp-2 block leading-snug font-bold md:text-lg ${active ? "text-brand" : ""}`}>{t.title}</span>
                   <span className="block truncate text-sm text-muted">Style {t.style}</span>
                 </span>
                 {active && playing ? (
@@ -168,7 +169,7 @@ export function ExamplePlayer({ tracks, header, cta }: { tracks: ExampleTrack[];
           </div>
 
           <div className="relative aspect-square overflow-hidden rounded-2xl shadow-xl shadow-ink/20">
-            <Artwork key={track.file} track={track} sizes="(min-width: 768px) 380px, 75vw" />
+            <Artwork key={track.file} track={track} sizes="(min-width: 768px) 380px, 75vw" alt={`Pochette de la chanson « ${track.title} »`} />
             <div className="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-ink/60 to-transparent" aria-hidden="true" />
             <div className="absolute bottom-3 left-3 flex flex-wrap gap-1.5 md:bottom-4 md:left-4">
               {track.tags.map((tag) => (
