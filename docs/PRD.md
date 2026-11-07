@@ -76,4 +76,4 @@ Accès par lien magique e-mail (Auth.js + Resend), liste blanche d'e-mails (`ADM
 ## 9. Hors périmètre technique mais à prévoir
 
 Pages CGU, confidentialité, remboursement ; numéro WhatsApp de support affiché partout ;
-Meta Pixel et TikTok Pixel sur l'accueil et la confirmation de paiement.
+Meta Pixel sur l'accueil et la confirmation de paiement, chargé seulement après consentement (bandeau cookies). TikTok Pixel abandonné le 7 novembre 2026.

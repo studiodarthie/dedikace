@@ -1,4 +1,4 @@
-// Choix « cookies de mesure » (pixels Meta / TikTok). Code navigateur : n'importe aucun module serveur.
+// Choix « cookies de mesure » (pixel Meta). Code navigateur : n'importe aucun module serveur.
 // Gardé 6 mois sur le téléphone, puis on redemande (recommandation CNIL).
 
 export type Consent = "yes" | "no" | "unset";

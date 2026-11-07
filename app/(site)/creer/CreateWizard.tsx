@@ -914,6 +914,10 @@ export function Checkout({
           WhatsApp.
         </li>
         <li>
+          🔁 Elle ne te plaît pas ? On la refait gratuitement, une fois, depuis
+          la page de ta chanson.
+        </li>
+        <li>
           ↩️ Un problème avec ta chanson ?{" "}
           <a
             href="/remboursement"
@@ -1061,6 +1065,9 @@ function TrustBanner({ price, priceCard }: { price: number; priceCard: number })
         Tu paies seulement si elles te plaisent : {formatXaf(price)} pour 2
         versions de ta chanson
         {priceCard !== price && <> ({formatXaf(priceCard)} par carte)</>}.
+      </p>
+      <p className="-mt-1.5 text-sm text-muted">
+        🔁 La chanson ne te plaît pas ? On la refait gratuitement, une fois.
       </p>
       <PayBadges />
     </div>

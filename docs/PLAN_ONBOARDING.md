@@ -26,8 +26,8 @@ avant les paroles, paroles gratuites avant paiement, bouton WhatsApp flottant.
       sans logos officiels.
 - [x] Sous le bouton de paiement : paiement sécurisé par Tranzak, lien vers la politique de remboursement,
       lien « Une question ? Écris-nous sur WhatsApp ».
-- [ ] « On refait ta chanson si elle ne te plaît pas » : à décider par le porteur du projet (coût d'une
-      génération supplémentaire) avant de l'afficher.
+- [x] « On refait ta chanson si elle ne te plaît pas » : validé le 7 novembre 2026. Affiché sur l'accueil,
+      dans l'encadré de l'étape 1 et sous le bouton de paiement (une nouvelle création gratuite, déjà en place).
 
 ## Phase 2 — Raconter en vocal (fait le 5 novembre 2026)
 
@@ -38,7 +38,10 @@ avant les paroles, paroles gratuites avant paiement, bouton WhatsApp flottant.
       `app/api/transcribe/route.ts` (3 Mo max), texte placé dans une case souvenir et modifiable.
       Caché si le navigateur ne sait pas enregistrer.
 - [x] Testé avec un vocal en français : « ndolè », « makossa », « Douala » bien reconnus.
-- [ ] Tester avec 5 vrais vocaux à l'accent camerounais, dont un en pidgin.
+- [x] Test du 7 novembre 2026 avec 5 vocaux de synthèse (3 en français, 2 en pidgin) : 5/5 corrects après ajout
+      d'une liste de 77 mots camerounais (`CAMEROON_KEYTERMS`, plats, quartiers, musique). Sans elle :
+      « ndolè » → « dolet », « Mvog-Ada » → « Bogada ».
+- [ ] Confirmer avec 2 ou 3 vrais vocaux à l'accent camerounais (le porteur du projet, sur son téléphone).
 - [x] Règle anti-abus du pare-feu Vercel sur `/api/transcribe` (10 requêtes / minute / IP).
 - [ ] Bouton 🎤 « Comment se prononce le prénom ? » → aide `lib/phonetics.ts`.
 

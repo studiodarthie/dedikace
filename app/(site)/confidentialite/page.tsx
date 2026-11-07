@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { LegalPage, SUPPORT_PHONE, SupportLink } from "@/components/LegalPage";
 
-// À FAIRE RELIRE par un juriste avant le lancement public (docs/PLAN_DEV.md, checklist).
+// Validé par le porteur du projet le 7 novembre 2026.
 export const metadata: Metadata = { title: "Confidentialité" };
 
 export default function PrivacyPage() {
@@ -39,7 +39,7 @@ export default function PrivacyPage() {
         <li>Vercel, Neon et Cloudflare (hébergement du site, de la base de données et des chansons) ;</li>
         <li>Resend (e-mails de connexion et e-mails internes) ;</li>
         <li>Google, seulement si tu choisis « Continuer avec Google » ;</li>
-        <li>Meta et TikTok, seulement si tu acceptes les cookies de mesure (voir ci-dessous).</li>
+        <li>Meta (Facebook, Instagram), seulement si tu acceptes les cookies de mesure (voir ci-dessous).</li>
       </ul>
       <p>Certains de ces prestataires sont situés hors du Cameroun. On ne vend jamais tes données.</p>
 
@@ -49,7 +49,7 @@ export default function PrivacyPage() {
         tes commandes gardés sur ton téléphone, et un cookie de connexion si tu as un espace.
       </p>
       <p>
-        Avec ton accord, on ajoute des cookies de mesure de Meta (Facebook, Instagram) et de TikTok. Ils servent à
+        Avec ton accord, on ajoute des cookies de mesure de Meta (Facebook, Instagram). Ils servent à
         savoir quelles publicités amènent des visiteurs et des commandes. Si tu refuses, ils ne sont pas chargés et
         le site marche pareil. Ton choix est gardé 6 mois. Tu peux le changer à tout moment avec le lien « Cookies »
         en bas de chaque page.

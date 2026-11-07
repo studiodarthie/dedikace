@@ -10,7 +10,7 @@ import { formatXaf } from "@/lib/format";
 const EXAMPLES: Omit<ExampleTrack, "image">[] = [
   {
     file: "anniversaire-makossa.mp3",
-    title: "Maman Mireille en fête",
+    title: "Maman Marie, joyeux anniversaire",
     style: "Makossa",
     emoji: "🎂",
     tags: ["Anniversaire", "Fête"],
@@ -193,6 +193,7 @@ export default function Home() {
           <ul className="flex flex-wrap justify-center gap-x-4 gap-y-1 text-[13px] font-medium text-muted md:gap-x-5 md:text-base">
             <li>✓ Paroles gratuites</li>
             <li>✓ Prête en 2 min</li>
+            <li>✓ Refaite gratuitement 1 fois</li>
             <li>✓ MoMo · Orange Money · carte</li>
           </ul>
           <a href="#exemples" className="flex items-center gap-2 font-semibold text-brand-dark md:text-lg">

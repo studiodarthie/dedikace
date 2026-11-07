@@ -140,6 +140,26 @@ export async function generateSong(request: SongRequest): Promise<GeneratedSong>
 const STT_URL = "https://api.elevenlabs.io/v1/speech-to-text";
 
 /** Transcrit un vocal (souvenirs racontés à l'oral). Langue détectée automatiquement : français, anglais, pidgin… */
+/**
+ * Mots d'ici que la transcription doit reconnaître (paramètre `keyterms`, +20 % sur un coût déjà minime).
+ * Moins de 100 termes : au-delà, ElevenLabs facture 20 s minimum par vocal. Testé le 7 novembre 2026 :
+ * sans la liste, « ndolè » devenait « dolet » et « Mvog-Ada » « Bogada ».
+ */
+const CAMEROON_KEYTERMS = [
+  // Plats
+  "ndolè", "eru", "koki", "mbongo tchobi", "okok", "sanga", "kondrè", "taro", "achu", "water fufu",
+  "couscous maïs", "miondo", "bâton de manioc", "beignet haricot", "bobolo", "soya", "poisson braisé", "plantain",
+  "pistache", "folong", "kwacoco", "nkui",
+  // Villes et quartiers
+  "Douala", "Yaoundé", "Bafoussam", "Bamenda", "Garoua", "Maroua", "Ngaoundéré", "Kribi", "Limbé", "Buea",
+  "Ebolowa", "Bertoua", "Dschang", "Edéa", "Nkongsamba", "Bonamoussadi", "Bonapriso", "Akwa", "Deïdo",
+  "Makepe", "Logbessou", "Ndokoti", "Bépanda", "New-Bell", "Mvog-Ada", "Mvog-Mbi", "Bastos", "Essos",
+  "Mokolo", "Biyem-Assi", "Nkolbisson", "Emana", "Ekounou", "Mimboman", "Etoudi", "Ngoa-Ekellé", "Mendong",
+  // Musique, fêtes, mots courants
+  "makossa", "bikutsi", "ndombolo", "mangambeu", "assiko", "bend skin", "njangi", "tontine", "mbombo",
+  "mami", "tata", "ma reine", "ma go", "mon gars", "le pater", "la mater", "wuna", "na so",
+];
+
 export async function transcribeVoice(audio: Blob, filename: string): Promise<string> {
   const body = new FormData();
   body.append("model_id", "scribe_v2");
@@ -147,6 +167,7 @@ export async function transcribeVoice(audio: Blob, filename: string): Promise<st
   body.append("tag_audio_events", "false"); // pas de « (rires) » dans le texte
   body.append("no_verbatim", "true"); // sans « euh », faux départs ni bruits
   body.append("timestamps_granularity", "none");
+  for (const term of CAMEROON_KEYTERMS) body.append("keyterms", term);
 
   let res: Response;
   try {

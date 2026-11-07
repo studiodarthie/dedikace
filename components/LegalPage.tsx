@@ -3,13 +3,17 @@ import { whatsappLink } from "@/lib/format";
 
 export const SUPPORT_PHONE = process.env.NEXT_PUBLIC_SUPPORT_WHATSAPP ?? "";
 
-/** Mise en page commune des pages légales. Textes provisoires : à faire relire par un juriste. */
+/** Identité de l'éditeur, reprise dans les mentions légales. */
+export const COMPANY = {
+  name: "Darthie Studios",
+  address: "413 rue Drouot, Douala, Cameroun",
+  niu: "P097516175228W",
+};
+
+/** Mise en page commune des pages légales (validées par le porteur du projet le 7 novembre 2026). */
 export function LegalPage({ title, updated, children }: { title: string; updated: string; children: ReactNode }) {
   return (
     <article className="flex flex-col gap-4 pt-4 leading-relaxed [&_h2]:mt-2 [&_h2]:text-lg [&_h2]:font-bold [&_li]:ml-5 [&_li]:list-disc">
-      <p role="note" className="rounded-2xl bg-gold/20 p-3 text-sm font-medium">
-        Texte provisoire, en cours de relecture.
-      </p>
       <h1 className="text-3xl font-extrabold tracking-tight">{title}</h1>
       <p className="text-sm text-muted">Dernière mise à jour : {updated}</p>
       {children}

@@ -130,7 +130,7 @@ Les clés Cloudflare R2 sont nécessaires au jour 4, Resend au jour 4 (alertes) 
 
   Événements standard : InitiateCheckout (début de création) et Purchase / CompletePayment (paiement réussi,
   une fois par commande). Pixels absents du back-office. Pixel Meta renseigné dans Vercel. TikTok Ads Manager
-  n'accepte pas encore les entreprises du Cameroun : TIKTOK_PIXEL_ID à ajouter plus tard (agence partenaire).
+  n'accepte pas encore les entreprises du Cameroun : TikTok Pixel abandonné le 7 novembre 2026 (code retiré).
   Reste à faire : faire relire les pages légales (éditeur : Darthie Studios).
 
 ## Jour 7 — Mise en production
@@ -163,6 +163,6 @@ Les clés Cloudflare R2 sont nécessaires au jour 4, Resend au jour 4 (alertes) 
 - [ ] Le numéro WhatsApp de support répond, et il est affiché sur toutes les pages
 - [ ] Une génération qui échoue déclenche bien l'e-mail d'alerte
 - [ ] Les pages CGU, confidentialité et remboursement ont été relues
-- [ ] Les pixels Meta et TikTok remontent les événements « début de création » et « paiement réussi »
+- [ ] Le pixel Meta remonte les événements « début de création » et « paiement réussi »
 - [ ] Le compte admin fonctionne et un e-mail hors liste blanche est refusé
 - [ ] Sauvegardes : la restauration à un instant donné de Neon est activée sur le projet de production

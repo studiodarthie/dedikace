@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { LegalPage, SupportLink } from "@/components/LegalPage";
 
-// À FAIRE RELIRE par un juriste avant le lancement public (docs/PLAN_DEV.md, checklist).
+// Validé par le porteur du projet le 7 novembre 2026.
 export const metadata: Metadata = { title: "Remboursement" };
 
 export default function RefundPage() {

@@ -49,7 +49,7 @@ lib/
   claude.ts  elevenlabs.ts  tranzak.ts  storage.ts  auth.ts  email.ts
   moderation.ts  phonetics.ts  styles.ts  occasions.ts  orders.ts  payments.ts  songs.ts  format.ts  env.ts
   admin.ts (requêtes et actions du back-office)  account.ts (espace client)
-  pixels.ts (Meta / TikTok, code navigateur)  my-orders.ts (commandes faites sur ce téléphone, navigateur)
+  pixels.ts (Meta, chargé après consentement, code navigateur)  consent.ts (choix cookies)  my-orders.ts (commandes faites sur ce téléphone, navigateur)
 components/
   WhatsAppButton.tsx  Pixels.tsx  LegalPage.tsx
 inngest/

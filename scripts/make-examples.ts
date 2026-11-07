@@ -13,7 +13,7 @@ const EXAMPLES = [
     voice: "female",
     brief: {
       occasion: "anniversaire",
-      recipientName: "Mireille",
+      recipientName: "Marie",
       relation: "maman",
       senderName: "Junior",
       anecdotes: ["Elle prépare le meilleur ndolé du quartier", "Elle chante toujours en faisant le ménage"],

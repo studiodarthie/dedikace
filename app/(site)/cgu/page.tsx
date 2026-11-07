@@ -1,17 +1,17 @@
 import type { Metadata } from "next";
-import { LegalPage, SUPPORT_PHONE, SupportLink } from "@/components/LegalPage";
+import { COMPANY, LegalPage, SUPPORT_PHONE, SupportLink } from "@/components/LegalPage";
 import { env } from "@/lib/env";
 import { formatXaf } from "@/lib/format";
 
-// À FAIRE RELIRE par un juriste avant le lancement public (docs/PLAN_DEV.md, checklist).
+// Validé par le porteur du projet le 7 novembre 2026 (pas de relecture par un juriste).
 export const metadata: Metadata = { title: "Conditions générales" };
 
 export default function CguPage() {
   return (
     <LegalPage title="Conditions générales d’utilisation et de vente" updated="7 novembre 2026">
       <p>
-        Dédikace est un service édité par Darthie Studios, 413 rue Drouot, Douala, Cameroun,
-        joignable sur WhatsApp au {SUPPORT_PHONE}. En commandant une chanson, tu acceptes les conditions ci-dessous.
+        Dédikace est un service édité par {COMPANY.name}, {COMPANY.address}, joignable sur WhatsApp au{" "}
+        {SUPPORT_PHONE}. En commandant une chanson, tu acceptes les conditions ci-dessous.
       </p>
 
       <h2>1. Le service</h2>
@@ -23,7 +23,8 @@ export default function CguPage() {
       </p>
       <p>
         Les paroles sont écrites avec Claude (Anthropic) et la musique est créée avec Eleven Music (ElevenLabs),
-        par leurs services officiels. Chaque chanson est relue automatiquement avant sa création (voir l’article 3).
+        par leurs services officiels, dans le cadre d’un abonnement qui autorise l’usage commercial. Chaque chanson
+        est relue automatiquement avant sa création (voir l’article 3).
       </p>
 
       <h2>2. Prix et paiement</h2>
@@ -77,6 +78,18 @@ export default function CguPage() {
         Ces conditions sont soumises au droit camerounais. En cas de désaccord, on cherche d’abord une solution
         amiable avec toi.
       </p>
+
+      <h2 id="mentions-legales">9. Mentions légales</h2>
+      <ul>
+        <li>
+          Éditeur : {COMPANY.name}, {COMPANY.address}. NIU : {COMPANY.niu}.
+        </li>
+        <li>Contact : WhatsApp {SUPPORT_PHONE}.</li>
+        <li>
+          Hébergement du site : Vercel Inc., 440 N Barranca Ave #4133, Covina, CA 91723, États-Unis. Base de données :
+          Neon ; fichiers audio : Cloudflare R2.
+        </li>
+      </ul>
     </LegalPage>
   );
 }

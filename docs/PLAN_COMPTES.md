@@ -50,4 +50,4 @@ Total : environ 3,5 jours de travail. Coût mensuel : 0 avec Google + e-mail.
 - `/compte/parametres` : prénom, numéro WhatsApp (prérempli dans /creer), déconnexion, suppression du compte.
 - `/commande/[id]` : paroles + paiement quand la commande est à finaliser ; encart « Garde tes chansons ».
 - Commandes rattachées : à la création si connecté, sinon à la connexion (identifiants gardés sur le téléphone).
-- [ ] Action manuelle : identifiant OAuth Google (Google Cloud Console) + variables sur Vercel.
+- [x] Action manuelle : identifiant OAuth Google (Google Cloud Console) + variables sur Vercel. Testé sur téléphone le 7 novembre 2026.

@@ -75,13 +75,16 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
             <Link href="/remboursement" className="underline">
               Remboursement
             </Link>
-            <CookieSettingsLink enabled={!!(env.META_PIXEL_ID || env.TIKTOK_PIXEL_ID)} />
+            <Link href="/cgu#mentions-legales" className="underline">
+              Mentions légales
+            </Link>
+            <CookieSettingsLink enabled={!!env.META_PIXEL_ID} />
             <span className="ml-auto">© Darthie Studios</span>
           </nav>
         </footer>
         <WhatsAppButton />
         <Suspense fallback={null}>
-          <Pixels metaId={env.META_PIXEL_ID} tiktokId={env.TIKTOK_PIXEL_ID} />
+          <Pixels metaId={env.META_PIXEL_ID} />
         </Suspense>
       </body>
     </html>

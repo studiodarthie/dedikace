@@ -37,7 +37,7 @@ avec un faux identifiant : refus → aucun pixel, accord → pixel chargé, lien
 ## Étape 3 — CGU et modèle IA (texte fait le 7 novembre 2026)
 
 - [x] CGU : préciser que la musique est générée avec ElevenLabs (API officielle) et les paroles avec Claude.
-- [ ] **Action pour toi** : vérifier dans ElevenLabs → Subscription que ton forfait est payant
+- [x] **Action pour toi** : vérifier dans ElevenLabs → Subscription que ton forfait est payant (confirmé : forfait payant)
       (l'usage commercial des musiques est réservé aux forfaits payants). Envoie-moi une capture sans clé.
       Une fois confirmé, ajouter dans les CGU « dans le cadre d'un abonnement qui autorise l'usage commercial ».
 
@@ -46,6 +46,17 @@ avec un faux identifiant : refus → aucun pixel, accord → pixel chargé, lien
 - [x] Captures à 360 px (téléphone) et 800 px (tablette) : accueil, /creer étapes 1 et 4, bandeau cookies.
 - [x] `npm run lint && npm run typecheck`.
 - [x] Commit puis mise en ligne **après ton OK**. Aucune migration de base nécessaire.
+
+## Décisions du 7 novembre 2026
+
+- Forfait ElevenLabs payant : phrase « usage commercial » ajoutée aux CGU.
+- Commande réelle déjà testée, connexion Google testée sur téléphone, fichiers A-COLLER supprimés.
+- Pages légales validées par le porteur du projet (pas de juriste) : bandeau « provisoire » retiré,
+  mentions légales ajoutées (NIU, hébergeur) dans les CGU (`/cgu#mentions-legales`, lien en pied de page).
+- Domaine acheté lundi 9 novembre : à brancher ensuite (Vercel, Tranzak, Google OAuth, NEXT_PUBLIC_APP_URL).
+- « On refait ta chanson » affiché (une nouvelle création gratuite par commande).
+- Exemple d'anniversaire recréé avec « Marie » (prénom de la pancarte sur la photo).
+- TikTok Pixel abandonné : code retiré, seul le pixel Meta reste (après consentement).
 
 ## Plus tard (pas dans ce lot)
 
