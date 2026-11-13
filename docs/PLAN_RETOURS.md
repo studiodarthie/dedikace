@@ -53,7 +53,9 @@ avec un faux identifiant : refus → aucun pixel, accord → pixel chargé, lien
 - Commande réelle déjà testée, connexion Google testée sur téléphone, fichiers A-COLLER supprimés.
 - Pages légales validées par le porteur du projet (pas de juriste) : bandeau « provisoire » retiré,
   mentions légales ajoutées (NIU, hébergeur) dans les CGU (`/cgu#mentions-legales`, lien en pied de page).
-- Domaine acheté lundi 9 novembre : à brancher ensuite (Vercel, Tranzak, Google OAuth, NEXT_PUBLIC_APP_URL).
+- Domaine **dedikace.app** branché le 13 novembre 2026 : DNS chez Cloudflare (2 CNAME « DNS uniquement »),
+  www → dedikace.app (308), certificats HTTPS Vercel. NEXT_PUBLIC_APP_URL déduite par Vercel (domaine le plus court).
+  Reste : Google OAuth (origine + URI de redirection), adresse TPN Tranzak, domaine d'envoi Resend.
 - « On refait ta chanson » affiché (une nouvelle création gratuite par commande).
 - Exemple d'anniversaire recréé avec « Marie » (prénom de la pancarte sur la photo).
 - TikTok Pixel abandonné : code retiré, seul le pixel Meta reste (après consentement).
