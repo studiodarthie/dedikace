@@ -10,11 +10,11 @@ Les clés Cloudflare R2 sont nécessaires au jour 4, Resend au jour 4 (alertes) 
 
 ## Jour 0 — Préparation (toi, sans code)
 
-- [ ] Créer les comptes : Neon, Anthropic (console), ElevenLabs, Tranzak (sandbox), Inngest, Vercel,
+- [x] Créer les comptes : Neon, Anthropic (console), ElevenLabs, Tranzak (sandbox), Inngest, Vercel,
       Cloudflare (R2), Resend
 - [ ] Écouter les 10 styles de docs/PROMPTS.md §2 dans ElevenLabs et retirer ceux qui sonnent faux
-- [ ] Préparer 4 MP3 d'exemple pour l'accueil (`public/examples/`)
-- [ ] Vérifier les conditions d'usage commercial d'ElevenLabs Music pour la revente de chansons
+- [x] Préparer 4 MP3 d'exemple pour l'accueil (`public/examples/`)
+- [x] Vérifier les conditions d'usage commercial d'ElevenLabs Music pour la revente de chansons
 
 ## Jour 1 — Socle
 
@@ -111,7 +111,7 @@ Les clés Cloudflare R2 sont nécessaires au jour 4, Resend au jour 4 (alertes) 
   Vérification : succès, échec, solde insuffisant, abandon et notification reçue deux fois testés par simulation
   (npm run test:payments ; pas de sandbox, Tranzak en mode production par choix).
 - [x] Vrai paiement de 100 FCFA en local (Orange Money), commande livrée de bout en bout.
-- [ ] Vrai paiement de 3 000 FCFA en ligne (après Inngest sur Vercel).
+- [x] Vrai paiement de 3 000 FCFA en ligne (après Inngest sur Vercel).
 
 ## Jour 6 — Back-office et pages légales
 
@@ -147,11 +147,11 @@ Les clés Cloudflare R2 sont nécessaires au jour 4, Resend au jour 4 (alertes) 
   que des types) ; paiement manuel admin = secours vérifié à la main dans Tranzak.
   À surveiller : /api/lyrics (appel Claude) n'a pas de limite par visiteur → règle de limitation dans Vercel Firewall.
 
-- [ ] Passer TRANZAK_MODE en production, déployer sur Vercel, connecter le domaine
+- [x] Passer TRANZAK_MODE en production, déployer sur Vercel, connecter le domaine (dedikace.app, 13 novembre 2026)
   (TRANZAK_MODE=production et Vercel : faits ; domaine : pas encore acheté)
-- [ ] Vérifier le domaine d'envoi dans Resend (SPF/DKIM) pour que les e-mails n'arrivent pas en spam
+- [x] Vérifier le domaine d'envoi dans Resend (SPF/DKIM) pour que les e-mails n'arrivent pas en spam
   (envoi accepté depuis izibooking.app ; passer à une adresse @dedikace quand le domaine existera)
-- [ ] Déployer Inngest en production (app synchronisée avec l'URL Vercel)
+- [x] Déployer Inngest en production (app synchronisée avec l'URL Vercel)
   (clés Inngest en place sur Vercel ; à confirmer par une vraie commande en ligne)
 - [ ] Dérouler la checklist ci-dessous
 
@@ -162,7 +162,7 @@ Les clés Cloudflare R2 sont nécessaires au jour 4, Resend au jour 4 (alertes) 
 - [ ] Le lien partagé sur WhatsApp affiche un bel aperçu et la chanson se lit sur Android en 3G
 - [ ] Le numéro WhatsApp de support répond, et il est affiché sur toutes les pages
 - [ ] Une génération qui échoue déclenche bien l'e-mail d'alerte
-- [ ] Les pages CGU, confidentialité et remboursement ont été relues
+- [x] Les pages CGU, confidentialité et remboursement ont été relues (validées par le porteur du projet le 7 novembre 2026)
 - [ ] Le pixel Meta remonte les événements « début de création » et « paiement réussi »
 - [ ] Le compte admin fonctionne et un e-mail hors liste blanche est refusé
 - [ ] Sauvegardes : la restauration à un instant donné de Neon est activée sur le projet de production
