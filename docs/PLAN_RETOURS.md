@@ -56,7 +56,8 @@ avec un faux identifiant : refus → aucun pixel, accord → pixel chargé, lien
 - Domaine **dedikace.app** branché le 13 novembre 2026 : DNS chez Cloudflare (2 CNAME « DNS uniquement »),
   www → dedikace.app (308), certificats HTTPS Vercel. NEXT_PUBLIC_APP_URL déduite par Vercel (domaine le plus court).
   Google OAuth (origine + URI de redirection) et adresse TPN Tranzak mises à jour le 13 novembre 2026.
-  Reste : domaine d'envoi Resend (noreply@dedikace.app).
+  E-mails : domaine dedikace.app vérifié chez Resend (DKIM, SPF, DMARC dans Cloudflare), EMAIL_FROM =
+  « Dédikace <noreply@dedikace.app> » sur Vercel (13 novembre 2026).
 - « On refait ta chanson » affiché (une nouvelle création gratuite par commande).
 - Exemple d'anniversaire recréé avec « Marie » (prénom de la pancarte sur la photo).
 - TikTok Pixel abandonné : code retiré, seul le pixel Meta reste (après consentement).
