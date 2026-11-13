@@ -25,12 +25,13 @@ Décisions du porteur du projet (13 novembre 2026) :
 - Fichiers : `lib/reminders.ts`, `inngest/remind-unpaid.ts`, `app/(site)/admin/relances/`. Testé sur la branche `dev`
   (liste, message, bouton, e-mail une seule fois et seulement avec un espace).
 
-## Étape 2 — « Envoyer la surprise » (~0,5 j)
+## Étape 2 — « Envoyer la surprise » (fait le 13 novembre 2026)
 
-- [ ] Page de la chanson : gros bouton « Envoyer la surprise 🎁 » avec 3 messages au choix (tendre, drôle, simple),
+- [x] Page de la chanson : gros bouton « Envoyer la surprise 🎁 » avec 3 messages au choix (tendre, drôle, simple),
       qui ouvre WhatsApp avec le message + le lien.
-- [ ] Conseils juste dessous : « Mets-la en statut », « Fais-la écouter en direct pendant la fête ».
-- [ ] Bouton « Télécharger le MP3 » mis en avant (pour l'envoyer en vocal / l'ajouter au statut).
+- [x] Conseils juste dessous : « Mets le lien en statut », « Fais-la écouter en direct pendant la fête »,
+      « Envoie aussi le MP3 » (le statut WhatsApp n'accepte pas un MP3 de 3 min : la vidéo de l'étape 4 le fera).
+- [x] Bouton « Télécharger le MP3 » mis en avant (pour l'envoyer en vocal / l'ajouter au statut).
 
 ## Étape 3 — Extraits par style dans /creer (~0,5 j + ~10 générations ElevenLabs)
 

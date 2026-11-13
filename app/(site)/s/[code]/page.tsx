@@ -10,6 +10,7 @@ import { getDeliveredSongs } from "@/lib/songs";
 import { getSignedSongUrl } from "@/lib/storage";
 import { getStyle } from "@/lib/styles";
 import { AutoRefresh, RegenerateButton, SongPlayer } from "./SongActions";
+import { SurprisePanel } from "./SurprisePanel";
 
 const APP_URL = env.NEXT_PUBLIC_APP_URL;
 const SUPPORT_PHONE = process.env.NEXT_PUBLIC_SUPPORT_WHATSAPP ?? "";
@@ -83,7 +84,6 @@ async function SongContent({ params }: { params: PageProps<"/s/[code]">["params"
     })),
   );
 
-  const shareText = `🎶 Une chanson rien que pour toi, ${order.recipientName} ! Écoute-la ici : ${pageUrl}`;
   const regenerating = order.status === "generating";
 
   return (
@@ -111,21 +111,17 @@ async function SongContent({ params }: { params: PageProps<"/s/[code]">["params"
           <li key={p.version} className="rounded-2xl bg-white p-4 shadow-sm ring-1 ring-sand">
             <p className="mb-3 font-bold">Version {p.version}</p>
             <SongPlayer src={p.listen} />
-            <a href={p.download} className="mt-3 inline-block font-semibold text-brand">
-              ⬇ Télécharger le MP3
+            <a
+              href={p.download}
+              className="mt-3 flex h-11 items-center justify-center gap-2 rounded-full bg-cream font-semibold text-ink ring-1 ring-sand transition active:scale-[0.98]"
+            >
+              <span aria-hidden="true">⬇️</span> Télécharger le MP3
             </a>
           </li>
         ))}
       </ul>
 
-      <a
-        href={`https://wa.me/?text=${encodeURIComponent(shareText)}`}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="flex h-14 items-center justify-center rounded-2xl bg-[#25d366] px-6 text-lg font-bold text-white shadow-md transition active:scale-[0.98]"
-      >
-        Partager sur WhatsApp
-      </a>
+      <SurprisePanel recipientName={order.recipientName} senderName={order.senderName} pageUrl={pageUrl} />
       <Link
         href="/creer"
         className="flex h-14 items-center justify-center rounded-2xl bg-brand px-6 text-lg font-bold text-white shadow-md shadow-brand/30 transition active:scale-[0.98]"
