@@ -65,6 +65,9 @@ export const orders = pgTable(
     moderationNote: text("moderation_note"),
     // Compte client (facultatif). Compte supprimé : la commande reste, le lien est effacé.
     userId: text("user_id").references(() => users.id, { onDelete: "set null" }),
+    // Relance des paroles non payées : WhatsApp envoyé à la main depuis le back-office, e-mail automatique.
+    remindedAt: timestamp("reminded_at", { withTimezone: true }),
+    reminderEmailedAt: timestamp("reminder_emailed_at", { withTimezone: true }),
     createdAt: createdAt(),
     updatedAt: timestamp("updated_at", { withTimezone: true })
       .notNull()

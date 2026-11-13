@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Suspense } from "react";
 import { getTodayStats, listOrders } from "@/lib/admin";
+import { listToRemind } from "@/lib/reminders";
 import { requireAdmin } from "@/lib/auth";
 import { orderStatus, type OrderStatus } from "@/lib/db/schema";
 import { formatXaf } from "@/lib/format";
@@ -32,7 +33,7 @@ async function Dashboard({ searchParams }: { searchParams: PageProps<"/admin">["
   const { email } = await requireAdmin();
   const { statut } = await searchParams;
   const status = orderStatus.enumValues.find((s) => s === statut);
-  const [stats, rows] = await Promise.all([getTodayStats(), listOrders(status)]);
+  const [stats, rows, reminders] = await Promise.all([getTodayStats(), listOrders(status), listToRemind()]);
 
   const tiles = [
     { label: "Formulaires commencés", value: String(stats.formsStarted) },
@@ -65,6 +66,16 @@ async function Dashboard({ searchParams }: { searchParams: PageProps<"/admin">["
           ))}
         </dl>
       </section>
+
+      <Link
+        href="/admin/relances"
+        className={`flex items-center justify-between rounded-2xl p-4 font-bold ${
+          reminders.todo.length > 0 ? "bg-[#25d366] text-white" : "bg-white ring-1 ring-sand"
+        }`}
+      >
+        <span>💬 À relancer sur WhatsApp</span>
+        <span className="rounded-full bg-white/25 px-2.5 py-0.5">{reminders.todo.length}</span>
+      </Link>
 
       <section aria-labelledby="orders" className="flex flex-col gap-3">
         <h2 id="orders" className="font-bold">

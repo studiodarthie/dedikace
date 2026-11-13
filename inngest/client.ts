@@ -15,6 +15,16 @@ export const orderPaid = eventType("order/paid", {
   }),
 });
 
+/** Premières paroles prêtes : lance la relance par e-mail 1 h plus tard si la commande n'est pas payée. */
+export const lyricsReady = eventType("order/lyrics-ready", {
+  schema: z.object({ orderId: z.uuid() }),
+});
+
+/** Un seul événement par commande (identifiant fixe) : les réécritures ne relancent pas une 2ᵉ fois. */
+export async function sendLyricsReady(orderId: string) {
+  await inngest.send(lyricsReady.create({ orderId }, { id: `lyrics-ready-${orderId}` }));
+}
+
 /**
  * Envoie l'événement avec un identifiant fixe par commande et par génération :
  * Inngest ignore un doublon reçu dans les 24 h (CLAUDE.md règle 2).

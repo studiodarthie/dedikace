@@ -22,6 +22,41 @@ export async function sendAdminAlert(subject: string, text: string): Promise<voi
   }
 }
 
+/** Relance d'une commande non payée (clients avec un espace). Lève une erreur si l'envoi échoue. */
+export async function sendPaymentReminder(
+  to: string,
+  data: { firstName: string | null; recipientName: string; url: string; failed: boolean },
+): Promise<void> {
+  if (!env.RESEND_API_KEY || !env.EMAIL_FROM) throw new Error("RESEND_API_KEY et EMAIL_FROM manquantes.");
+  resend ??= new Resend(env.RESEND_API_KEY);
+  const hello = data.firstName ? `Salut ${data.firstName} 👋` : "Salut 👋";
+  const line = data.failed
+    ? `Ton paiement n'est pas passé, mais tes paroles pour ${data.recipientName} sont bien gardées.`
+    : `Les paroles de ta chanson pour ${data.recipientName} sont prêtes et elles t'attendent.`;
+  const support = env.NEXT_PUBLIC_SUPPORT_WHATSAPP;
+  const esc = (s: string) => s.replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]!);
+  const { error } = await resend.emails.send({
+    from: env.EMAIL_FROM,
+    to,
+    subject: data.failed ? "Ton paiement n'est pas passé : tes paroles t'attendent" : `Ta chanson pour ${data.recipientName} t'attend 🎶`,
+    text: [
+      hello,
+      "",
+      line,
+      "Tu peux les relire et lancer ta chanson ici :",
+      data.url,
+      "",
+      `Une question ? Écris-nous sur WhatsApp au ${support}.`,
+      "",
+      "L'équipe Dédikace",
+    ].join("\n"),
+    html: `<p>${esc(hello)}</p><p>${esc(line)}</p>
+<p><a href="${data.url}" style="display:inline-block;padding:12px 20px;background:#e0451b;color:#fff;border-radius:999px;text-decoration:none;font-weight:bold">Lancer ma chanson</a></p>
+<p style="color:#666;font-size:13px">Une question ? Écris-nous sur WhatsApp au ${esc(support)}. L'équipe Dédikace</p>`,
+  });
+  if (error) throw new Error(`Relance par e-mail échouée : ${error.message}`);
+}
+
 /** Lien magique de connexion (espace client et back-office, Auth.js). Lève une erreur si l'envoi échoue. */
 export async function sendMagicLink(to: string, url: string): Promise<void> {
   if (!env.RESEND_API_KEY || !env.EMAIL_FROM) {

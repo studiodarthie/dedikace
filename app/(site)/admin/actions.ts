@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { z } from "zod";
 import { AdminError, markRefunded, relaunchGeneration, validateManualPayment } from "@/lib/admin";
 import { requireAdmin, signOut } from "@/lib/auth";
+import { markReminded } from "@/lib/reminders";
 
 export type ActionState = { ok?: string; error?: string };
 
@@ -24,6 +25,14 @@ async function run(orderId: string, ok: string, action: (email: string) => Promi
   }
   revalidatePath(`/admin/commandes/${orderId}`);
   return { ok };
+}
+
+/** Bouton « Relancer sur WhatsApp » : note la date de la relance. */
+export async function markRemindedAction(orderId: string): Promise<void> {
+  await requireAdmin();
+  if (!z.uuid().safeParse(orderId).success) return;
+  await markReminded(orderId);
+  revalidatePath("/admin/relances");
 }
 
 export async function relaunchAction(orderId: string): Promise<ActionState> {

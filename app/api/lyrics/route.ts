@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { sendLyricsReady } from "@/inngest/client";
 import { auth } from "@/lib/auth";
 import { generateLyrics, LyricsError, type LyricsBrief } from "@/lib/claude";
 import type { Order } from "@/lib/db/schema";
@@ -105,6 +106,10 @@ async function generateAndSave(order: Order, kind: "first" | "rewrite") {
   }
   const saved = await updateLyrics(order.id, { title: result.title, lyrics: result.lyrics, kind });
   await trackEvent("lyrics_generated", order.id);
+  if (kind === "first") {
+    // Relance 1 h plus tard si personne n'a payé. Une panne d'Inngest ne doit pas bloquer les paroles.
+    await sendLyricsReady(order.id).catch((error) => console.error("[relance] envoi de l'événement échoué", error));
+  }
   return success(saved);
 }
 
