@@ -37,6 +37,7 @@ export const paymentStatus = pgEnum("payment_status", [
   "refunded",
 ]);
 export const songStatus = pgEnum("song_status", ["queued", "generating", "ready", "failed"]);
+export const videoStatus = pgEnum("video_status", ["queued", "rendering", "ready", "failed"]);
 
 const createdAt = () => timestamp("created_at", { withTimezone: true }).notNull().defaultNow();
 
@@ -128,6 +129,27 @@ export const songs = pgTable(
   ],
 );
 
+// Vidéo statut WhatsApp (docs/PLAN_CROISSANCE.md, étape 4) : une vidéo par commande, refaite si on change de photo.
+// Photo et MP4 dans le bucket R2 privé, servis par URL présignées comme les chansons.
+export const videos = pgTable("videos", {
+  id: uuid("id").primaryKey().defaultRandom(),
+  orderId: uuid("order_id")
+    .notNull()
+    .unique()
+    .references(() => orders.id, { onDelete: "cascade" }),
+  status: videoStatus("status").notNull().default("queued"),
+  photoKey: text("photo_key").notNull(),
+  videoKey: text("video_key"),
+  // Nombre de vidéos créées pour cette commande (limite contre les abus).
+  renders: integer("renders").notNull().default(1),
+  error: text("error"),
+  createdAt: createdAt(),
+  updatedAt: timestamp("updated_at", { withTimezone: true })
+    .notNull()
+    .defaultNow()
+    .$onUpdate(() => new Date()),
+});
+
 export const eventTypes = ["form_started", "lyrics_generated", "payment_started", "payment_succeeded"] as const;
 
 // Événements de l'entonnoir pour les compteurs du back-office. Aucune donnée personnelle.
@@ -203,4 +225,5 @@ export type NewOrder = typeof orders.$inferInsert;
 export type OrderStatus = (typeof orderStatus.enumValues)[number];
 export type Payment = typeof payments.$inferSelect;
 export type Song = typeof songs.$inferSelect;
+export type Video = typeof videos.$inferSelect;
 export type EventType = (typeof eventTypes)[number];

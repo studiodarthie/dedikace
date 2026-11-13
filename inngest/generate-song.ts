@@ -9,13 +9,13 @@ import {
   markSongGenerating,
   markSongReady,
   queueSongs,
+  SONG_SECONDS,
   VERSIONS,
 } from "@/lib/songs";
 import { songKey, uploadSong } from "@/lib/storage";
 import { stylePromptFor, type StyleId } from "@/lib/styles";
 import { inngest, orderPaid } from "./client";
 
-const SONG_SECONDS = 180;
 
 // Statuts depuis lesquels une génération peut démarrer (PRD §6) :
 // paid (première création), delivered (régénération gratuite), generation_failed (relance admin).

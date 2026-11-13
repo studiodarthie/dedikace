@@ -1,5 +1,5 @@
 import "server-only";
-import { GetObjectCommand, PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
+import { DeleteObjectCommand, GetObjectCommand, PutObjectCommand, S3Client } from "@aws-sdk/client-s3";
 import { getSignedUrl } from "@aws-sdk/s3-request-presigner";
 import { env, requireEnv } from "@/lib/env";
 
@@ -27,6 +27,25 @@ export async function uploadSong(key: string, audio: Buffer): Promise<void> {
   await s3().send(
     new PutObjectCommand({ Bucket: env.R2_BUCKET, Key: key, Body: audio, ContentType: "audio/mpeg" }),
   );
+}
+
+/** Photo et vidéo statut : {order_id}/photo-<id>.jpg et {order_id}/statut-<id>.mp4. */
+export function videoKeys(orderId: string, id: string) {
+  return { photo: `${orderId}/photo-${id}.jpg`, video: `${orderId}/statut-${id}.mp4` };
+}
+
+export async function uploadObject(key: string, body: Buffer, contentType: string): Promise<void> {
+  await s3().send(new PutObjectCommand({ Bucket: env.R2_BUCKET, Key: key, Body: body, ContentType: contentType }));
+}
+
+export async function downloadObject(key: string): Promise<Buffer> {
+  const res = await s3().send(new GetObjectCommand({ Bucket: env.R2_BUCKET, Key: key }));
+  if (!res.Body) throw new Error(`Objet vide : ${key}`);
+  return Buffer.from(await res.Body.transformToByteArray());
+}
+
+export async function deleteObject(key: string): Promise<void> {
+  await s3().send(new DeleteObjectCommand({ Bucket: env.R2_BUCKET, Key: key }));
 }
 
 /** Lien d'écoute temporaire. `downloadName` force le téléchargement sous ce nom. */

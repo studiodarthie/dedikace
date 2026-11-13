@@ -11,6 +11,7 @@ import { getSignedSongUrl } from "@/lib/storage";
 import { getStyle } from "@/lib/styles";
 import { AutoRefresh, RegenerateButton, SongPlayer } from "./SongActions";
 import { SurprisePanel } from "./SurprisePanel";
+import { VideoPanel } from "./VideoPanel";
 
 const APP_URL = env.NEXT_PUBLIC_APP_URL;
 const SUPPORT_PHONE = process.env.NEXT_PUBLIC_SUPPORT_WHATSAPP ?? "";
@@ -122,6 +123,7 @@ async function SongContent({ params }: { params: PageProps<"/s/[code]">["params"
       </ul>
 
       <SurprisePanel recipientName={order.recipientName} senderName={order.senderName} pageUrl={pageUrl} />
+      {order.status === "delivered" && <VideoPanel code={order.publicCode} recipientName={order.recipientName} />}
       <Link
         href="/creer"
         className="flex h-14 items-center justify-center rounded-2xl bg-brand px-6 text-lg font-bold text-white shadow-md shadow-brand/30 transition active:scale-[0.98]"

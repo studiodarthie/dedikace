@@ -11,6 +11,7 @@ create type order_status as enum (
 create type payment_channel as enum ('mtn', 'orange', 'card', 'manual');
 create type payment_status as enum ('pending', 'successful', 'failed', 'cancelled', 'refunded');
 create type song_status as enum ('queued', 'generating', 'ready', 'failed');
+create type video_status as enum ('queued', 'rendering', 'ready', 'failed');
 
 create table orders (
   id uuid primary key default gen_random_uuid(),
@@ -63,6 +64,19 @@ create table songs (
   error text,
   created_at timestamptz not null default now(),
   unique (order_id, version, generation)
+);
+
+-- Vidéo statut WhatsApp (docs/PLAN_CROISSANCE.md, étape 4) : une par commande, refaite si la photo change.
+create table videos (
+  id uuid primary key default gen_random_uuid(),
+  order_id uuid not null unique references orders(id) on delete cascade,
+  status video_status not null default 'queued',
+  photo_key text not null,                  -- photo envoyée par le client (bucket R2 privé)
+  video_key text,                           -- MP4 720×1280 (bucket R2 privé)
+  renders int not null default 1,           -- nombre de créations (limite contre les abus)
+  error text,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
 );
 
 -- Événements de l'entonnoir, pour les compteurs du back-office (PRD §7).

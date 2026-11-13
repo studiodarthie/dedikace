@@ -15,6 +15,16 @@ export const orderPaid = eventType("order/paid", {
   }),
 });
 
+/** Photo reçue : fabrique la vidéo statut (lib/video.ts). */
+export const videoRequested = eventType("video/requested", {
+  schema: z.object({ videoId: z.uuid() }),
+});
+
+/** Identifiant par vidéo et par création : un changement de photo relance bien, un doublon est ignoré. */
+export async function sendVideoRequested(videoId: string, renders: number) {
+  await inngest.send(videoRequested.create({ videoId }, { id: `video-${videoId}-r${renders}` }));
+}
+
 /** Premières paroles prêtes : lance la relance par e-mail 1 h plus tard si la commande n'est pas payée. */
 export const lyricsReady = eventType("order/lyrics-ready", {
   schema: z.object({ orderId: z.uuid() }),

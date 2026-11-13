@@ -43,16 +43,23 @@ Décisions du porteur du projet (13 novembre 2026) :
   Les 10 extraits sont vérifiés par transcription : chacun contient bien le refrain chanté.
   Chansons complètes de l'accueil en 64 kb/s (~1,4 Mo) dans `public/examples/full/`, chargées seulement sur demande.
 
-## Étape 4 — Vidéo pour les statuts WhatsApp (~2 j)
+## Étape 4 — Vidéo pour les statuts WhatsApp (fait le 14 novembre 2026)
 
-- [ ] Page de la chanson : « Crée ta vidéo statut » → choisir une photo (réduite sur le téléphone à 1080 px
+- [x] Page de la chanson : « Crée ta vidéo statut » → choisir une photo (réduite sur le téléphone à 1080 px
       avant l'envoi, pour la 3G), envoyée dans le bucket R2 privé.
-- [ ] Création côté serveur (Inngest + ffmpeg) : vidéo verticale 1080×1920, 30 s autour du refrain, photo avec
+- [x] Création côté serveur (Inngest + ffmpeg) : vidéo verticale 1080×1920, 30 s autour du refrain, photo avec
       zoom lent, prénom + titre + paroles du refrain qui défilent, petit « dedikace.app » en bas (pub gratuite).
       MP4 H.264 : le format que WhatsApp accepte en statut.
-- [ ] Bouton « Télécharger la vidéo » + « Partager » (partage natif du téléphone sur Android).
-- [ ] Modération : la photo n'est jamais montrée publiquement sans la vidéo ; supprimée avec la commande.
+- [x] Bouton « Télécharger la vidéo » + conseil « Actus → Mon statut → Galerie ». (Partage natif abandonné :
+      il faudrait ouvrir le bucket R2 aux requêtes du site ; le téléchargement suffit.)
+- [x] Modération : la photo n'est jamais montrée publiquement sans la vidéo ; supprimée avec la commande.
 - Base : table `videos` (statut, photo, fichier, erreurs) (migration). Coût : temps de calcul Vercel uniquement.
+- Fabrication : `lib/video.ts` (textes en PNG avec resvg + police Outfit dans `assets/fonts/`, ffmpeg-static,
+  720×1280, 24 i/s, ~1,6 Mo), tâche Inngest `render-video` (2 à la fois au plus), données `lib/videos.ts`,
+  routes `app/api/video` (photo) et `app/api/video/status`. Seul l'acheteur crée (identifiant privé gardé sur
+  son téléphone ou espace connecté), 5 vidéos par commande au plus ; tout le monde peut regarder la vidéo prête.
+- Paroles calées sur le plan de composition envoyé à ElevenLabs (`sectionTimeline`) : 30 s à partir de 1,5 s avant
+  le premier refrain. Testé de bout en bout en local (photo → vidéo prête → lecteur 720×1280, 30 s).
 
 ## Étape 5 — Offre premium à 7 000 FCFA (~1,5 j)
 

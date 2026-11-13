@@ -3,6 +3,9 @@ import { and, desc, eq, inArray, ne, sql } from "drizzle-orm";
 import { db } from "@/lib/db";
 import { songs, type Song } from "@/lib/db/schema";
 
+/** Durée demandée à ElevenLabs pour une chanson (secondes). */
+export const SONG_SECONDS = 180;
+
 export const VERSIONS = [1, 2] as const;
 
 /** Crée les lignes des 2 versions d'une génération (sans effet si elles existent déjà). */

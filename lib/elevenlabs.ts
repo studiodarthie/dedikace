@@ -55,6 +55,32 @@ function englishName(label: string) {
 
 const clamp = (n: number, min: number, max: number) => Math.min(max, Math.max(min, n));
 
+/** Durées proportionnelles au nombre de lignes, puis ajustées pour viser la durée demandée (après l'intro). */
+function sectionDurations(sections: Section[], durationSeconds: number): number[] {
+  const raw = sections.map((s) => s.lines.length * MS_PER_LINE);
+  const target = durationSeconds * 1000 - INTRO_MS;
+  const scale = target / raw.reduce((a, b) => a + b, 0);
+  return raw.map((ms) => clamp(Math.round(ms * scale), MIN_CHUNK_MS, MAX_CHUNK_MS));
+}
+
+export type TimedSection = { label: string; isChorus: boolean; startMs: number; durationMs: number; lines: string[] };
+
+/**
+ * Moment où chaque section est chantée, d'après le plan de composition envoyé à ElevenLabs
+ * (les durées des sections y sont imposées). Sert à caler les paroles de la vidéo statut.
+ */
+export function sectionTimeline(lyrics: string, durationSeconds: number): TimedSection[] {
+  const sections = parseLyrics(lyrics);
+  if (sections.length === 0) return [];
+  const durations = sectionDurations(sections, durationSeconds);
+  let start = INTRO_MS;
+  return sections.map((s, i) => {
+    const item = { label: s.label, isChorus: englishName(s.label) === "Chorus", startMs: start, durationMs: durations[i], lines: s.lines };
+    start += durations[i];
+    return item;
+  });
+}
+
 export type SongRequest = {
   /** Description du style (lib/styles.ts → stylePromptFor), en anglais. */
   stylePrompt: string;
@@ -77,11 +103,7 @@ export function buildCompositionPlan({ stylePrompt, lyrics, songLanguage, chorus
     "great production quality",
   ];
 
-  // Durées proportionnelles au nombre de lignes, puis ajustées pour viser la durée demandée.
-  const raw = sections.map((s) => s.lines.length * MS_PER_LINE);
-  const target = durationSeconds * 1000 - INTRO_MS;
-  const scale = target / raw.reduce((a, b) => a + b, 0);
-  const durations = raw.map((ms) => clamp(Math.round(ms * scale), MIN_CHUNK_MS, MAX_CHUNK_MS));
+  const durations = sectionDurations(sections, durationSeconds);
 
   // Refrain dans une autre langue que les couplets : on le précise sur chaque refrain.
   const chorusStyle = chorusLanguage !== songLanguage ? `chorus sung in ${sungLanguage(chorusLanguage)}` : undefined;
