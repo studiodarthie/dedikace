@@ -70,6 +70,8 @@ export function ExamplePlayer({ tracks, header, cta }: { tracks: ExampleTrack[];
   const [time, setTime] = useState(0);
   const [duration, setDuration] = useState(0);
   const [failed, setFailed] = useState(false);
+  // Extrait de 80 s par défaut (léger pour la 3G) ; la chanson complète (3 min, ~1,4 Mo) seulement sur demande.
+  const [full, setFull] = useState(false);
   const track = tracks[index];
   const bars = useMemo(() => waveform(track.file, 44), [track.file]);
   const progress = duration ? time / duration : 0;
@@ -80,7 +82,7 @@ export function ExamplePlayer({ tracks, header, cta }: { tracks: ExampleTrack[];
     const el = audio.current;
     if (!el || !autoplay.current) return;
     el.play().catch(() => setPlaying(false));
-  }, [index]);
+  }, [index, full]);
 
   function toggle() {
     const el = audio.current;
@@ -134,7 +136,7 @@ export function ExamplePlayer({ tracks, header, cta }: { tracks: ExampleTrack[];
                 {active && playing ? (
                   <Equalizer />
                 ) : (
-                  <span className="text-sm text-muted tabular-nums">{t.length}</span>
+                  <span className="text-sm text-muted tabular-nums">{full ? "3:00" : t.length}</span>
                 )}
               </button>
             </li>
@@ -234,7 +236,7 @@ export function ExamplePlayer({ tracks, header, cta }: { tracks: ExampleTrack[];
               <input
                 type="range"
                 min={0}
-                max={duration || 80}
+                max={duration || (full ? 180 : 80)}
                 step={0.1}
                 value={time}
                 onChange={(e) => {
@@ -246,10 +248,23 @@ export function ExamplePlayer({ tracks, header, cta }: { tracks: ExampleTrack[];
             </div>
             <p className="flex justify-between text-xs text-muted tabular-nums">
               <span>{formatTime(time)}</span>
-              <span>{duration ? formatTime(duration) : track.length}</span>
+              <span>{duration ? formatTime(duration) : full ? "3:00" : track.length}</span>
             </p>
           </div>
         </div>
+        <button
+          type="button"
+          onClick={() => {
+            autoplay.current = true;
+            setTime(0);
+            setDuration(0);
+            setFailed(false);
+            setFull((f) => !f);
+          }}
+          className="mt-4 text-sm font-semibold text-brand-dark underline"
+        >
+          {full ? "Revenir à l’extrait (1 min 20)" : "Écouter la chanson complète (3 min)"}
+        </button>
         {failed && (
           <p role="alert" className="mt-3 text-sm font-medium text-brand-dark">
             L’extrait n’a pas pu se lancer. Vérifie ta connexion et réessaie.
@@ -257,7 +272,7 @@ export function ExamplePlayer({ tracks, header, cta }: { tracks: ExampleTrack[];
         )}
         <audio
           ref={audio}
-          src={`/examples/${track.file}`}
+          src={full ? `/examples/full/${track.file}` : `/examples/${track.file}`}
           preload="none"
           onPlay={() => setPlaying(true)}
           onPause={() => setPlaying(false)}

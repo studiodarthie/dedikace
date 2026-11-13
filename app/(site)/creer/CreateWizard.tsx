@@ -16,7 +16,7 @@ import {
 } from "@/lib/occasions";
 import { rememberOrder } from "@/lib/my-orders";
 import { trackPixel } from "@/lib/pixels";
-import { STYLE_TAGLINES, STYLES } from "@/lib/styles";
+import { STYLE_TAGLINES, STYLES, type StyleId } from "@/lib/styles";
 import { VoiceNote } from "./VoiceNote";
 
 // ---------- Brouillon (localStorage) ----------
@@ -599,22 +599,11 @@ function Wizard({
               ))}
             </div>
           </Field>
-          <Field group label="Style">
-            <div className="flex flex-col gap-2">
-              {STYLES.map((s) => (
-                <Choice
-                  key={s.id}
-                  selected={form.styleId === s.id}
-                  onClick={() => update("styleId", s.id)}
-                  align="left"
-                >
-                  <span className="block font-bold">{s.label}</span>
-                  <span className="block text-sm font-normal text-muted">
-                    {STYLE_TAGLINES[s.id]}
-                  </span>
-                </Choice>
-              ))}
-            </div>
+          <Field group label="Style" hint="Touche ▶ pour écouter 15 secondes de chaque style.">
+            <StylePicker
+              value={form.styleId}
+              onChange={(id) => update("styleId", id)}
+            />
           </Field>
           <Field group label="Voix">
             <div className="grid grid-cols-2 gap-2">
@@ -935,6 +924,83 @@ export function Checkout({
 }
 
 // ---------- Petits composants ----------
+
+/**
+ * Cartes de style + bouton ▶ (extrait de 15 s, public/styles/<style>.mp3, ~90 Ko).
+ * Un seul lecteur pour tous les styles, chargé seulement au toucher (3G).
+ */
+function StylePicker({
+  value,
+  onChange,
+}: {
+  value: string;
+  onChange: (id: StyleId) => void;
+}) {
+  const audio = useRef<HTMLAudioElement | null>(null);
+  const [playing, setPlaying] = useState<string | null>(null);
+  const [loading, setLoading] = useState<string | null>(null);
+
+  // On coupe le son si la personne quitte l'étape.
+  useEffect(() => () => audio.current?.pause(), []);
+
+  function toggle(id: StyleId) {
+    audio.current ??= new Audio();
+    const el = audio.current;
+    if (playing === id) {
+      el.pause();
+      setPlaying(null);
+      return;
+    }
+    el.pause();
+    el.src = `/styles/${id}.mp3`;
+    el.onended = () => setPlaying(null);
+    el.onplaying = () => setLoading(null);
+    setLoading(id);
+    setPlaying(id);
+    onChange(id);
+    el.play().catch(() => {
+      setPlaying(null);
+      setLoading(null);
+    });
+  }
+
+  return (
+    <div className="flex flex-col gap-2">
+      {STYLES.map((s) => (
+        <div key={s.id} className="flex items-stretch gap-2">
+          <div className="flex min-w-0 flex-1 [&>button]:w-full">
+            <Choice selected={value === s.id} onClick={() => onChange(s.id)} align="left">
+              <span className="block font-bold">{s.label}</span>
+              <span className="block text-sm font-normal text-muted">
+                {STYLE_TAGLINES[s.id]}
+              </span>
+            </Choice>
+          </div>
+          <button
+            type="button"
+            onClick={() => toggle(s.id)}
+            aria-label={playing === s.id ? `Arrêter l'extrait ${s.label}` : `Écouter un extrait ${s.label}`}
+            className={`flex w-14 shrink-0 items-center justify-center rounded-2xl transition active:scale-95 ${
+              playing === s.id ? "bg-ink text-white" : "bg-white text-brand ring-1 ring-sand"
+            }`}
+          >
+            {loading === s.id ? (
+              <span className="h-5 w-5 animate-spin rounded-full border-2 border-current border-t-transparent" aria-hidden="true" />
+            ) : playing === s.id ? (
+              <svg viewBox="0 0 24 24" className="h-5 w-5 fill-current" aria-hidden="true">
+                <path d="M6 5h4v14H6zM14 5h4v14h-4z" />
+              </svg>
+            ) : (
+              <svg viewBox="0 0 24 24" className="ml-0.5 h-5 w-5 fill-current" aria-hidden="true">
+                <path d="M7 4.5v15l12-7.5z" />
+              </svg>
+            )}
+          </button>
+        </div>
+      ))}
+    </div>
+  );
+}
 
 const inputClass =
   "w-full rounded-xl bg-white px-4 py-3 text-base ring-1 ring-sand placeholder:text-muted/60 focus:ring-2 focus:ring-brand focus:outline-none";

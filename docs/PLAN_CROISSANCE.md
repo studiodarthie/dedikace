@@ -33,12 +33,15 @@ Décisions du porteur du projet (13 novembre 2026) :
       « Envoie aussi le MP3 » (le statut WhatsApp n'accepte pas un MP3 de 3 min : la vidéo de l'étape 4 le fera).
 - [x] Bouton « Télécharger le MP3 » mis en avant (pour l'envoyer en vocal / l'ajouter au statut).
 
-## Étape 3 — Extraits par style dans /creer (~0,5 j + ~10 générations ElevenLabs)
+## Étape 3 — Extraits par style dans /creer (fait le 14 novembre 2026)
 
-- [ ] 10 extraits de 15 s (un par style), même texte neutre (« Joyeux anniversaire… »), voix alternées homme/femme,
+- [x] 10 extraits de 15 s (un par style), même texte neutre (« Joyeux anniversaire… »), voix alternées homme/femme,
       créés par un script comme les exemples, servis en MP3 léger (48 kb/s, ~90 Ko) depuis `public/styles/`.
-- [ ] Bouton ▶ sur chaque carte de style, un seul extrait à la fois, chargé seulement au toucher (3G).
-- [ ] Exemples de l'accueil : bouton « Écouter la chanson complète » (3 min) en plus de l'extrait.
+- [x] Bouton ▶ sur chaque carte de style, un seul extrait à la fois, chargé seulement au toucher (3G).
+- [x] Exemples de l'accueil : bouton « Écouter la chanson complète » (3 min) en plus de l'extrait.
+- Script `npm run make:style-samples` (refrain neutre, voix alternées ; « hommage » a son propre texte doux).
+  Les 10 extraits sont vérifiés par transcription : chacun contient bien le refrain chanté.
+  Chansons complètes de l'accueil en 64 kb/s (~1,4 Mo) dans `public/examples/full/`, chargées seulement sur demande.
 
 ## Étape 4 — Vidéo pour les statuts WhatsApp (~2 j)
 
