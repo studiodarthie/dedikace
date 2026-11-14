@@ -1,6 +1,6 @@
 import "server-only";
 import { randomBytes } from "node:crypto";
-import { and, count, desc, eq, gte, inArray, ne, sql, sum } from "drizzle-orm";
+import { and, desc, eq, ilike, inArray, ne, or, sql } from "drizzle-orm";
 import { sendOrderPaid } from "@/inngest/client";
 import { db } from "@/lib/db";
 import { events, orders, payments, songs, type OrderStatus } from "@/lib/db/schema";
@@ -10,27 +10,17 @@ import { getOrderById, setStatus, trackEvent } from "@/lib/orders";
 
 export class AdminError extends Error {}
 
-/** Minuit à Douala (UTC+1, sans heure d'été) : début des compteurs « du jour ». */
-const startOfToday = sql`(date_trunc('day', now() at time zone 'Africa/Douala') at time zone 'Africa/Douala')`;
-
-export async function getTodayStats() {
-  const [[forms], [paid], [revenue], [failures]] = await Promise.all([
-    db.select({ n: count() }).from(events).where(and(eq(events.type, "form_started"), gte(events.createdAt, startOfToday))),
-    db.select({ n: count() }).from(events).where(and(eq(events.type, "payment_succeeded"), gte(events.createdAt, startOfToday))),
-    db
-      .select({ total: sum(payments.amountXaf).mapWith(Number) })
-      .from(payments)
-      .where(and(eq(payments.status, "successful"), gte(payments.verifiedAt, startOfToday))),
-    db
-      .select({ n: count() })
-      .from(orders)
-      .where(and(inArray(orders.status, ["payment_failed", "generation_failed"]), gte(orders.updatedAt, startOfToday))),
-  ]);
-  return { formsStarted: forms.n, paidOrders: paid.n, revenueXaf: revenue.total ?? 0, failures: failures.n };
-}
-
-/** Les 100 dernières commandes, sans les brouillons sauf si on les demande. */
-export async function listOrders(status?: OrderStatus) {
+/** Les 100 dernières commandes, sans les brouillons sauf si on les demande. `q` : prénom, numéro ou code. */
+export async function listOrders(status?: OrderStatus, q?: string) {
+  const term = q?.trim().slice(0, 60).replace(/[%_\\]/g, (c) => `\\${c}`);
+  const search = term
+    ? or(
+        ilike(orders.recipientName, `%${term}%`),
+        ilike(orders.senderName, `%${term}%`),
+        ilike(orders.publicCode, `%${term}%`),
+        ilike(sql`regexp_replace(${orders.whatsappPhone}, '\\s', '', 'g')`, `%${term.replace(/\s/g, "")}%`),
+      )
+    : undefined;
   const rows = await db
     .select({
       id: orders.id,
@@ -42,7 +32,7 @@ export async function listOrders(status?: OrderStatus) {
       createdAt: orders.createdAt,
     })
     .from(orders)
-    .where(status ? eq(orders.status, status) : ne(orders.status, "draft"))
+    .where(and(status ? eq(orders.status, status) : ne(orders.status, "draft"), search))
     .orderBy(desc(orders.createdAt))
     .limit(100);
 

@@ -118,8 +118,12 @@ async function main() {
       (e) => check("remboursement refusé sans paiement", e instanceof admin.AdminError),
     );
 
-    const stats = await admin.getTodayStats();
-    check("compteurs du jour", stats.paidOrders >= 1 && stats.formsStarted >= 0, JSON.stringify(stats));
+    const { getDashboard } = await import("@/lib/admin-stats");
+    const stats = await getDashboard("jour");
+    // Le paiement de test vient d'être remboursé : il sort du chiffre d'affaires mais reste dans le parcours.
+    check("compteurs du jour", stats.funnel.paymentSucceeded >= 1 && stats.sales.orders >= 0, JSON.stringify(stats.funnel));
+    const found = await admin.listOrders(undefined, order.publicCode);
+    check("recherche par code", found.some((o) => o.id === order.id));
   } finally {
     // Les événements de test ne doivent pas gonfler les compteurs du jour.
     if (created.length) await db.delete(events).where(inArray(events.orderId, created));
