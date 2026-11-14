@@ -1,6 +1,6 @@
-// Crée les 4 exemples audio de l'accueil (public/examples/) avec le même circuit qu'une vraie commande :
+// Crée les exemples audio de l'accueil (public/examples/) avec le même circuit qu'une vraie commande :
 // paroles Claude → modération → ElevenLabs. Consomme ~12 min de crédit ElevenLabs.
-// npm run make:examples [-- nom-du-fichier.mp3]   (sans argument : les 4)
+// npm run make:examples [-- nom-du-fichier.mp3]   (sans argument : tous)
 // La chanson complète est gardée dans scripts/out/examples/ ; l'accueil reçoit un extrait de 80 s (ffmpeg).
 import { execFileSync } from "node:child_process";
 import { mkdirSync, writeFileSync } from "node:fs";
@@ -21,29 +21,37 @@ const EXAMPLES = [
     },
   },
   {
-    file: "dot-bikutsi.mp3",
+    file: "reussite-bikutsi.mp3",
     styleId: "bikutsi",
     voice: "male",
     brief: {
-      occasion: "dot",
-      recipientName: "Ngono",
-      relation: "future épouse",
-      senderName: "Paul",
-      anecdotes: ["On s'est rencontrés à l'université de Yaoundé", "Son rire illumine toute la famille"],
+      occasion: "reussite",
+      recipientName: "Arielle",
+      relation: "petite sœur",
+      senderName: "Boris",
+      anecdotes: [
+        "Elle a eu son Bac D du premier coup",
+        "Tout le quartier a dansé devant la maison quand les résultats sont sortis",
+        "Elle révisait avec une lampe tempête pendant les coupures de courant",
+      ],
       chorusLanguage: "fr",
     },
   },
   {
-    file: "bac-afrobeats.mp3",
-    styleId: "afrobeats",
+    file: "anniversaire-coupe-decale.mp3",
+    styleId: "coupe-decale",
     voice: "female",
     brief: {
-      occasion: "reussite",
-      recipientName: "Brenda",
-      relation: "petite sœur",
-      senderName: "Steve",
-      anecdotes: ["Elle a eu son Bac avec mention", "Elle veut devenir médecin", "Elle révisait tard le soir à la lampe"],
-      chorusLanguage: "pidgin",
+      occasion: "anniversaire",
+      recipientName: "Cédric",
+      relation: "meilleur ami",
+      senderName: "la bande du quartier",
+      anecdotes: [
+        "Il fête ses 30 ans",
+        "C'est toujours le premier sur la piste et le dernier à rentrer",
+        "Il fait le meilleur poisson braisé de toute la bande",
+      ],
+      chorusLanguage: "fr",
     },
   },
   {
@@ -67,7 +75,7 @@ async function main() {
   const { generateLyrics } = await import("@/lib/claude");
   const { generateSong } = await import("@/lib/elevenlabs");
   const { moderateText } = await import("@/lib/moderation");
-  const { stylePromptFor } = await import("@/lib/styles");
+  const { stylePromptFor, styleAvoidFor } = await import("@/lib/styles");
 
   const only = process.argv[2];
   const outDir = path.join("scripts", "out", "examples");
@@ -87,6 +95,7 @@ async function main() {
         const started = Date.now();
         const song = await generateSong({
           stylePrompt: stylePromptFor(ex.styleId, ex.voice),
+          styleAvoid: styleAvoidFor(ex.styleId),
           lyrics: lyrics.lyrics,
           songLanguage: "fr",
           chorusLanguage: ex.brief.chorusLanguage,
@@ -100,6 +109,8 @@ async function main() {
           "-y", "-loglevel", "error", "-i", full, "-t", String(EXTRACT_SECONDS),
           "-af", `afade=t=out:st=${EXTRACT_SECONDS - 4}:d=4`, "-b:a", "96k", path.join(publicDir, ex.file),
         ]);
+        mkdirSync(path.join(publicDir, "full"), { recursive: true });
+        execFileSync("ffmpeg", ["-y", "-loglevel", "error", "-i", full, "-b:a", "64k", path.join(publicDir, "full", ex.file)]);
         console.log(`✓ ${ex.file} — « ${lyrics.title} » — créée en ${Math.round((Date.now() - started) / 1000)} s`);
       }),
     );

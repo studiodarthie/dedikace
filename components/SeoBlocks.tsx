@@ -25,7 +25,7 @@ export async function Promises({ locale = "fr" }: { locale?: Locale }) {
   return (
     <ul className="flex flex-wrap gap-x-4 gap-y-1 text-sm font-medium text-muted">
       <li>{en ? "✓ Free lyrics" : "✓ Paroles gratuites"}</li>
-      <li>{en ? "✓ Ready in 2 min" : "✓ Prête en 2 min"}</li>
+      <li>{en ? "✓ Ready in 3 min" : "✓ Prête en 3 min"}</li>
       <li>✓ 2 versions</li>
       <li>
         ✓ {formatXaf(prices.momo, locale)} {en ? "with MoMo or Orange Money" : "par MoMo ou Orange Money"}

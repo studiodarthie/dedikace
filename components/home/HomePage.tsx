@@ -14,7 +14,8 @@ import { localePath, type Locale } from "@/lib/i18n";
 // Accueil, en français (/) et en anglais (/en). Les textes des deux langues sont côte à côte.
 
 // Exemples audio de l'accueil : extraits de 80 s créés par npm run make:examples (public/examples/).
-const EXAMPLES: (Omit<ExampleTrack, "image"> & { en: Pick<ExampleTrack, "title" | "style" | "tags"> })[] = [
+// illustrated : dessin animé plutôt que la photo de la scène (évite deux fois la même photo).
+const EXAMPLES: (Omit<ExampleTrack, "image"> & { illustrated?: boolean; en: Pick<ExampleTrack, "title" | "style" | "tags"> })[] = [
   {
     file: "anniversaire-makossa.mp3",
     title: "Maman Marie, joyeux anniversaire",
@@ -27,6 +28,18 @@ const EXAMPLES: (Omit<ExampleTrack, "image"> & { en: Pick<ExampleTrack, "title" 
     en: { title: "Mama Marie, happy birthday", style: "Makossa · sung in French", tags: ["Birthday", "Party"] },
   },
   {
+    file: "anniversaire-coupe-decale.mp3",
+    title: "Cédric, trente ans de fête",
+    style: "Coupé-décalé",
+    emoji: "🎉",
+    tags: ["Anniversaire", "Fête"],
+    length: "1:20",
+    scene: "anniversaire",
+    illustrated: true,
+    cover: "from-brand to-gold",
+    en: { title: "Cédric, trente ans de fête", style: "Coupé-décalé · female voice · sung in French", tags: ["Birthday", "Party"] },
+  },
+  {
     file: "mariage-jeff.mp3",
     title: "Jeff, c’est ton grand jour",
     style: "Afrobeats · voix féminine · chanson en anglais · refrain en français",
@@ -36,6 +49,17 @@ const EXAMPLES: (Omit<ExampleTrack, "image"> & { en: Pick<ExampleTrack, "title" 
     scene: "dot",
     cover: "from-brand to-gold",
     en: { title: "Jeff, c’est ton grand jour", style: "Afrobeats · female voice · sung in English · chorus in French", tags: ["Wedding", "Party"] },
+  },
+  {
+    file: "reussite-bikutsi.mp3",
+    title: "Arielle, Bac D en poche",
+    style: "Bikutsi · voix masculine",
+    emoji: "🎓",
+    tags: ["Réussite", "Fête"],
+    length: "1:20",
+    scene: "bac",
+    cover: "from-leaf to-gold",
+    en: { title: "Arielle, Bac D en poche", style: "Bikutsi · male voice · sung in French", tags: ["Success", "Party"] },
   },
   {
     file: "hommage-acoustique.mp3",
@@ -118,7 +142,7 @@ const faq = (prices: Prices, locale: Locale) =>
           q: "How much does it cost?",
           a: `${formatXaf(prices.momo, "en")} with MTN MoMo or Orange Money, ${formatXaf(prices.card, "en")} by bank card${prices.launchEndsEn ? ` (launch price, until ${prices.launchEndsEn})` : ""}. The lyrics are free: you only pay if you like them.`,
         },
-        { q: "How long do I wait?", a: "About 2 minutes after payment. You get a link to open and share." },
+        { q: "How long do I wait?", a: "2 to 3 minutes after payment. You get a link to open and share." },
         { q: "Do we really hear the name?", a: "Yes, that’s the whole point: the name is sung, with your memories. You read the lyrics before paying." },
         {
           q: "What if I don’t like the song?",
@@ -132,7 +156,7 @@ const faq = (prices: Prices, locale: Locale) =>
           q: "Combien ça coûte ?",
           a: `${formatXaf(prices.momo)} par MTN MoMo ou Orange Money, ${formatXaf(prices.card)} par carte bancaire${prices.launchEnds ? ` (prix de lancement, jusqu’au ${prices.launchEnds})` : ""}. Les paroles sont gratuites : tu ne paies que si elles te plaisent.`,
         },
-        { q: "Combien de temps faut-il attendre ?", a: "Environ 2 minutes après le paiement. Tu reçois un lien à ouvrir et à partager." },
+        { q: "Combien de temps faut-il attendre ?", a: "2 à 3 minutes après le paiement. Tu reçois un lien à ouvrir et à partager." },
         {
           q: "On entend vraiment le prénom ?",
           a: "Oui, c’est tout l’intérêt : le prénom est chanté, avec tes souvenirs. Tu relis les paroles avant de payer.",
@@ -158,7 +182,7 @@ const T = {
     h1a: "Ton nom dans",
     h1b: "une chanson.",
     lead: "Raconte tes souvenirs, on en fait une vraie chanson sur des rythmes de chez nous.",
-    promises: ["✓ Paroles gratuites", "✓ Prête en 2 min", "✓ Refaite gratuitement 1 fois", "✓ MoMo · Orange Money · carte"],
+    promises: ["✓ Paroles gratuites", "✓ Prête en 3 min", "✓ Refaite gratuitement 1 fois", "✓ MoMo · Orange Money · carte"],
     listen: "Écouter un exemple",
     create: "Créer ma chanson",
     createMine: "Créer la mienne",
@@ -186,7 +210,7 @@ const T = {
     h1a: "Your name in",
     h1b: "a song.",
     lead: "Share your memories, we turn them into a real song on rhythms from home.",
-    promises: ["✓ Free lyrics", "✓ Ready in 2 min", "✓ 1 free redo", "✓ MoMo · Orange Money · card"],
+    promises: ["✓ Free lyrics", "✓ Ready in 3 min", "✓ 1 free redo", "✓ MoMo · Orange Money · card"],
     listen: "Listen to an example",
     create: "Create my song",
     createMine: "Create mine",
@@ -249,10 +273,10 @@ export async function HomePage({ locale }: { locale: Locale }) {
   const to = (p: string) => localePath(locale, p);
   const createHref = to("/creer");
   // Photo de pochette facultative : public/examples/<scene>.jpg (sinon, illustration animée).
-  const tracks: ExampleTrack[] = EXAMPLES.filter((ex) => hasExample(ex.file)).map(({ en: english, ...ex }) => ({
+  const tracks: ExampleTrack[] = EXAMPLES.filter((ex) => hasExample(ex.file)).map(({ en: english, illustrated, ...ex }) => ({
     ...ex,
     ...(en ? english : {}),
-    image: hasExample(`${ex.scene}.jpg`) ? `/examples/${ex.scene}.jpg` : undefined,
+    image: !illustrated && hasExample(`${ex.scene}.jpg`) ? `/examples/${ex.scene}.jpg` : undefined,
   }));
 
   return (

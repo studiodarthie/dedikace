@@ -36,7 +36,7 @@ export const OCCASION_PAGES: OccasionPage[] = [
     emoji: "🎂",
     title: "Chanson d'anniversaire personnalisée avec le prénom",
     description:
-      "Offre une chanson d'anniversaire unique avec son prénom au refrain, sur un rythme makossa, afrobeats ou bikutsi. Paroles gratuites, prête en 2 minutes.",
+      "Offre une chanson d'anniversaire unique avec son prénom au refrain, sur un rythme makossa, afrobeats ou bikutsi. Paroles gratuites, prête en 3 minutes.",
     h1: "Une chanson d’anniversaire avec son prénom",
     intro: [
       "Le gâteau, les bougies… et une chanson rien que pour elle ou pour lui. Dédikace écrit et compose une vraie chanson d’anniversaire avec le prénom chanté au refrain et vos souvenirs dans les couplets.",
@@ -52,7 +52,7 @@ export const OCCASION_PAGES: OccasionPage[] = [
       },
       {
         q: "Et si c’est son anniversaire aujourd’hui ?",
-        a: "Pas de souci : les paroles arrivent en quelques secondes, et la chanson environ 2 minutes après le paiement.",
+        a: "Pas de souci : les paroles arrivent en quelques secondes, et la chanson 2 à 3 minutes après le paiement.",
       },
       {
         q: "Je peux ajouter des surnoms ?",
@@ -100,7 +100,7 @@ export const OCCASION_PAGES: OccasionPage[] = [
     emoji: "💍",
     title: "Chanson pour la dot : un cadeau unique pour la famille",
     description:
-      "Marque la cérémonie de la dot avec une chanson personnalisée qui honore la mariée et sa famille. Bikutsi, makossa, rumba, prête en 2 minutes.",
+      "Marque la cérémonie de la dot avec une chanson personnalisée qui honore la mariée et sa famille. Bikutsi, makossa, rumba, prête en 3 minutes.",
     h1: "Une chanson pour la dot, qui honore la famille",
     intro: [
       "La dot, c’est deux familles qui se rencontrent. Arrive avec une chanson qui honore ta future épouse, ses parents et tout le village, avec son prénom au refrain.",
@@ -119,7 +119,7 @@ export const OCCASION_PAGES: OccasionPage[] = [
       },
       {
         q: "Elle est prête combien de temps avant la cérémonie ?",
-        a: "Environ 2 minutes après le paiement. Tu peux donc la faire même le jour J.",
+        a: "2 à 3 minutes après le paiement. Tu peux donc la faire même le jour J.",
       },
     ],
   },
@@ -165,6 +165,7 @@ export const OCCASION_PAGES: OccasionPage[] = [
     description:
       "Félicite un enfant, un frère ou une amie pour son Bac, son BEPC, son CAP ou son diplôme avec une chanson personnalisée à son nom. Afrobeats, épique, makossa.",
     h1: "Une chanson pour fêter sa réussite",
+    example: { file: "reussite-bikutsi.mp3", title: "Arielle, Bac D en poche", style: "Bikutsi" },
     intro: [
       "Le Bac, le BEPC, le CEP, un concours ou un diplôme : après tant d’efforts, ça se fête en musique. Dédikace crée une chanson de félicitations avec son prénom au refrain.",
       "Les nuits de révision, la fierté de la famille, le quartier qui célèbre les résultats : raconte-nous, on en fait une chanson qu’il ou elle n’oubliera pas.",
@@ -302,7 +303,7 @@ export const STYLE_PAGES: StylePage[] = [
   {
     id: "bikutsi",
     title: "Chanson bikutsi personnalisée pour faire danser",
-    description: "Une chanson bikutsi à ton nom, rapide et dansante, pour une dot, un anniversaire ou une fête de famille. Prête en 2 minutes.",
+    description: "Une chanson bikutsi à ton nom, rapide et dansante, pour une dot, un anniversaire ou une fête de famille. Prête en 3 minutes.",
     h1: "Ta chanson bikutsi personnalisée",
     intro: "Rythme rapide du Centre, guitare qui tourne en boucle, chœurs qui chantent avec toi : le bikutsi fait danser tout le monde, surtout pendant une dot.",
     occasions: ["dot", "anniversaire", "reussite"],
@@ -334,7 +335,7 @@ export const STYLE_PAGES: StylePage[] = [
   {
     id: "afrobeats",
     title: "Chanson afrobeats personnalisée avec ton prénom",
-    description: "Une chanson afrobeats moderne et groovy à ton nom, avec refrain en français, anglais ou pidgin. Prête en 2 minutes.",
+    description: "Une chanson afrobeats moderne et groovy à ton nom, avec refrain en français, anglais ou pidgin. Prête en 3 minutes.",
     h1: "Ta chanson afrobeats personnalisée",
     intro: "Groove moderne, percussions chaloupées et basse profonde : l’afrobeats plaît à toutes les générations, en français, en anglais ou en pidgin.",
     occasions: ["anniversaire", "reussite", "amour"],

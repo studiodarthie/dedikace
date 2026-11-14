@@ -26,7 +26,7 @@ export const STYLE_TAGLINES: Record<(typeof STYLES)[number]["id"], string> = {
   amapiano: "Tendance, basses profondes",
   afrozouk: "Romantique, avec un groove africain",
   "coupe-decale": "Festif, ambiance boîte",
-  afrosoul: "Piano et cordes, des frissons garantis",
+  afrosoul: "Piano et cordes, pour donner des frissons",
   epique: "Grand et puissant, comme au cinéma",
   hommage: "Guitare acoustique, calme et digne",
 };
@@ -55,7 +55,7 @@ export const STYLE_TAGLINES_EN: Record<(typeof STYLES)[number]["id"], string> = 
   amapiano: "Trendy, deep basslines",
   afrozouk: "Romantic, with an African groove",
   "coupe-decale": "Festive, party vibe",
-  afrosoul: "Piano and strings, goosebumps guaranteed",
+  afrosoul: "Piano and strings, made for goosebumps",
   epique: "Big and powerful, like in the movies",
   hommage: "Acoustic guitar, calm and dignified",
 };

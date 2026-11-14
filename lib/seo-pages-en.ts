@@ -13,7 +13,7 @@ const OCCASIONS_EN: Record<string, OccasionText> = {
   anniversaire: {
     title: "Personalised birthday song with their name",
     description:
-      "Give a unique birthday song with their name in the chorus, on a makossa, afrobeats or bikutsi rhythm. Free lyrics, ready in 2 minutes.",
+      "Give a unique birthday song with their name in the chorus, on a makossa, afrobeats or bikutsi rhythm. Free lyrics, ready in 3 minutes.",
     h1: "A birthday song with their name",
     intro: [
       "The cake, the candles… and a song just for them. Dédikace writes and composes a real birthday song with the name sung in the chorus and your memories in the verses.",
@@ -26,7 +26,7 @@ const OCCASIONS_EN: Record<string, OccasionText> = {
         q: "Can I play it during the party?",
         a: "Yes. You get a link and MP3 files to download: plug your phone into the speaker and play it when the cake comes out.",
       },
-      { q: "What if their birthday is today?", a: "No problem: the lyrics arrive in seconds, and the song about 2 minutes after payment." },
+      { q: "What if their birthday is today?", a: "No problem: the lyrics arrive in seconds, and the song 2 to 3 minutes after payment." },
       { q: "Can I use nicknames?", a: "Yes, write the name or nickname everyone uses: that’s what will be sung." },
     ],
   },
@@ -50,7 +50,7 @@ const OCCASIONS_EN: Record<string, OccasionText> = {
   dot: {
     title: "Song for a traditional wedding (dowry ceremony)",
     description:
-      "Mark the dowry ceremony with a personalised song that honours the bride and her family. Bikutsi, makossa, rumba, ready in 2 minutes.",
+      "Mark the dowry ceremony with a personalised song that honours the bride and her family. Bikutsi, makossa, rumba, ready in 3 minutes.",
     h1: "A song for the dowry ceremony that honours the family",
     intro: [
       "The dowry is two families coming together. Arrive with a song that honours your bride-to-be, her parents and the whole village, with her name in the chorus.",
@@ -60,7 +60,7 @@ const OCCASIONS_EN: Record<string, OccasionText> = {
     faq: [
       { q: "Can the song mention the family?", a: "Yes: write in your memories what you want to say to her parents or family, we put it in the verses." },
       { q: "Can part of it be in pidgin or French?", a: "Yes. You choose the song’s language and the chorus language: English, French or pidgin." },
-      { q: "How long before the ceremony is it ready?", a: "About 2 minutes after payment. You can even make it on the day." },
+      { q: "How long before the ceremony is it ready?", a: "2 to 3 minutes after payment. You can even make it on the day." },
     ],
   },
   hommage: {
@@ -85,6 +85,7 @@ const OCCASIONS_EN: Record<string, OccasionText> = {
     description:
       "Congratulate a child, a brother or a friend on their exams, GCE, graduation or diploma with a personalised song with their name. Afrobeats, epic, makossa.",
     h1: "A song to celebrate their success",
+    example: { title: "Arielle, Bac D en poche", style: "Bikutsi, sung in French" },
     intro: [
       "GCE, BEPC, Bac, an entrance exam or a degree: after so much effort, it deserves music. Dédikace creates a congratulations song with their name in the chorus.",
       "The late-night revision, the family’s pride, the neighbourhood celebrating the results: tell us, we turn it into a song they won’t forget.",
@@ -157,7 +158,7 @@ const STYLES_EN: Record<string, StyleText> = {
   },
   bikutsi: {
     title: "Personalised bikutsi song to get everyone dancing",
-    description: "A fast, danceable bikutsi song with your name, for a dowry ceremony, a birthday or a family party. Ready in 2 minutes.",
+    description: "A fast, danceable bikutsi song with your name, for a dowry ceremony, a birthday or a family party. Ready in 3 minutes.",
     h1: "Your personalised bikutsi song",
     intro: "A fast rhythm from the Centre region, looping guitar, choirs singing along: bikutsi gets everyone dancing, especially at a dowry ceremony.",
   },
@@ -181,7 +182,7 @@ const STYLES_EN: Record<string, StyleText> = {
   },
   afrobeats: {
     title: "Personalised afrobeats song with your name",
-    description: "A modern, groovy afrobeats song with your name, with the chorus in English, French or pidgin. Ready in 2 minutes.",
+    description: "A modern, groovy afrobeats song with your name, with the chorus in English, French or pidgin. Ready in 3 minutes.",
     h1: "Your personalised afrobeats song",
     intro: "Modern groove, swinging percussion and deep bass: afrobeats pleases every generation, in English, French or pidgin.",
   },

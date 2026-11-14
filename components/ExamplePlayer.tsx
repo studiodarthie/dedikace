@@ -105,7 +105,7 @@ export function ExamplePlayer({ tracks, header, cta }: { tracks: ExampleTrack[];
 
   const list = (
     <div className="flex min-w-0 flex-col gap-3">
-      <p className="text-xs font-bold tracking-[0.2em] text-muted uppercase">4 extraits, 4 moments de vie</p>
+      <p className="text-xs font-bold tracking-[0.2em] text-muted uppercase">{en ? `${tracks.length} excerpts, ${tracks.length} moments` : `${tracks.length} extraits, ${tracks.length} moments de vie`}</p>
       <ul className="flex flex-col gap-1.5">
         {tracks.map((t, i) => {
           const active = i === index;

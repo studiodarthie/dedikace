@@ -19,7 +19,7 @@ export const metadata: Metadata = {
   metadataBase: new URL(env.NEXT_PUBLIC_APP_URL),
   title: { default: "Dédikace — Chanson personnalisée avec ton prénom", template: "%s · Dédikace" },
   description:
-    "Offre une chanson personnalisée avec le prénom au refrain : anniversaire, mariage, dot, hommage, réussite. Makossa, bikutsi, afrobeats, rumba. Paroles gratuites, prête en 2 minutes, paiement Mobile Money.",
+    "Offre une chanson personnalisée avec le prénom au refrain : anniversaire, mariage, dot, hommage, réussite. Makossa, bikutsi, afrobeats, rumba. Paroles gratuites, prête en 3 minutes, paiement Mobile Money.",
   applicationName: "Dédikace",
   keywords: [
     "chanson personnalisée",
