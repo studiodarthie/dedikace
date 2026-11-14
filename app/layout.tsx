@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Outfit } from "next/font/google";
+import Image from "next/image";
 import Link from "next/link";
 import { Suspense } from "react";
 import { env } from "@/lib/env";
@@ -19,7 +20,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#e0451b",
+  themeColor: "#d9401a",
   width: "device-width",
   initialScale: 1,
 };
@@ -31,8 +32,16 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       <body className="flex min-h-full flex-col">
         <header className="sticky top-0 z-40 border-b border-sand/60 bg-cream/85 backdrop-blur">
           <div className="mx-auto flex h-16 w-full max-w-6xl items-center justify-between gap-4 px-4 md:px-8">
-            <Link href="/" className="text-xl font-extrabold tracking-tight text-brand md:text-2xl">
-              Dédikace<span className="text-gold">.</span>
+            <Link href="/" aria-label="Dédikace, accueil" className="shrink-0">
+              <Image
+                src="/brand/logo-couleur.svg"
+                alt="Dédikace"
+                width={432}
+                height={100}
+                priority
+                unoptimized
+                className="h-7 w-auto md:h-9"
+              />
             </Link>
             <nav aria-label="Navigation principale" className="hidden items-center gap-1 rounded-full bg-white/70 p-1 text-sm font-medium ring-1 ring-sand md:flex">
               {[

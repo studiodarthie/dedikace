@@ -25,6 +25,18 @@ const FONTS = [path.join(FONT_DIR, "Outfit-Bold.ttf"), path.join(FONT_DIR, "Outf
 
 export class VideoError extends Error {}
 
+/** Logo blanc (assets/brand), posé en bas de la vidéo : son contenu est inséré tel quel dans le calque SVG. */
+let logoCache: { viewBox: string; body: string } | undefined;
+async function whiteLogo() {
+  if (!logoCache) {
+    const svg = await readFile(path.join(process.cwd(), "assets", "brand", "logo-blanc.svg"), "utf8");
+    const viewBox = svg.match(/viewBox="([^"]+)"/)?.[1] ?? "0 0 4398 1019";
+    const body = svg.replace(/^[\s\S]*?<svg[^>]*>/, "").replace(/<\/svg>\s*$/, "");
+    logoCache = { viewBox, body };
+  }
+  return logoCache;
+}
+
 const esc = (s: string) => s.replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&apos;" })[c]!);
 
 /** Coupe un texte en lignes d'au plus `max` caractères (sans couper les mots). */
@@ -59,8 +71,8 @@ function png(svg: string): Buffer {
     .asPng();
 }
 
-/** Calque fixe : dégradés sombres haut et bas, « Pour Marie », titre, « dedikace.app ». */
-function frameSvg(recipientName: string, title: string): string {
+/** Calque fixe : dégradés sombres haut et bas, « Pour Marie », titre, logo et « dedikace.app ». */
+function frameSvg(recipientName: string, title: string, logo: { viewBox: string; body: string }): string {
   const titleLines = wrap(noEmoji(title), 24, 2);
   const titleText = titleLines
     .map((l, i) => `<text x="${W / 2}" y="${200 + i * 62}" font-size="54" font-weight="800" text-anchor="middle" fill="#fff">${esc(l)}</text>`)
@@ -74,8 +86,8 @@ function frameSvg(recipientName: string, title: string): string {
   <rect x="0" y="${H - 560}" width="${W}" height="560" fill="url(#bot)"/>
   <text x="${W / 2}" y="120" font-size="34" font-weight="700" text-anchor="middle" fill="#ffcf5a" letter-spacing="2">POUR ${esc(noEmoji(recipientName).toUpperCase())}</text>
   ${titleText}
-  <rect x="${W / 2 - 130}" y="${H - 92}" width="260" height="52" rx="26" fill="#e0451b"/>
-  <text x="${W / 2}" y="${H - 56}" font-size="28" font-weight="800" text-anchor="middle" fill="#fff">dedikace.app</text>
+  <svg x="${W / 2 - 95}" y="${H - 108}" width="190" height="44" viewBox="${logo.viewBox}">${logo.body}</svg>
+  <text x="${W / 2}" y="${H - 34}" font-size="24" font-weight="700" text-anchor="middle" fill="#ffcf5a" letter-spacing="1">dedikace.app</text>
 </svg>`;
 }
 
@@ -135,7 +147,7 @@ export async function renderStatusVideo(input: VideoInput): Promise<Buffer> {
       .jpeg({ quality: 88 })
       .toFile(path.join(dir, "photo.jpg"));
     await writeFile(path.join(dir, "song.mp3"), input.audio);
-    await writeFile(path.join(dir, "frame.png"), png(frameSvg(input.recipientName, input.title)));
+    await writeFile(path.join(dir, "frame.png"), png(frameSvg(input.recipientName, input.title, await whiteLogo())));
 
     const { startSeconds, cues } = videoWindow(input.lyrics, input.songSeconds);
     await Promise.all(cues.map((c, i) => writeFile(path.join(dir, `l${i}.png`), png(lyricSvg(c.text)))));

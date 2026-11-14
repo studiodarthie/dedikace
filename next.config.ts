@@ -7,7 +7,7 @@ const nextConfig: NextConfig = {
   // et fichiers à embarquer dans la fonction Inngest qui fabrique la vidéo.
   serverExternalPackages: ["ffmpeg-static", "@resvg/resvg-js"],
   outputFileTracingIncludes: {
-    "/api/inngest": ["./node_modules/ffmpeg-static/ffmpeg", "./assets/fonts/*.ttf"],
+    "/api/inngest": ["./node_modules/ffmpeg-static/ffmpeg", "./assets/fonts/*.ttf", "./assets/brand/*.svg"],
   },
   partialPrefetching: true,
   turbopack: {

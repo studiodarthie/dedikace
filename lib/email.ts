@@ -4,6 +4,10 @@ import { env } from "@/lib/env";
 
 let resend: Resend | undefined;
 
+/** Logo en tête des e-mails clients (PNG : Gmail n'affiche pas le SVG). */
+const logo = () =>
+  `<p><img src="${env.NEXT_PUBLIC_APP_URL.replace(/\/$/, "")}/brand/logo-email.png" width="150" height="35" alt="Dédikace" style="display:block;border:0"></p>`;
+
 /** Alerte envoyée aux adresses de ADMIN_EMAILS. Ne lève jamais d'erreur : une alerte ratée ne doit rien bloquer. */
 export async function sendAdminAlert(subject: string, text: string): Promise<void> {
   console.error(`[alerte] ${subject}\n${text}`);
@@ -43,7 +47,7 @@ export async function sendSongReady(to: string, data: { firstName: string | null
     to,
     subject: `🎶 La chanson pour ${data.recipientName} est prête !`,
     text: [hello, "", `La chanson pour ${data.recipientName} est prête : 2 versions à écouter et à partager.`, data.url, "", "Pense à la vidéo pour ton statut WhatsApp, sur la même page.", "", "L'équipe Dédikace"].join("\n"),
-    html: `<p>${esc(hello)}</p><p>La chanson pour <strong>${esc(data.recipientName)}</strong> est prête : 2 versions à écouter et à partager.</p>
+    html: `${logo()}<p>${esc(hello)}</p><p>La chanson pour <strong>${esc(data.recipientName)}</strong> est prête : 2 versions à écouter et à partager.</p>
 <p><a href="${data.url}" style="display:inline-block;padding:12px 20px;background:#e0451b;color:#fff;border-radius:999px;text-decoration:none;font-weight:bold">Écouter ma chanson</a></p>
 <p style="color:#666;font-size:13px">Pense à la vidéo pour ton statut WhatsApp, sur la même page. L'équipe Dédikace</p>`,
   });
@@ -78,7 +82,7 @@ export async function sendPaymentReminder(
       "",
       "L'équipe Dédikace",
     ].join("\n"),
-    html: `<p>${esc(hello)}</p><p>${esc(line)}</p>
+    html: `${logo()}<p>${esc(hello)}</p><p>${esc(line)}</p>
 <p><a href="${data.url}" style="display:inline-block;padding:12px 20px;background:#e0451b;color:#fff;border-radius:999px;text-decoration:none;font-weight:bold">Lancer ma chanson</a></p>
 <p style="color:#666;font-size:13px">Une question ? Écris-nous sur WhatsApp au ${esc(support)}. L'équipe Dédikace</p>`,
   });
@@ -96,7 +100,7 @@ export async function sendMagicLink(to: string, url: string): Promise<void> {
     to,
     subject: "Ton lien de connexion à Dédikace",
     text: `Clique sur ce lien pour te connecter à ton espace Dédikace :\n${url}\n\nIl est valable 24 h et ne sert qu'une fois. Si tu n'as rien demandé, ignore cet e-mail.`,
-    html: `<p>Clique sur ce bouton pour te connecter à ton espace Dédikace :</p>
+    html: `${logo()}<p>Clique sur ce bouton pour te connecter à ton espace Dédikace :</p>
 <p><a href="${url}" style="display:inline-block;padding:12px 20px;background:#e0451b;color:#fff;border-radius:999px;text-decoration:none;font-weight:bold">Me connecter</a></p>
 <p style="color:#666;font-size:13px">Le lien est valable 24 h et ne sert qu'une fois. Si tu n'as rien demandé, ignore cet e-mail.</p>`,
   });
