@@ -1099,7 +1099,7 @@ function Choice({
       type="button"
       aria-pressed={selected}
       onClick={onClick}
-      className={`min-h-14 rounded-2xl ${compact ? "px-1 py-2.5" : "px-4 py-3"} font-semibold transition active:scale-[0.98] ${
+      className={`min-h-14 min-w-0 rounded-2xl break-words hyphens-auto ${compact ? "px-1 py-2.5" : align === "left" ? "px-4 py-3" : "px-2 py-3 sm:px-4"} font-semibold transition active:scale-[0.98] ${
         align === "left" ? "text-left" : "text-center"
       } ${selected ? "bg-brand text-white shadow-md shadow-brand/30 [&_.text-muted]:text-white/80" : "bg-white ring-1 ring-sand"}`}
     >

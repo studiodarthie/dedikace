@@ -21,6 +21,9 @@ html {
 }
 
 body {
+  /* Filet de sécurité : rien ne fait défiler la page de côté sur un petit écran (clip garde l'en-tête collant). */
+  overflow-x: clip;
+  overflow-wrap: break-word;
   background: var(--color-cream);
   color: var(--color-ink);
   font-family: var(--font-outfit), system-ui, sans-serif;

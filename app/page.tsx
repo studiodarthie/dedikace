@@ -63,10 +63,10 @@ const EXAMPLES: Omit<ExampleTrack, "image">[] = [
 
 // Autocollants décoratifs. Ordinateur : sur les côtés de l'écran. Téléphone : collés aux coins du titre.
 const STICKERS = [
-  { emoji: "🎂", label: "Anniversaire", desktop: "top-[22%] left-[8%] -rotate-6", mobile: "top-1 left-0 -rotate-6" },
-  { emoji: "💍", label: "Dot", desktop: "top-[26%] right-[9%] rotate-6 [animation-delay:1.2s]", mobile: "top-1 right-1 rotate-6 [animation-delay:1.2s]" },
-  { emoji: "🎓", label: "Bac", desktop: "bottom-[30%] left-[12%] rotate-3 [animation-delay:2.4s]", mobile: "-bottom-1 left-3 rotate-3 [animation-delay:2.4s]" },
-  { emoji: "❤️", label: "Mariage", desktop: "bottom-[38%] right-[6%] -rotate-3 [animation-delay:3.1s]", mobile: "bottom-0 -right-1 -rotate-3 [animation-delay:3.1s]" },
+  { emoji: "🎂", label: "Anniversaire", desktop: "top-[22%] left-[8%] -rotate-6", mobile: "top-0 left-0 -rotate-6", narrow: true },
+  { emoji: "💍", label: "Dot", desktop: "top-[26%] right-[9%] rotate-6 [animation-delay:1.2s]", mobile: "top-0 right-1 rotate-6 [animation-delay:1.2s]", narrow: false },
+  { emoji: "🎓", label: "Bac", desktop: "bottom-[30%] left-[12%] rotate-3 [animation-delay:2.4s]", mobile: "-bottom-1 left-3 rotate-3 [animation-delay:2.4s]", narrow: false },
+  { emoji: "❤️", label: "Mariage", desktop: "bottom-[38%] right-[6%] -rotate-3 [animation-delay:3.1s]", mobile: "-bottom-1 right-0 -rotate-3 [animation-delay:3.1s]", narrow: true },
 ];
 
 function Sticker({ emoji, label, className }: { emoji: string; label: string; className: string }) {
@@ -138,7 +138,7 @@ function CreateButton({ label = "Créer ma chanson", className = "" }: { label?:
   return (
     <Link
       href="/creer"
-      className={`flex h-14 items-center justify-center gap-2 rounded-full bg-gradient-to-r from-[#f07a1a] to-brand px-8 text-lg font-bold text-white shadow-lg ring-4 shadow-brand/30 ring-brand/15 transition hover:shadow-xl active:scale-[0.98] ${className}`}
+      className={`flex min-h-14 items-center justify-center gap-2 rounded-full bg-gradient-to-r from-[#f07a1a] to-brand px-5 py-2 text-lg leading-tight font-bold text-balance max-[359px]:text-base min-[400px]:px-8 text-white shadow-lg ring-4 shadow-brand/30 ring-brand/15 transition hover:shadow-xl active:scale-[0.98] ${className}`}
     >
       {label}
       <span aria-hidden="true">→</span>
@@ -200,13 +200,13 @@ export default function Home() {
         <Container className="flex flex-1 flex-col items-center justify-center gap-5 pt-6 pb-8 text-center md:gap-8 md:py-16">
           <p className="flex items-center gap-2 rounded-full bg-white px-3 py-1 text-[11px] font-bold tracking-wide text-muted uppercase shadow-sm ring-1 ring-sand md:px-4 md:py-1.5 md:text-xs">
             <span className="h-2 w-2 rounded-full bg-brand" aria-hidden="true" />
-            Makossa · Bikutsi · Afrobeats · Rumba
+            Makossa · Bikutsi · Afrobeats<span className="max-[399px]:hidden"> · Rumba</span>
           </p>
           <div className="relative w-full py-10 lg:py-0">
             {STICKERS.map((s) => (
-              <Sticker key={s.label} emoji={s.emoji} label={s.label} className={`lg:hidden ${s.mobile}`} />
+              <Sticker key={s.label} emoji={s.emoji} label={s.label} className={`lg:hidden ${s.narrow ? "" : "max-[399px]:hidden"} ${s.mobile}`} />
             ))}
-            <h1 className="text-[3.1rem] leading-[0.98] font-extrabold tracking-tight min-[400px]:text-[3.4rem] md:text-7xl lg:text-8xl">
+            <h1 className="text-[clamp(2.1rem,11.5vw,3.4rem)] leading-[1.02] font-extrabold tracking-tight md:text-7xl lg:text-8xl">
               Ton nom dans
               <br />
               <span className="bg-gradient-to-r from-brand to-gold bg-clip-text text-transparent">une chanson.</span>

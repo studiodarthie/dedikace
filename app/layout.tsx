@@ -50,7 +50,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     <html lang="fr" className={`${outfit.variable} h-full antialiased`} suppressHydrationWarning>
       <body className="flex min-h-full flex-col">
         <header className="sticky top-0 z-40 border-b border-sand/60 bg-cream/85 backdrop-blur">
-          <div className="mx-auto flex h-16 w-full max-w-6xl items-center justify-between gap-4 px-4 md:px-8">
+          <div className="mx-auto flex h-16 w-full max-w-6xl items-center justify-between gap-2 px-4 max-[359px]:px-3 md:gap-4 md:px-8">
             <Link href="/" aria-label="Dédikace, accueil" className="shrink-0">
               <Image
                 src="/brand/logo-couleur.svg"
@@ -59,7 +59,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
                 height={100}
                 priority
                 unoptimized
-                className="h-7 w-auto md:h-9"
+                className="h-6 w-auto min-[360px]:h-7 md:h-9"
               />
             </Link>
             <nav aria-label="Navigation principale" className="hidden items-center gap-1 rounded-full bg-white/70 p-1 text-sm font-medium ring-1 ring-sand md:flex">
@@ -73,12 +73,12 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
                 </Link>
               ))}
             </nav>
-            <div className="flex items-center gap-2">
+            <div className="flex shrink-0 items-center gap-2">
               <Link
                 href="/compte"
                 aria-label="Mon espace"
                 title="Mon espace"
-                className="flex h-10 w-10 items-center justify-center rounded-full bg-white text-ink ring-1 ring-sand transition active:scale-95 md:h-11 md:w-11"
+                className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white text-ink ring-1 ring-sand transition active:scale-95 md:h-11 md:w-11"
               >
                 <svg viewBox="0 0 24 24" className="h-5 w-5" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" aria-hidden="true">
                   <circle cx="12" cy="8" r="4" />
