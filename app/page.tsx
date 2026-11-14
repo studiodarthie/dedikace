@@ -30,6 +30,16 @@ const EXAMPLES: Omit<ExampleTrack, "image">[] = [
     cover: "from-gold to-brand",
   },
   {
+    file: "mariage-jeff.mp3",
+    title: "Jeff, c’est ton grand jour",
+    style: "Afrobeats · voix féminine · chanson en anglais · refrain en français",
+    emoji: "💍",
+    tags: ["Mariage", "Fête"],
+    length: "1:20",
+    scene: "dot",
+    cover: "from-brand to-gold",
+  },
+  {
     file: "hommage-acoustique.mp3",
     title: "Papa Emmanuel, ta lumière",
     style: "Acoustique",

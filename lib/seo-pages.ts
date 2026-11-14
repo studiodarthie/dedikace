@@ -73,6 +73,7 @@ export const OCCASION_PAGES: OccasionPage[] = [
     ],
     cta: "Créer notre chanson de mariage",
     styles: ["rumba", "zouklove", "afrozouk", "makossa", "gospel"],
+    example: { file: "mariage-jeff.mp3", title: "Jeff, c’est ton grand jour", style: "Afrobeats, couplets en anglais, refrain en français" },
     faq: [
       {
         q: "On peut mettre les deux prénoms ?",
