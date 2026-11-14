@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useId, useState } from "react";
 import { localePath, stripLocale, type Locale } from "@/lib/i18n";
 import { useLocale } from "@/lib/use-locale";
 
@@ -22,6 +22,36 @@ export function HtmlLang() {
   return null;
 }
 
+/** Drapeaux en SVG (les émojis drapeaux s'affichent en lettres sur Windows). */
+function Flag({ locale, className = "" }: { locale: Locale; className?: string }) {
+  const id = useId();
+  if (locale === "fr")
+    return (
+      <svg viewBox="0 0 3 2" className={className} aria-hidden="true" preserveAspectRatio="xMidYMid slice">
+        <rect width="1" height="2" fill="#0055a4" />
+        <rect x="1" width="1" height="2" fill="#fff" />
+        <rect x="2" width="1" height="2" fill="#ef4135" />
+      </svg>
+    );
+  return (
+    <svg viewBox="0 0 60 30" className={className} aria-hidden="true" preserveAspectRatio="xMidYMid slice">
+      <clipPath id={`${id}s`}>
+        <path d="M0,0 v30 h60 v-30 z" />
+      </clipPath>
+      <clipPath id={`${id}t`}>
+        <path d="M30,15 h30 v15 z v15 h-30 z h-30 v-15 z v-15 h30 z" />
+      </clipPath>
+      <g clipPath={`url(#${id}s)`}>
+        <path d="M0,0 v30 h60 v-30 z" fill="#012169" />
+        <path d="M0,0 L60,30 M60,0 L0,30" stroke="#fff" strokeWidth="6" />
+        <path d="M0,0 L60,30 M60,0 L0,30" clipPath={`url(#${id}t)`} stroke="#C8102E" strokeWidth="4" />
+        <path d="M30,0 v30 M0,15 h60" stroke="#fff" strokeWidth="10" />
+        <path d="M30,0 v30 M0,15 h60" stroke="#C8102E" strokeWidth="6" />
+      </g>
+    </svg>
+  );
+}
+
 /** Bouton FR / EN : même page dans l'autre langue. Petit écran : seulement la langue cible. */
 export function LanguageSwitch() {
   const locale = useLocale();
@@ -35,10 +65,11 @@ export function LanguageSwitch() {
       hrefLang={l}
       aria-current={l === locale ? "true" : undefined}
       aria-label={l === "fr" ? "Version française" : "English version"}
-      className={`flex h-8 items-center rounded-full px-2.5 text-xs font-bold transition ${
+      className={`flex h-8 items-center gap-1.5 rounded-full px-2.5 text-xs font-bold transition ${
         l === locale ? "bg-ink text-cream" : "text-muted hover:text-ink"
       }`}
     >
+      <Flag locale={l} className="h-3.5 w-5 shrink-0 rounded-[3px] ring-1 ring-ink/10" />
       {l.toUpperCase()}
     </Link>
   );
@@ -50,9 +81,10 @@ export function LanguageSwitch() {
         onClick={() => remember(other)}
         hrefLang={other}
         aria-label={other === "fr" ? "Version française" : "English version"}
-        className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-white text-xs font-bold ring-1 ring-sand min-[400px]:h-10 min-[400px]:w-10 md:hidden"
+        className="flex h-9 min-w-9 shrink-0 items-center justify-center gap-1 rounded-full bg-white px-2 text-xs font-bold ring-1 ring-sand min-[400px]:h-10 min-[400px]:min-w-10 md:hidden"
       >
-        {other.toUpperCase()}
+        <Flag locale={other} className="h-3.5 w-5 shrink-0 rounded-[3px] ring-1 ring-ink/10" />
+        <span className="max-[479px]:hidden">{other.toUpperCase()}</span>
       </Link>
     </>
   );
