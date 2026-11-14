@@ -18,6 +18,8 @@ import { rememberOrder } from "@/lib/my-orders";
 import { trackPixel } from "@/lib/pixels";
 import { STYLE_TAGLINES, STYLES, type StyleId } from "@/lib/styles";
 import { VoiceNote } from "./VoiceNote";
+import { playExclusive } from "@/lib/single-audio";
+import { CreateSkeleton } from "@/components/Skeletons";
 
 // ---------- Brouillon (localStorage) ----------
 
@@ -169,10 +171,7 @@ export function CreateWizard({ defaults, ...prices }: Prices & { defaults?: Defa
   const isClient = useIsClient();
   if (!isClient) {
     return (
-      <div
-        className="mt-6 h-64 animate-pulse rounded-3xl bg-sand/60"
-        aria-label="Chargement"
-      />
+      <CreateSkeleton />
     );
   }
   return <Wizard initial={loadDraft(defaults)} {...prices} />;
@@ -967,6 +966,12 @@ function StylePicker({
     el.pause();
     el.src = `/styles/${id}.mp3`;
     el.onended = () => setPlaying(null);
+    // Un seul son à la fois : si un autre lecteur de la page démarre, ce bouton revient sur ▶.
+    el.onplay = () =>
+      playExclusive(el, () => {
+        setPlaying(null);
+        setLoading(null);
+      });
     el.onplaying = () => setLoading(null);
     setLoading(id);
     setPlaying(id);

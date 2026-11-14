@@ -7,6 +7,7 @@ import { env } from "@/lib/env";
 import { OCCASION_PAGES } from "@/lib/seo-pages";
 import { HeaderCta } from "@/components/HeaderCta";
 import { CookieSettingsLink, Pixels } from "@/components/Pixels";
+import { SingleAudio } from "@/components/SingleAudio";
 import { WebAnalytics } from "@/components/WebAnalytics";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
 import "./globals.css";
@@ -126,6 +127,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <Suspense fallback={null}>
           <Pixels metaId={env.META_PIXEL_ID} />
         </Suspense>
+        <SingleAudio />
         <WebAnalytics />
       </body>
     </html>

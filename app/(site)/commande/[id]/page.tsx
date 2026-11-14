@@ -9,6 +9,7 @@ import { getOrderById } from "@/lib/orders";
 import { pricesAt } from "@/lib/pricing";
 import { getLatestPayment } from "@/lib/payments";
 import { OrderTracker } from "./OrderTracker";
+import { OrderSkeleton } from "@/components/Skeletons";
 
 const PAID = new Set(["paid", "generating", "delivered", "generation_failed"]);
 
@@ -16,7 +17,7 @@ export const metadata: Metadata = { title: "Ta commande", robots: { index: false
 
 export default function OrderPage({ params }: PageProps<"/commande/[id]">) {
   return (
-    <Suspense fallback={<div className="mt-6 h-72 animate-pulse rounded-3xl bg-sand/60" aria-label="Chargement" />}>
+    <Suspense fallback={<OrderSkeleton />}>
       <OrderContent params={params} />
     </Suspense>
   );

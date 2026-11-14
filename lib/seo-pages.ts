@@ -103,7 +103,6 @@ export const OCCASION_PAGES: OccasionPage[] = [
     ],
     cta: "Créer ma chanson pour la dot",
     styles: ["bikutsi", "makossa", "rumba", "gospel", "epique"],
-    example: { file: "dot-bikutsi.mp3", title: "Ngono, ma reine de la dot", style: "Bikutsi" },
     faq: [
       {
         q: "La chanson peut citer la famille ?",
@@ -165,7 +164,6 @@ export const OCCASION_PAGES: OccasionPage[] = [
     ],
     cta: "Créer sa chanson de réussite",
     styles: ["afrobeats", "epique", "makossa", "amapiano", "coupe-decale"],
-    example: { file: "bac-afrobeats.mp3", title: "Brenda la Docteur", style: "Afrobeats · refrain en pidgin" },
     faq: [
       {
         q: "Ça marche pour un diplôme universitaire ?",

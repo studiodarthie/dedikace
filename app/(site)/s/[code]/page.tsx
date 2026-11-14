@@ -12,6 +12,7 @@ import { getStyle } from "@/lib/styles";
 import { AutoRefresh, RegenerateButton, SongPlayer } from "./SongActions";
 import { SurprisePanel } from "./SurprisePanel";
 import { VideoPanel } from "./VideoPanel";
+import { SongSkeleton } from "@/components/Skeletons";
 
 const APP_URL = env.NEXT_PUBLIC_APP_URL;
 const SUPPORT_PHONE = process.env.NEXT_PUBLIC_SUPPORT_WHATSAPP ?? "";
@@ -35,7 +36,7 @@ export async function generateMetadata({ params }: PageProps<"/s/[code]">): Prom
 
 export default function SongPage({ params }: PageProps<"/s/[code]">) {
   return (
-    <Suspense fallback={<div className="mt-6 h-96 animate-pulse rounded-3xl bg-sand/60" aria-label="Chargement" />}>
+    <Suspense fallback={<SongSkeleton />}>
       <SongContent params={params} />
     </Suspense>
   );

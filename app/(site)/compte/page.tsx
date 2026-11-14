@@ -7,6 +7,7 @@ import { env } from "@/lib/env";
 import { whatsappLink } from "@/lib/format";
 import { OCCASIONS } from "@/lib/occasions";
 import { ClaimOrders } from "./ClaimOrders";
+import { AccountSkeleton } from "@/components/Skeletons";
 
 export const metadata: Metadata = { title: "Mon espace", robots: { index: false, follow: false } };
 
@@ -14,7 +15,7 @@ const SUPPORT_PHONE = process.env.NEXT_PUBLIC_SUPPORT_WHATSAPP ?? "";
 
 export default function AccountPage() {
   return (
-    <Suspense fallback={<div className="mt-6 h-96 animate-pulse rounded-3xl bg-sand/60" aria-label="Chargement" />}>
+    <Suspense fallback={<AccountSkeleton />}>
       <AccountContent />
     </Suspense>
   );
