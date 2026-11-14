@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useLocale } from "@/lib/use-locale";
+import { MissionCta } from "@/components/MissionCta";
 
 export default function NotFound() {
   const en = useLocale() === "en";
@@ -22,6 +23,7 @@ export default function NotFound() {
       >
         {en ? "Back to home" : "Retour à l’accueil"}
       </Link>
+      <MissionCta locale={en ? "en" : "fr"} className="mt-10 w-full" />
     </div>
   );
 }

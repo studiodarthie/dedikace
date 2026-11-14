@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import { env } from "@/lib/env";
@@ -14,6 +13,7 @@ import { AutoRefresh, RegenerateButton, SongPlayer } from "./SongActions";
 import { SurprisePanel } from "./SurprisePanel";
 import { VideoPanel } from "./VideoPanel";
 import { SongSkeleton } from "@/components/Skeletons";
+import { MissionCta } from "@/components/MissionCta";
 
 const APP_URL = env.NEXT_PUBLIC_APP_URL;
 const SUPPORT_PHONE = process.env.NEXT_PUBLIC_SUPPORT_WHATSAPP ?? "";
@@ -178,12 +178,7 @@ async function SongContent({ params, locale }: { params: Promise<{ code: string 
 
       <SurprisePanel recipientName={order.recipientName} senderName={order.senderName} pageUrl={pageUrl} />
       {order.status === "delivered" && <VideoPanel code={order.publicCode} recipientName={order.recipientName} />}
-      <Link
-        href={localePath(locale, "/creer")}
-        className="flex h-14 items-center justify-center rounded-2xl bg-brand px-6 text-lg font-bold text-white shadow-md shadow-brand/30 transition active:scale-[0.98]"
-      >
-        {t.createMine}
-      </Link>
+      <MissionCta locale={locale} title={locale === "en" ? "Your turn to give a song?" : "À ton tour d’offrir une chanson ?"} button={t.createMine} />
 
       {!order.freeRegenUsed && order.status === "delivered" && <RegenerateButton code={order.publicCode} />}
 

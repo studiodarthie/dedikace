@@ -9,6 +9,7 @@ import { getStyle, styleLabel, STYLE_TAGLINES, STYLE_TAGLINES_EN } from "@/lib/s
 import { alternates, localePath, type Locale } from "@/lib/i18n";
 import { localizeStylePage } from "@/lib/seo-pages-en";
 import { currentPrices } from "@/lib/pricing";
+import { MissionCta } from "@/components/MissionCta";
 
 // Page de présentation d'un style, partagée par /style/[id] et /en/style/[id].
 
@@ -143,7 +144,7 @@ async function Content({ params, locale }: { params: Promise<{ id: string }>; lo
 
       <FaqList items={faq} locale={locale} />
 
-      <CtaButton href={href}>{t.create(label)}</CtaButton>
+      <MissionCta locale={locale} href={href} button={t.create(label)} />
 
       <LinkCloud
         title={t.others}

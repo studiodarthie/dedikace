@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import { whatsappLink } from "@/lib/format";
+import { MissionCta } from "@/components/MissionCta";
 
 export const SUPPORT_PHONE = process.env.NEXT_PUBLIC_SUPPORT_WHATSAPP ?? "";
 
@@ -29,6 +30,7 @@ export function LegalPage({
         {locale === "en" ? `Last updated: ${updated}. This is a translation; the French version prevails.` : `Dernière mise à jour : ${updated}`}
       </p>
       {children}
+      <MissionCta locale={locale} className="mt-6" />
     </article>
   );
 }

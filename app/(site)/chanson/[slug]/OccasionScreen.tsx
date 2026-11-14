@@ -10,6 +10,7 @@ import { breadcrumbSchema, faqSchema, serviceSchema, SITE_URL } from "@/lib/seo"
 import { OCCASION_PAGES, occasionPage, stylePage } from "@/lib/seo-pages";
 import { styleLabel, STYLE_TAGLINES, STYLE_TAGLINES_EN } from "@/lib/styles";
 import { currentPrices } from "@/lib/pricing";
+import { MissionCta } from "@/components/MissionCta";
 
 // Page de présentation d'une occasion, partagée par /chanson/[slug] et /en/chanson/[slug].
 
@@ -158,7 +159,7 @@ async function Content({ params, locale }: { params: Promise<{ slug: string }>; 
 
       <FaqList items={page.faq} locale={locale} />
 
-      <CtaButton href={href}>{page.cta}</CtaButton>
+      <MissionCta locale={locale} href={href} button={page.cta} />
 
       <LinkCloud
         title={t.others}
