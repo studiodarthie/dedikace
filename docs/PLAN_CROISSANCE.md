@@ -87,7 +87,7 @@ que pour Preview sur Vercel. Clé ajoutée en Production, chanson relancée et l
 - [x] Tableau de bord admin : périodes, objectif 600 000 FCFA, CA par jour, parcours, ventes par occasion, style,
       moyen de paiement, heures, qualité, alertes, recherche, export CSV
 - [x] En-têtes de sécurité (HSTS, anti-iframe, permissions)
-- [ ] Google Search Console : vérifier le domaine (TXT chez Cloudflare) et envoyer `sitemap.xml` (action du porteur)
+- [x] Google Search Console : domaine vérifié via Cloudflare, `https://dedikace.app/sitemap.xml` envoyé le 14 novembre 2026
 - [ ] Écouter les extraits « afrosoul » et « epique » ; retirer un style qui sonne faux
 
 ## Étape 5 — Offre premium à 7 000 FCFA (~1,5 j)
