@@ -51,3 +51,10 @@ scripts/out/
 *.docx
 A-COLLER-DANS-VERCEL.txt
 A-COLLER-AUTH-SECRET.txt
+
+# Fichiers personnels à ne jamais envoyer
+lib/image.png
+logo-dedikace_Plan de travail 1.png
+public/BimBamBoum.mp3
+public/Boosta.mp3
+scripts/tmp/
