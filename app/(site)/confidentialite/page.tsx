@@ -1,12 +1,16 @@
 import type { Metadata } from "next";
 import { LegalPage, SUPPORT_PHONE, SupportLink } from "@/components/LegalPage";
 
-// Validé par le porteur du projet le 7 novembre 2026.
-export const metadata: Metadata = { title: "Confidentialité" };
+// Validé par le porteur du projet le 7 novembre 2026 ; prestataires décrits par catégorie depuis le 14 novembre 2026.
+export const metadata: Metadata = {
+  title: "Confidentialité",
+  description: "Quelles informations Dédikace collecte, pourquoi, et tes droits.",
+  alternates: { canonical: "/confidentialite" },
+};
 
 export default function PrivacyPage() {
   return (
-    <LegalPage title="Politique de confidentialité" updated="7 novembre 2026">
+    <LegalPage title="Politique de confidentialité" updated="14 novembre 2026">
       <p>
         Cette page explique quelles informations Dédikace collecte, pourquoi, et ce que tu peux faire. Le
         responsable est Darthie Studios, 413 rue Drouot, Douala, Cameroun,
@@ -22,7 +26,7 @@ export default function PrivacyPage() {
         </li>
         <li>
           les informations de paiement nécessaires au suivi (montant, moyen de paiement, numéro Mobile Money). Les
-          données de carte bancaire sont saisies chez Tranzak : on ne les voit jamais ;
+          données de carte bancaire sont saisies chez notre prestataire de paiement : on ne les voit jamais ;
         </li>
         <li>
           si tu crées un espace (facultatif) : ton adresse e-mail, ton nom et ta photo de profil Google si tu te
@@ -34,10 +38,10 @@ export default function PrivacyPage() {
       <h2>Avec qui on les partage</h2>
       <p>Seulement avec les prestataires qui font fonctionner le service :</p>
       <ul>
-        <li>Anthropic (écriture des paroles) et ElevenLabs (création de la musique) ;</li>
-        <li>Tranzak (paiement) ;</li>
-        <li>Vercel, Neon et Cloudflare (hébergement du site, de la base de données et des chansons) ;</li>
-        <li>Resend (e-mails de connexion et e-mails internes) ;</li>
+        <li>nos outils d’intelligence artificielle (écriture des paroles et création de la musique) ;</li>
+        <li>notre prestataire de paiement ;</li>
+        <li>nos hébergeurs (site, données et fichiers audio) ;</li>
+        <li>notre service d’envoi d’e-mails ;</li>
         <li>Google, seulement si tu choisis « Continuer avec Google » ;</li>
         <li>Meta (Facebook, Instagram), seulement si tu acceptes les cookies de mesure (voir ci-dessous).</li>
       </ul>

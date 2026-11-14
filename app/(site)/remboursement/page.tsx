@@ -2,7 +2,11 @@ import type { Metadata } from "next";
 import { LegalPage, SupportLink } from "@/components/LegalPage";
 
 // Validé par le porteur du projet le 7 novembre 2026.
-export const metadata: Metadata = { title: "Remboursement" };
+export const metadata: Metadata = {
+  title: "Remboursement",
+  description: "Nouvelle création gratuite et cas de remboursement chez Dédikace.",
+  alternates: { canonical: "/remboursement" },
+};
 
 export default function RefundPage() {
   return (

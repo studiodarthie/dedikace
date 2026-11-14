@@ -13,7 +13,7 @@ export const COMPANY = {
 /** Mise en page commune des pages légales (validées par le porteur du projet le 7 novembre 2026). */
 export function LegalPage({ title, updated, children }: { title: string; updated: string; children: ReactNode }) {
   return (
-    <article className="flex flex-col gap-4 pt-4 leading-relaxed [&_h2]:mt-2 [&_h2]:text-lg [&_h2]:font-bold [&_li]:ml-5 [&_li]:list-disc">
+    <article className="flex flex-col gap-4 pt-4 leading-relaxed [&_h2]:mt-2 [&_h2]:text-lg [&_h2]:font-bold [&_li]:ml-5 [&_li]:list-disc [&_p_a]:font-semibold [&_p_a]:text-brand [&_p_a]:underline">
       <h1 className="text-3xl font-extrabold tracking-tight">{title}</h1>
       <p className="text-sm text-muted">Dernière mise à jour : {updated}</p>
       {children}
