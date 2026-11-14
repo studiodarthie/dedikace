@@ -5,7 +5,7 @@ export default function manifest(): MetadataRoute.Manifest {
   return {
     name: "Dédikace — Ton nom dans une chanson",
     short_name: "Dédikace",
-    description: "Une chanson personnalisée en quelques minutes, sur des rythmes d'Afrique centrale.",
+    description: "Une chanson personnalisée en quelques minutes, sur des rythmes de chez nous.",
     start_url: "/",
     display: "standalone",
     background_color: "#fff8ee",

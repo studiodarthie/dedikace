@@ -84,6 +84,8 @@ export function sectionTimeline(lyrics: string, durationSeconds: number): TimedS
 export type SongRequest = {
   /** Description du style (lib/styles.ts → stylePromptFor), en anglais. */
   stylePrompt: string;
+  /** Styles à éviter propres à ce genre (lib/styles.ts → styleAvoidFor). */
+  styleAvoid?: string[];
   lyrics: string;
   songLanguage: string;
   chorusLanguage: string;
@@ -107,13 +109,16 @@ const DYNAMICS: Record<string, string[]> = {
 };
 
 /** Construit le plan de composition : une intro instrumentale puis un morceau par section des paroles. */
-export function buildCompositionPlan({ stylePrompt, lyrics, songLanguage, chorusLanguage, durationSeconds }: SongRequest) {
+export function buildCompositionPlan({ stylePrompt, styleAvoid = [], lyrics, songLanguage, chorusLanguage, durationSeconds }: SongRequest) {
   const sections = parseLyrics(applyPhonetics(lyrics));
   if (sections.length === 0) throw new MusicError("Paroles vides ou sans sections.", false);
 
-  const genre = stylePrompt.split(",")[0].trim();
+  // La signature du genre (instruments, tempo, voix) est répétée sur chaque section : sans elle, le moteur
+  // garde le style de l'intro puis dérive vers une pop africaine générique dès que le chant commence.
+  const signature = stylePrompt.split(",").map((s) => s.trim()).filter(Boolean);
+  const avoid = [...AVOID, ...styleAvoid];
   const baseStyles = [
-    ...stylePrompt.split(",").map((s) => s.trim()).filter(Boolean),
+    ...signature,
     "clear and intelligible lead vocals",
     `verses sung in ${sungLanguage(songLanguage)}`,
     ...PRODUCTION,
@@ -125,12 +130,12 @@ export function buildCompositionPlan({ stylePrompt, lyrics, songLanguage, chorus
   const chorusStyle = chorusLanguage !== songLanguage ? `chorus sung in ${sungLanguage(chorusLanguage)}` : undefined;
   const lastChorus = sections.map((s) => englishName(s.label)).lastIndexOf("Chorus");
   const chunks = [
-    { text: "[Intro]", duration_ms: INTRO_MS, positive_styles: [...baseStyles, ...DYNAMICS.Intro], negative_styles: AVOID },
+    { text: "[Intro]", duration_ms: INTRO_MS, positive_styles: [...baseStyles, ...DYNAMICS.Intro], negative_styles: avoid },
     ...sections.map((s, i) => {
       const name = englishName(s.label);
       const kind = name.startsWith("Verse") ? "Verse" : name;
       const styles = [
-        genre,
+        ...signature,
         ...(DYNAMICS[kind] ?? []),
         ...(name === "Chorus" && chorusStyle ? [chorusStyle] : []),
         ...(i === lastChorus ? ["final chorus with extra lift and vocal ad-libs", "ends on a clean, satisfying musical resolution"] : []),
@@ -139,7 +144,7 @@ export function buildCompositionPlan({ stylePrompt, lyrics, songLanguage, chorus
         text: [`[${name}]`, ...s.lines.slice(0, 30)].join("\n"),
         duration_ms: durations[i],
         positive_styles: styles,
-        negative_styles: AVOID,
+        negative_styles: avoid,
       };
     }),
   ];

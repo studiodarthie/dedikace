@@ -84,8 +84,13 @@ function loadDraft(defaults: Defaults = {}): Draft {
     const raw = window.localStorage.getItem(STORAGE_KEY);
     if (raw) {
       const draft = JSON.parse(raw) as Draft;
-      const step = draft.step === 4 && !draft.saved ? 3 : draft.step;
+      let step = draft.step === 4 && !draft.saved ? 3 : draft.step;
       const form = { ...EMPTY_FORM, ...draft.form };
+      // Style retiré depuis (ex. ndombolo) et paroles pas encore créées : on refait choisir le style.
+      if (form.styleId && !draft.saved && !STYLES.some((s) => s.id === form.styleId)) {
+        form.styleId = "";
+        step = Math.min(step, 2);
+      }
       // Langue retirée depuis (ex. lingala) : on revient au français.
       const known = (id: string) => LANGUAGES.some((l) => l.id === id);
       if (!known(form.songLanguage)) form.songLanguage = "fr";

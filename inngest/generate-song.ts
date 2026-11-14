@@ -14,7 +14,7 @@ import {
   VERSIONS,
 } from "@/lib/songs";
 import { songKey, uploadSong } from "@/lib/storage";
-import { stylePromptFor, type StyleId } from "@/lib/styles";
+import { styleAvoidFor, stylePromptFor, type StyleId } from "@/lib/styles";
 import { inngest, orderPaid } from "./client";
 
 
@@ -88,6 +88,7 @@ export const generateSongFunction = inngest.createFunction(
           try {
             const song = await generateSong({
               stylePrompt: stylePromptFor(order.styleId, order.voice),
+              styleAvoid: styleAvoidFor(order.styleId),
               lyrics: order.lyrics,
               songLanguage: order.songLanguage,
               chorusLanguage: order.chorusLanguage,

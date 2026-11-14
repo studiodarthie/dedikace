@@ -41,7 +41,7 @@ export const OCCASION_PAGES: OccasionPage[] = [
       "Maman, papa, ta chérie, ton meilleur ami ou ta petite sœur : raconte-nous 1 à 3 souvenirs, choisis le rythme, et toute la salle chantera son nom.",
     ],
     cta: "Créer sa chanson d’anniversaire",
-    styles: ["makossa", "afrobeats", "bikutsi", "ndombolo", "coupe-decale"],
+    styles: ["makossa", "afrobeats", "bikutsi", "amapiano", "coupe-decale"],
     example: { file: "anniversaire-makossa.mp3", title: "Maman Marie, joyeux anniversaire", style: "Makossa" },
     faq: [
       {
@@ -72,7 +72,7 @@ export const OCCASION_PAGES: OccasionPage[] = [
       "La rencontre, les galères traversées ensemble, la promesse de vieillir côte à côte : tu choisis les souvenirs, on en fait une vraie chanson d’amour.",
     ],
     cta: "Créer notre chanson de mariage",
-    styles: ["rumba", "afrozouk", "makossa", "gospel", "afrosoul"],
+    styles: ["rumba", "zouklove", "afrozouk", "makossa", "gospel"],
     faq: [
       {
         q: "On peut mettre les deux prénoms ?",
@@ -95,14 +95,14 @@ export const OCCASION_PAGES: OccasionPage[] = [
     emoji: "💍",
     title: "Chanson pour la dot : un cadeau unique pour la famille",
     description:
-      "Marque la cérémonie de la dot avec une chanson personnalisée qui honore la mariée et sa famille. Bikutsi, makossa, ndombolo, prête en 2 minutes.",
+      "Marque la cérémonie de la dot avec une chanson personnalisée qui honore la mariée et sa famille. Bikutsi, makossa, rumba, prête en 2 minutes.",
     h1: "Une chanson pour la dot, qui honore la famille",
     intro: [
       "La dot, c’est deux familles qui se rencontrent. Arrive avec une chanson qui honore ta future épouse, ses parents et tout le village, avec son prénom au refrain.",
       "Raconte comment vous vous êtes connus, ce que tu promets, ce que la famille représente pour toi : on en fait une chanson à danser pendant la cérémonie.",
     ],
     cta: "Créer ma chanson pour la dot",
-    styles: ["bikutsi", "makossa", "ndombolo", "rumba", "epique"],
+    styles: ["bikutsi", "makossa", "rumba", "gospel", "epique"],
     example: { file: "dot-bikutsi.mp3", title: "Ngono, ma reine de la dot", style: "Bikutsi" },
     faq: [
       {
@@ -195,7 +195,7 @@ export const OCCASION_PAGES: OccasionPage[] = [
       "Votre premier rendez-vous, son sourire, ce qui te manque quand elle part : pour la Saint-Valentin, un anniversaire de couple ou juste pour surprendre.",
     ],
     cta: "Créer ma chanson d’amour",
-    styles: ["afrozouk", "rumba", "afrobeats", "afrosoul", "amapiano"],
+    styles: ["zouklove", "afrozouk", "rumba", "afrobeats", "afrosoul"],
     faq: [
       {
         q: "C’est une bonne idée pour la Saint-Valentin ?",
@@ -225,7 +225,7 @@ export const OCCASION_PAGES: OccasionPage[] = [
       "Écris ce que tu regrettes et ce que tu veux réparer : on en fait une chanson touchante, jamais lourde, à lui envoyer sur WhatsApp.",
     ],
     cta: "Créer ma chanson d’excuses",
-    styles: ["rumba", "afrozouk", "afrosoul", "hommage"],
+    styles: ["zouklove", "rumba", "afrozouk", "afrosoul"],
     faq: [
       {
         q: "Ça marche pour un ami ou un parent, pas seulement en couple ?",
@@ -308,12 +308,12 @@ export const STYLE_PAGES: StylePage[] = [
     occasions: ["mariage", "amour", "excuses"],
   },
   {
-    id: "ndombolo",
-    title: "Chanson ndombolo personnalisée, ambiance garantie",
-    description: "Une chanson ndombolo à ton nom pour faire danser toute la famille : guitare sebene rapide et cris de fête. Paroles gratuites.",
-    h1: "Ta chanson ndombolo personnalisée",
-    intro: "Guitare sebene qui file, caisse claire qui claque, cris de fête : le ndombolo met le feu à n’importe quelle fête de famille.",
-    occasions: ["anniversaire", "dot", "reussite"],
+    id: "zouklove",
+    title: "Chanson zouk love personnalisée avec ton prénom",
+    description: "Un zouk love doux et sensuel avec ton prénom au refrain : piano électrique, nappes chaudes et voix tendre. Pour une déclaration ou un mariage.",
+    h1: "Ta chanson zouk love personnalisée",
+    intro: "Groove lent qui balance, piano électrique, guitare légère et voix tout en douceur : le zouk love est fait pour dire « je t’aime ».",
+    occasions: ["amour", "mariage", "excuses"],
   },
   {
     id: "gospel",

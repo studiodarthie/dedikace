@@ -222,7 +222,7 @@ export default async function Home() {
             </h1>
           </div>
           <p className="max-w-xl text-base text-muted md:text-2xl md:leading-relaxed">
-            Raconte tes souvenirs, on en fait une vraie chanson sur des rythmes d&apos;Afrique centrale.
+            Raconte tes souvenirs, on en fait une vraie chanson sur des rythmes de chez nous.
           </p>
           <CreateButton className="w-full max-w-sm md:w-auto" />
           <ul className="flex flex-wrap justify-center gap-x-4 gap-y-1 text-[13px] font-medium text-muted md:gap-x-5 md:text-base">

@@ -15,6 +15,10 @@ const securityHeaders = [
 
 const nextConfig: NextConfig = {
   poweredByHeader: false,
+  // Styles retirés : l'ancienne page renvoie vers le style qui la remplace (référencement conservé).
+  async redirects() {
+    return [{ source: "/style/ndombolo", destination: "/style/zouklove", permanent: true }];
+  },
   async headers() {
     return [{ source: "/:path*", headers: securityHeaders }];
   },

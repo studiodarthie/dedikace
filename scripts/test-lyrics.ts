@@ -30,7 +30,7 @@ const CASES: Case[] = [
   { label: "Mariage, rumba, anglais", occasion: "mariage", recipientName: "Patrick et Grâce", relation: "meilleurs amis", anecdotes: ["Ils se sont connus à la chorale", "10 ans d'amour avant de se marier"], styleId: "rumba", chorusLanguage: "en", voice: "male" },
   { label: "Déclaration, amapiano", occasion: "amour", recipientName: "Laeticia", relation: "collègue", anecdotes: ["Son sourire chaque lundi matin au bureau"], styleId: "amapiano", chorusLanguage: "fr", voice: "male" },
   { label: "Encouragement, gospel", occasion: "encouragement", recipientName: "Tonton Paul", relation: "oncle", anecdotes: ["Il se bat contre la maladie depuis un an", "Il garde toujours la foi"], styleId: "gospel", chorusLanguage: "fr", voice: "female" },
-  { label: "Anniversaire diaspora, ndombolo", occasion: "anniversaire", recipientName: "Kevin", relation: "cousin", senderName: "la famille de Paris", anecdotes: ["Il fête ses 30 ans à Montréal", "Le roi de la danse aux mariages"], styleId: "ndombolo", chorusLanguage: "fr", voice: "male" },
+  { label: "Anniversaire diaspora, coupé-décalé", occasion: "anniversaire", recipientName: "Kevin", relation: "cousin", senderName: "la famille de Paris", anecdotes: ["Il fête ses 30 ans à Montréal", "Le roi de la danse aux mariages"], styleId: "coupe-decale", chorusLanguage: "fr", voice: "male" },
   { label: "BEPC, coupé-décalé", occasion: "reussite", recipientName: "Ibrahim", relation: "fils", senderName: "papa et maman", anecdotes: ["Premier de sa classe au BEPC"], styleId: "coupe-decale", chorusLanguage: "fr", voice: "male" },
 ];
 

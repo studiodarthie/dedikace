@@ -11,7 +11,7 @@ const GENTLE = ["[Refrain]", "Ta lumière brille encore", "Dans nos cœurs, tu e
 async function main() {
   const { generateSong } = await import("@/lib/elevenlabs");
   const { moderateText } = await import("@/lib/moderation");
-  const { STYLES, stylePromptFor } = await import("@/lib/styles");
+  const { STYLES, styleAvoidFor, stylePromptFor } = await import("@/lib/styles");
 
   const only = process.argv[2];
   const outDir = path.join("scripts", "out", "styles");
@@ -30,6 +30,7 @@ async function main() {
         if (!moderateText(lyrics).ok) throw new Error("Texte refusé par la modération");
         const song = await generateSong({
           stylePrompt: stylePromptFor(style.id, style.voice),
+          styleAvoid: styleAvoidFor(style.id),
           lyrics,
           songLanguage: "fr",
           chorusLanguage: "fr",
