@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
+import { useLocale } from "@/lib/use-locale";
 
 /** Recharge la page toutes les 10 s tant que la chanson est en cours de création. */
 export function AutoRefresh({ seconds = 10 }: { seconds?: number }) {
@@ -15,11 +16,15 @@ export function AutoRefresh({ seconds = 10 }: { seconds?: number }) {
 
 export function RegenerateButton({ code }: { code: string }) {
   const router = useRouter();
+  const en = useLocale() === "en";
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   async function regenerate() {
-    if (!window.confirm("On recrée 2 nouvelles versions de ta chanson, avec les mêmes paroles. C'est gratuit, une seule fois. Continuer ?")) {
+    const question = en
+      ? "We’ll make 2 new versions of your song, with the same lyrics. It’s free, once only. Continue?"
+      : "On recrée 2 nouvelles versions de ta chanson, avec les mêmes paroles. C'est gratuit, une seule fois. Continuer ?";
+    if (!window.confirm(question)) {
       return;
     }
     setBusy(true);
@@ -28,16 +33,16 @@ export function RegenerateButton({ code }: { code: string }) {
       const res = await fetch("/api/regenerate", {
         method: "POST",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify({ code }),
+        body: JSON.stringify({ code, locale: en ? "en" : "fr" }),
       });
       if (!res.ok) {
         const data = (await res.json().catch(() => ({}))) as { error?: string };
-        setError(data.error ?? "Une erreur est survenue. Réessaie.");
+        setError(data.error ?? (en ? "Something went wrong. Try again." : "Une erreur est survenue. Réessaie."));
         return;
       }
       router.refresh();
     } catch {
-      setError("Pas de connexion internet. Réessaie.");
+      setError(en ? "No internet connection. Try again." : "Pas de connexion internet. Réessaie.");
     } finally {
       setBusy(false);
     }
@@ -51,7 +56,7 @@ export function RegenerateButton({ code }: { code: string }) {
         disabled={busy}
         className="h-12 rounded-2xl bg-white font-semibold ring-1 ring-sand disabled:opacity-50"
       >
-        {busy ? "Un instant…" : "La chanson ne me plaît pas"}
+        {busy ? (en ? "One moment…" : "Un instant…") : en ? "I don’t like the song" : "La chanson ne me plaît pas"}
       </button>
       {error && (
         <p role="alert" className="text-sm font-medium text-red-800">
@@ -71,6 +76,7 @@ let lastRetry = 0;
  * chargement coupé en 3G), la page redemande au serveur des liens neufs.
  */
 export function SongPlayer({ src }: { src: string }) {
+  const en = useLocale() === "en";
   const router = useRouter();
   const ref = useRef<HTMLAudioElement>(null);
   const [failed, setFailed] = useState(false);
@@ -91,13 +97,13 @@ export function SongPlayer({ src }: { src: string }) {
   return (
     <>
       <audio ref={ref} key={src} controls preload="metadata" src={src} onError={onError} onLoadedMetadata={() => setFailed(false)} className="w-full">
-        Ton navigateur ne peut pas lire ce fichier.
+        {en ? "Your browser can’t play this file." : "Ton navigateur ne peut pas lire ce fichier."}
       </audio>
       {failed && (
         <p role="status" className="mt-2 text-sm text-muted">
-          Chargement difficile…{" "}
+          {en ? "Slow loading…" : "Chargement difficile…"}{" "}
           <button type="button" onClick={() => window.location.reload()} className="font-semibold text-brand underline">
-            Recharger
+            {en ? "Reload" : "Recharger"}
           </button>
         </p>
       )}

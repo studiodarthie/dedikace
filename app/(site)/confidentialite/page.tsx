@@ -1,11 +1,12 @@
 import type { Metadata } from "next";
 import { LegalPage, SUPPORT_PHONE, SupportLink } from "@/components/LegalPage";
+import { alternates } from "@/lib/i18n";
 
 // Validé par le porteur du projet le 7 novembre 2026 ; prestataires décrits par catégorie depuis le 14 novembre 2026.
 export const metadata: Metadata = {
   title: "Confidentialité",
   description: "Quelles informations Dédikace collecte, pourquoi, et tes droits.",
-  alternates: { canonical: "/confidentialite" },
+  alternates: alternates("fr", "/confidentialite"),
 };
 
 export default function PrivacyPage() {
@@ -50,7 +51,8 @@ export default function PrivacyPage() {
       <h2 id="cookies">Cookies</h2>
       <p>
         Le site utilise seulement ce qui est nécessaire pour fonctionner : ton brouillon de chanson et la liste de
-        tes commandes gardés sur ton téléphone, et un cookie de connexion si tu as un espace.
+        tes commandes gardés sur ton téléphone, un cookie qui retient ta langue, et un cookie de connexion si tu as un
+        espace.
       </p>
       <p>
         Avec ton accord, on ajoute des cookies de mesure de Meta (Facebook, Instagram). Ils servent à

@@ -3,6 +3,7 @@ import type { ReactNode } from "react";
 import { formatXaf } from "@/lib/format";
 import type { Faq } from "@/lib/seo-pages";
 import { currentPrices } from "@/lib/pricing";
+import type { Locale } from "@/lib/i18n";
 
 // Briques communes des pages de présentation (/chanson/…, /style/…) : bouton, étapes, FAQ, liens.
 
@@ -18,32 +19,45 @@ export function CtaButton({ href, children }: { href: string; children: ReactNod
   );
 }
 
-export async function Promises() {
+export async function Promises({ locale = "fr" }: { locale?: Locale }) {
   const prices = await currentPrices();
+  const en = locale === "en";
   return (
     <ul className="flex flex-wrap gap-x-4 gap-y-1 text-sm font-medium text-muted">
-      <li>✓ Paroles gratuites</li>
-      <li>✓ Prête en 2 min</li>
+      <li>{en ? "✓ Free lyrics" : "✓ Paroles gratuites"}</li>
+      <li>{en ? "✓ Ready in 2 min" : "✓ Prête en 2 min"}</li>
       <li>✓ 2 versions</li>
-      <li>✓ {formatXaf(prices.momo)} par MoMo ou Orange Money{prices.launchEnds && ` (prix de lancement jusqu’au ${prices.launchEnds})`}</li>
+      <li>
+        ✓ {formatXaf(prices.momo, locale)} {en ? "with MoMo or Orange Money" : "par MoMo ou Orange Money"}
+        {en
+          ? prices.launchEndsEn && ` (launch price until ${prices.launchEndsEn})`
+          : prices.launchEnds && ` (prix de lancement jusqu’au ${prices.launchEnds})`}
+      </li>
     </ul>
   );
 }
 
-const STEPS = [
-  { icon: "💬", title: "Raconte", text: "Le prénom et 1 à 3 souvenirs. 2 minutes, sans compte." },
-  { icon: "✍️", title: "Valide les paroles", text: "Elles sont gratuites : modifie-les ou fais-les réécrire." },
-  { icon: "🎶", title: "Reçois ta chanson", text: "2 versions d’environ 3 minutes, à partager sur WhatsApp." },
-];
+const STEPS: Record<Locale, { icon: string; title: string; text: string }[]> = {
+  fr: [
+    { icon: "💬", title: "Raconte", text: "Le prénom et 1 à 3 souvenirs. 2 minutes, sans compte." },
+    { icon: "✍️", title: "Valide les paroles", text: "Elles sont gratuites : modifie-les ou fais-les réécrire." },
+    { icon: "🎶", title: "Reçois ta chanson", text: "2 versions d’environ 3 minutes, à partager sur WhatsApp." },
+  ],
+  en: [
+    { icon: "💬", title: "Tell us", text: "The name and 1 to 3 memories. 2 minutes, no account." },
+    { icon: "✍️", title: "Approve the lyrics", text: "They are free: edit them or have them rewritten." },
+    { icon: "🎶", title: "Get your song", text: "2 versions of about 3 minutes, to share on WhatsApp." },
+  ],
+};
 
-export function Steps() {
+export function Steps({ locale = "fr" }: { locale?: Locale }) {
   return (
     <section aria-labelledby="etapes" className="flex flex-col gap-3">
       <h2 id="etapes" className="text-xl font-extrabold">
-        Comment ça marche
+        {locale === "en" ? "How it works" : "Comment ça marche"}
       </h2>
       <ol className="flex flex-col gap-2">
-        {STEPS.map((s, i) => (
+        {STEPS[locale].map((s, i) => (
           <li key={s.title} className="flex gap-3 rounded-2xl bg-white p-3 ring-1 ring-sand">
             <span className="text-2xl" aria-hidden="true">
               {s.icon}
@@ -61,11 +75,11 @@ export function Steps() {
   );
 }
 
-export function FaqList({ items }: { items: Faq[] }) {
+export function FaqList({ items, locale = "fr" }: { items: Faq[]; locale?: Locale }) {
   return (
     <section aria-labelledby="questions" className="flex flex-col gap-3">
       <h2 id="questions" className="text-xl font-extrabold">
-        Questions fréquentes
+        {locale === "en" ? "Frequently asked questions" : "Questions fréquentes"}
       </h2>
       {items.map((f) => (
         <details key={f.q} className="group rounded-2xl bg-white p-4 ring-1 ring-sand">
@@ -101,9 +115,9 @@ export function LinkCloud({ title, links }: { title: string; links: { href: stri
   );
 }
 
-export function Breadcrumb({ items }: { items: { href?: string; label: string }[] }) {
+export function Breadcrumb({ items, locale = "fr" }: { items: { href?: string; label: string }[]; locale?: Locale }) {
   return (
-    <nav aria-label="Fil d’Ariane" className="text-sm text-muted">
+    <nav aria-label={locale === "en" ? "Breadcrumb" : "Fil d’Ariane"} className="text-sm text-muted">
       <ol className="flex flex-wrap gap-1">
         {items.map((item, i) => (
           <li key={item.label} className="flex gap-1">

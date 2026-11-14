@@ -26,17 +26,19 @@ export type ReminderRow = {
   senderName: string | null;
   occasion: string;
   whatsappPhone: string;
+  locale: "fr" | "en";
   updatedAt: Date;
   remindedAt: Date | null;
 };
 
 /** Lien privé vers la page de la commande, où le client relit ses paroles et paie. */
-export function orderUrl(orderId: string): string {
-  return `${env.NEXT_PUBLIC_APP_URL.replace(/\/$/, "")}/commande/${orderId}`;
+export function orderUrl(orderId: string, locale: "fr" | "en" = "fr"): string {
+  return `${env.NEXT_PUBLIC_APP_URL.replace(/\/$/, "")}${locale === "en" ? "/en" : ""}/commande/${orderId}`;
 }
 
 /** Message WhatsApp tout prêt, au ton du site (tutoiement, phrases courtes). */
-export function reminderMessage(o: Pick<ReminderRow, "id" | "status" | "recipientName" | "senderName">): string {
+export function reminderMessage(o: Pick<ReminderRow, "id" | "status" | "recipientName" | "senderName" | "locale">): string {
+  if (o.locale === "en") return reminderMessageEn(o);
   const hello = o.senderName ? `Salut ${o.senderName} 👋` : "Salut 👋";
   const line =
     o.status === "payment_failed"
@@ -53,6 +55,23 @@ export function reminderMessage(o: Pick<ReminderRow, "id" | "status" | "recipien
   ].join("\n");
 }
 
+function reminderMessageEn(o: Pick<ReminderRow, "id" | "status" | "recipientName" | "senderName">): string {
+  const hello = o.senderName ? `Hi ${o.senderName} 👋` : "Hi 👋";
+  const line =
+    o.status === "payment_failed"
+      ? `Your payment for ${o.recipientName}’s song didn’t go through, but your lyrics are safely kept ✍🏾`
+      : `The lyrics of your song for ${o.recipientName} are ready and waiting for you ✍🏾🎶`;
+  const prices = pricesAt(new Date());
+  return [
+    `${hello} It’s Dédikace.`,
+    line,
+    "",
+    `You can read them again and start your song here: ${orderUrl(o.id, "en")}`,
+    "",
+    `${formatXaf(prices.momo, "en")} for 2 versions, with MTN MoMo or Orange Money${prices.launchEndsEn ? ` (launch price until ${prices.launchEndsEn})` : ""}. A question? Reply here 🙂`,
+  ].join("\n");
+}
+
 /** À relancer d'abord (jamais relancées), puis celles déjà relancées sur les 7 derniers jours. */
 export async function listToRemind(): Promise<{ todo: ReminderRow[]; done: ReminderRow[] }> {
   const now = Date.now();
@@ -65,6 +84,7 @@ export async function listToRemind(): Promise<{ todo: ReminderRow[]; done: Remin
       senderName: orders.senderName,
       occasion: orders.occasion,
       whatsappPhone: orders.whatsappPhone,
+      locale: orders.locale,
       updatedAt: orders.updatedAt,
       remindedAt: orders.remindedAt,
     })
@@ -116,6 +136,7 @@ export async function emailReminderIfUnpaid(orderId: string): Promise<"sent" | "
       id: orders.id,
       status: orders.status,
       recipientName: orders.recipientName,
+      locale: orders.locale,
       emailedAt: orders.reminderEmailedAt,
       email: users.email,
       name: users.name,
@@ -138,8 +159,9 @@ export async function emailReminderIfUnpaid(orderId: string): Promise<"sent" | "
     await sendPaymentReminder(row.email, {
       firstName: row.name?.trim().split(/\s+/)[0] || null,
       recipientName: row.recipientName,
-      url: orderUrl(row.id),
+      url: orderUrl(row.id, row.locale),
       failed: row.status === "payment_failed",
+      locale: row.locale,
     });
   } catch (error) {
     // Envoi raté : on libère la réservation pour que la nouvelle tentative d'Inngest puisse renvoyer.

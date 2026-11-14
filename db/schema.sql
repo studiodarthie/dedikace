@@ -33,6 +33,7 @@ create table orders (
   status order_status not null default 'draft',
   price_xaf int not null default 3000,
   country text not null default 'CM',
+  locale text not null default 'fr',          -- langue de l'interface (fr | en) : e-mails, relances, liens
   moderation_note text,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()

@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
 import { ExampleCover, type CoverScene } from "@/components/ExampleCover";
+import { useLocale } from "@/lib/use-locale";
 
 export type ExampleTrack = {
   file: string;
@@ -64,6 +65,7 @@ function Equalizer({ className = "" }: { className?: string }) {
  */
 export function ExamplePlayer({ tracks, header, cta }: { tracks: ExampleTrack[]; header: ReactNode; cta: ReactNode }) {
   const audio = useRef<HTMLAudioElement>(null);
+  const en = useLocale() === "en";
   const [index, setIndex] = useState(0);
   const [playing, setPlaying] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -113,7 +115,7 @@ export function ExamplePlayer({ tracks, header, cta }: { tracks: ExampleTrack[];
                 type="button"
                 onClick={() => select(i)}
                 aria-current={active ? "true" : undefined}
-                aria-label={`${active && playing ? "Mettre en pause" : "Écouter"} ${t.title}`}
+                aria-label={`${active && playing ? (en ? "Pause" : "Mettre en pause") : en ? "Listen to" : "Écouter"} ${t.title}`}
                 className={`flex w-full items-center gap-4 rounded-2xl p-2.5 pr-4 text-left transition md:p-3 md:pr-5 ${
                   active ? "bg-white shadow-sm ring-1 ring-gold/70" : "active:bg-white/70 md:hover:bg-white/60"
                 }`}
@@ -131,7 +133,10 @@ export function ExamplePlayer({ tracks, header, cta }: { tracks: ExampleTrack[];
                 </span>
                 <span className="min-w-0 flex-1">
                   <span className={`line-clamp-2 block leading-snug font-bold md:text-lg ${active ? "text-brand" : ""}`}>{t.title}</span>
-                  <span className="block truncate text-sm text-muted">Style {t.style}</span>
+                  <span className="block truncate text-sm text-muted">
+                    {en ? "" : "Style "}
+                    {t.style}
+                  </span>
                 </span>
                 {active && playing ? (
                   <Equalizer />
@@ -171,7 +176,7 @@ export function ExamplePlayer({ tracks, header, cta }: { tracks: ExampleTrack[];
           </div>
 
           <div className="relative aspect-square overflow-hidden rounded-2xl shadow-xl shadow-ink/20">
-            <Artwork key={track.file} track={track} sizes="(min-width: 768px) 380px, 75vw" alt={`Pochette de la chanson « ${track.title} »`} />
+            <Artwork key={track.file} track={track} sizes="(min-width: 768px) 380px, 75vw" alt={en ? `Cover of the song “${track.title}”` : `Pochette de la chanson « ${track.title} »`} />
             <div className="absolute inset-x-0 bottom-0 h-1/3 bg-gradient-to-t from-ink/60 to-transparent" aria-hidden="true" />
             <div className="absolute bottom-3 left-3 flex flex-wrap gap-1.5 md:bottom-4 md:left-4">
               {track.tags.map((tag) => (
@@ -197,17 +202,20 @@ export function ExamplePlayer({ tracks, header, cta }: { tracks: ExampleTrack[];
         <div className="mt-6 flex flex-col gap-1 md:mt-8">
           <p className="flex items-center gap-2 text-xs font-bold tracking-[0.2em] text-brand uppercase">
             <span className={`h-2 w-2 rounded-full bg-brand ${playing ? "animate-pulse" : ""}`} aria-hidden="true" />
-            {playing ? "En lecture" : "Prêt à écouter"}
+            {playing ? (en ? "Now playing" : "En lecture") : en ? "Ready to play" : "Prêt à écouter"}
           </p>
           <p className="text-2xl leading-tight font-extrabold tracking-tight md:text-4xl">{track.title}</p>
-          <p className="text-muted md:text-lg">Style {track.style}</p>
+          <p className="text-muted md:text-lg">
+            {en ? "" : "Style "}
+            {track.style}
+          </p>
         </div>
 
         <div className="mt-5 flex items-center gap-4">
           <button
             type="button"
             onClick={toggle}
-            aria-label={playing ? `Mettre en pause ${track.title}` : `Écouter ${track.title}`}
+            aria-label={playing ? `${en ? "Pause" : "Mettre en pause"} ${track.title}` : `${en ? "Listen to" : "Écouter"} ${track.title}`}
             className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-gold to-brand text-white shadow-lg shadow-brand/30 transition active:scale-95 md:h-16 md:w-16"
           >
             {loading ? (
@@ -242,7 +250,7 @@ export function ExamplePlayer({ tracks, header, cta }: { tracks: ExampleTrack[];
                 onChange={(e) => {
                   if (audio.current) audio.current.currentTime = Number(e.target.value);
                 }}
-                aria-label="Position dans l’extrait"
+                aria-label={en ? "Position in the excerpt" : "Position dans l’extrait"}
                 className="absolute inset-0 h-full w-full cursor-pointer opacity-0"
               />
             </div>
@@ -263,7 +271,13 @@ export function ExamplePlayer({ tracks, header, cta }: { tracks: ExampleTrack[];
           }}
           className="mt-4 text-sm font-semibold text-brand-dark underline"
         >
-          {full ? "Revenir à l’extrait (1 min 20)" : "Écouter la chanson complète (3 min)"}
+          {full
+            ? en
+              ? "Back to the excerpt (1 min 20)"
+              : "Revenir à l’extrait (1 min 20)"
+            : en
+              ? "Listen to the full song (3 min)"
+              : "Écouter la chanson complète (3 min)"}
         </button>
         {failed && (
           <p role="alert" className="mt-3 text-sm font-medium text-brand-dark">

@@ -37,6 +37,7 @@ app/
   connexion/               connexion commune (Google ou lien magique)
   compte/                  espace client : Mes chansons, compte/parametres
   admin/                   back-office (protégé, réservé à ADMIN_EMAILS)
+  en/  (site)/en/          version anglaise (/en/…) : pages fines qui réutilisent les écrans partagés (locale)
   cgu/  confidentialite/  remboursement/   pages légales
   api/lyrics/route.ts      génération / réécriture des paroles
   api/pay/route.ts         initialisation du paiement Tranzak
@@ -49,6 +50,7 @@ lib/
   claude.ts  elevenlabs.ts  tranzak.ts  storage.ts  auth.ts  email.ts
   moderation.ts  phonetics.ts  styles.ts  occasions.ts  orders.ts  payments.ts  songs.ts  format.ts  env.ts
   admin.ts (requêtes et actions du back-office)  account.ts (espace client)
+  i18n.ts (langues, adresses /en)  i18n-errors.ts  use-locale.ts (navigateur)  seo-pages-en.ts
   pixels.ts (Meta, chargé après consentement, code navigateur)  consent.ts (choix cookies)  my-orders.ts (commandes faites sur ce téléphone, navigateur)
 components/
   WhatsAppButton.tsx  Pixels.tsx  LegalPage.tsx

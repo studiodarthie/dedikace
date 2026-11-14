@@ -1,16 +1,20 @@
+"use client";
+
 import { whatsappLink } from "@/lib/format";
+import { useLocale } from "@/lib/use-locale";
 
 const SUPPORT_PHONE = process.env.NEXT_PUBLIC_SUPPORT_WHATSAPP ?? "";
 
 /** Bouton de support flottant, présent sur toutes les pages (PLAN_DEV prompt 5). */
 export function WhatsAppButton() {
+  const en = useLocale() === "en";
   if (!/^\+\d{8,15}$/.test(SUPPORT_PHONE)) return null;
   return (
     <a
-      href={whatsappLink(SUPPORT_PHONE, "Bonjour Dédikace, j'ai une question :")}
+      href={whatsappLink(SUPPORT_PHONE, en ? "Hello Dédikace, I have a question:" : "Bonjour Dédikace, j'ai une question :")}
       target="_blank"
       rel="noopener noreferrer"
-      aria-label="Écrire au support sur WhatsApp"
+      aria-label={en ? "Message support on WhatsApp" : "Écrire au support sur WhatsApp"}
       className="fixed right-4 bottom-4 z-50 flex h-14 w-14 items-center justify-center rounded-full bg-[#25d366] text-white shadow-lg shadow-black/20 transition active:scale-95"
     >
       <svg viewBox="0 0 32 32" aria-hidden="true" className="h-8 w-8 fill-current">

@@ -113,15 +113,20 @@ que pour Preview sur Vercel. Clé ajoutée en Production, chanson relancée et l
       un code de réduction par commande.
 - Base : tables `referrals` et `coupons` (migration).
 
-## Étape 7 — Interface en anglais (~2,5 j)
+## Étape 7 — Interface en anglais (fait le 14 novembre 2026)
 
-- [ ] Adresses : français inchangé (`dedikace.app/creer`), anglais sous `dedikace.app/en/...` (utile pour les
-      pubs visant Bamenda, Buea, le Nigeria, le Ghana).
-- [ ] Bouton FR / EN dans l'en-tête ; premier choix d'après la langue du téléphone.
-- [ ] Tous les textes : accueil, création, paiement, attente, page de la chanson, espace, e-mails, messages
-      d'erreur, pages légales. Le back-office reste en français.
-- [ ] Par défaut en anglais : langue de la chanson et du refrain sur « Anglais ».
-- [ ] Vérifier chaque écran à 360 px dans les deux langues (l'anglais est souvent plus court, mais pas toujours).
+- [x] Adresses : français inchangé (`dedikace.app/creer`), anglais sous `dedikace.app/en/...` (pages fines dans
+      `app/en` et `app/(site)/en`, qui réutilisent les écrans partagés avec `locale`).
+- [x] Bouton FR / EN dans l'en-tête ; bannière qui propose l'autre langue d'après le téléphone (pas de redirection
+      forcée : Google doit voir les deux versions). Choix retenu dans le cookie `lang`.
+- [x] Tous les textes : accueil, création, paiement, attente, page de la chanson, espace, connexion, e-mails
+      (lien magique, chanson prête, relance), relance WhatsApp, messages d'erreur (`lib/i18n-errors.ts`), pages
+      légales (traduction, la version française fait foi), 20 pages de présentation (`lib/seo-pages-en.ts`).
+      Le back-office reste en français (il affiche la langue de la commande).
+- [x] Par défaut en anglais : langue de la chanson et du refrain sur « Anglais ».
+- [x] Commande : colonne `orders.locale` (migration 0007) pour écrire au client dans sa langue.
+- [x] Plan du site et balises hreflang dans les deux langues ; image de partage anglaise (`app/en/opengraph-image`).
+- [x] Vérifié à 320, 360 et 412 px, texte normal et agrandi de 25 %, dans les deux langues.
 
 ## Étape 8 — Témoignages (~0,5 j, quand les premières réactions arrivent)
 

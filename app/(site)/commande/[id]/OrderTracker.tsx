@@ -8,6 +8,90 @@ import type { OrderStatus } from "@/lib/db/schema";
 import { whatsappLink } from "@/lib/format";
 import { rememberOrder } from "@/lib/my-orders";
 import { trackPurchaseOnce } from "@/lib/pixels";
+import { localePath } from "@/lib/i18n";
+import { useLocale } from "@/lib/use-locale";
+
+const T = {
+  fr: {
+    help: (ref: string) => `Bonjour, j'ai besoin d'aide pour ma commande ${ref}.`,
+    helpLink: "Besoin d’aide ? Écris-nous sur WhatsApp",
+    confirmOnPhone: "Valide le paiement sur ton téléphone",
+    waitingConfirm: "On attend la confirmation du paiement",
+    requestArrived: "Une demande de paiement est arrivée sur ton téléphone. Tape ton code secret pour la valider.",
+    nothing: ["Rien reçu ? Compose ", " pour voir les paiements en attente."],
+    bank: "Termine le paiement sur la page de ta banque. Cette page se met à jour toute seule.",
+    retryPay: "Ça ne marche pas ? Réessayer le paiement",
+    payFailed: "Le paiement n'a pas abouti",
+    lyricsReady: (n: string) => `Les paroles pour ${n} sont prêtes`,
+    notCharged: "Aucun montant n’a été débité. Vérifie ton solde ou ton numéro, puis réessaie.",
+    seeLyrics: "Voir les paroles",
+    retry: "Réessayer le paiement",
+    songReady: (n: string) => `La chanson de ${n} est prête !`,
+    creating: (n: string) => `On crée la chanson de ${n}`,
+    opening: "On l’ouvre…",
+    received: "Paiement reçu, merci ! 2 versions de ta chanson sont en préparation.",
+    late: "⏳ Petit retard de notre côté. Notre équipe est prévenue et s’en occupe : ta chanson arrive, et si on n’y arrive pas, on te rembourse. Tu peux nous écrire sur WhatsApp à tout moment.",
+    usual: "Ça prend en général 2 à 4 minutes. Tu peux fermer cette page : ta chanson t’attendra sur son lien et dans Mon espace.",
+    problem: "On a eu un souci avec ta chanson",
+    problemText: "Ton paiement est bien reçu. Notre équipe est prévenue et s’en occupe : ta chanson arrive, sinon on te rembourse.",
+    problemMessage: (n: string, ref: string) => `Bonjour, ma chanson pour ${n} a un souci (commande ${ref}).`,
+    writeTeam: "Écrire à l’équipe sur WhatsApp",
+    refunded: "Commande remboursée",
+    refundedText: "Cette commande a été remboursée.",
+    notStarted: "Le paiement n'a pas encore commencé",
+    backToLyrics: "Retourner à mes paroles",
+    offline: "Connexion instable… on réessaie.",
+    keep: "Garde tes chansons dans ton espace",
+    keepHint: "Connexion en 1 clic avec Google ou ton e-mail.",
+    steps: ["Paiement reçu", "Création des 2 versions", "Ta chanson est prête"],
+    state: { done: "(fait)", active: "(en cours)", todo: "(à venir)" },
+    linkTitle: "🔗 Le lien de ta chanson",
+    copied: "Copié ✓",
+    copy: "Copier le lien",
+    share: (n: string, url: string) => `Ma chanson Dédikace pour ${n} 🎶 ${url}`,
+    sendMe: "Me l’envoyer",
+  },
+  en: {
+    help: (ref: string) => `Hello, I need help with my order ${ref}.`,
+    helpLink: "Need help? Message us on WhatsApp",
+    confirmOnPhone: "Confirm the payment on your phone",
+    waitingConfirm: "Waiting for payment confirmation",
+    requestArrived: "A payment request has arrived on your phone. Enter your PIN to confirm it.",
+    nothing: ["Nothing received? Dial ", " to see pending payments."],
+    bank: "Finish the payment on your bank’s page. This page updates by itself.",
+    retryPay: "Not working? Try the payment again",
+    payFailed: "The payment didn’t go through",
+    lyricsReady: (n: string) => `The lyrics for ${n} are ready`,
+    notCharged: "Nothing was charged. Check your balance or your number, then try again.",
+    seeLyrics: "See the lyrics",
+    retry: "Try the payment again",
+    songReady: (n: string) => `${n}’s song is ready!`,
+    creating: (n: string) => `We’re creating ${n}’s song`,
+    opening: "Opening it…",
+    received: "Payment received, thank you! 2 versions of your song are being made.",
+    late: "⏳ A small delay on our side. Our team has been alerted and is on it: your song is coming, and if we can’t make it, we refund you. You can message us on WhatsApp at any time.",
+    usual: "It usually takes 2 to 4 minutes. You can close this page: your song will wait for you on its link and in My space.",
+    problem: "We had a problem with your song",
+    problemText: "Your payment was received. Our team has been alerted and is on it: your song is coming, otherwise we refund you.",
+    problemMessage: (n: string, ref: string) => `Hello, my song for ${n} has a problem (order ${ref}).`,
+    writeTeam: "Message the team on WhatsApp",
+    refunded: "Order refunded",
+    refundedText: "This order has been refunded.",
+    notStarted: "The payment hasn’t started yet",
+    backToLyrics: "Back to my lyrics",
+    offline: "Unstable connection… retrying.",
+    keep: "Keep your songs in your space",
+    keepHint: "1-click sign-in with Google or your email.",
+    steps: ["Payment received", "Creating the 2 versions", "Your song is ready"],
+    state: { done: "(done)", active: "(in progress)", todo: "(next)" },
+    linkTitle: "🔗 Your song’s link",
+    copied: "Copied ✓",
+    copy: "Copy the link",
+    share: (n: string, url: string) => `My Dédikace song for ${n} 🎶 ${url}`,
+    sendMe: "Send it to me",
+  },
+};
+type Text = (typeof T)["fr"];
 
 type Snapshot = {
   status: OrderStatus;
@@ -47,6 +131,9 @@ export function OrderTracker({
   appUrl: string;
 }) {
   const router = useRouter();
+  const locale = useLocale();
+  const t = T[locale];
+  const to = (p: string) => localePath(locale, p);
   const [snap, setSnap] = useState(initial);
   const [offline, setOffline] = useState(false);
   // Horloge lancée seulement dans le navigateur (le serveur n'a pas la même heure : pas d'écart à l'affichage).
@@ -92,19 +179,20 @@ export function OrderTracker({
 
   // Chanson prête : on ouvre sa page toute seule.
   useEffect(() => {
-    if (snap.status === "delivered" && snap.publicCode) router.replace(`/s/${snap.publicCode}`);
-  }, [snap.status, snap.publicCode, router]);
+    if (snap.status === "delivered" && snap.publicCode) router.replace(to(`/s/${snap.publicCode}`));
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- `to` ne dépend que de la langue
+  }, [snap.status, snap.publicCode, router, locale]);
 
   const name = snap.recipientName;
   const support = /^\+\d{8,15}$/.test(supportPhone) ? supportPhone : null;
   const helpLink = support && (
     <a
-      href={whatsappLink(support, `Bonjour, j'ai besoin d'aide pour ma commande ${orderId.slice(0, 8)}.`)}
+      href={whatsappLink(support, t.help(orderId.slice(0, 8)))}
       target="_blank"
       rel="noopener noreferrer"
       className="text-center text-sm text-muted underline"
     >
-      Besoin d’aide ? Écris-nous sur WhatsApp
+      {t.helpLink}
     </a>
   );
 
@@ -113,21 +201,22 @@ export function OrderTracker({
     case "pending_payment": {
       const momo = snap.channel === "mtn" || snap.channel === "orange";
       content = (
-        <Panel icon="📱" title={momo ? "Valide le paiement sur ton téléphone" : "On attend la confirmation du paiement"}>
+        <Panel icon="📱" title={momo ? t.confirmOnPhone : t.waitingConfirm}>
           {momo ? (
             <>
-              <p>Une demande de paiement est arrivée sur ton téléphone. Tape ton code secret pour la valider.</p>
+              <p>{t.requestArrived}</p>
               <p className="rounded-2xl bg-sand/60 p-4 text-sm">
-                Rien reçu ? Compose <strong>{snap.channel === "mtn" ? "*126#" : "#150*50#"}</strong> pour voir les paiements en
-                attente.
+                {t.nothing[0]}
+                <strong>{snap.channel === "mtn" ? "*126#" : "#150*50#"}</strong>
+                {t.nothing[1]}
               </p>
             </>
           ) : (
-            <p>Termine le paiement sur la page de ta banque. Cette page se met à jour toute seule.</p>
+            <p>{t.bank}</p>
           )}
           {startedAt > 0 && now - startedAt > SLOW_PAYMENT_MS && (
-            <Link href="/creer" className="font-semibold text-brand underline">
-              Ça ne marche pas ? Réessayer le paiement
+            <Link href={to("/creer")} className="font-semibold text-brand underline">
+              {t.retryPay}
             </Link>
           )}
         </Panel>
@@ -139,11 +228,11 @@ export function OrderTracker({
       if (pay) {
         content = (
           <div className="flex flex-col gap-5 text-left">
-            <Panel icon={snap.status === "payment_failed" ? "😕" : "✍️"} title={snap.status === "payment_failed" ? "Le paiement n'a pas abouti" : `Les paroles pour ${name} sont prêtes`}>
-              {snap.status === "payment_failed" && <p>Aucun montant n’a été débité. Vérifie ton solde ou ton numéro, puis réessaie.</p>}
+            <Panel icon={snap.status === "payment_failed" ? "😕" : "✍️"} title={snap.status === "payment_failed" ? t.payFailed : t.lyricsReady(name)}>
+              {snap.status === "payment_failed" && <p>{t.notCharged}</p>}
             </Panel>
             <details className="rounded-3xl bg-white p-4 shadow-sm ring-1 ring-sand">
-              <summary className="cursor-pointer font-bold">{pay.title || "Voir les paroles"}</summary>
+              <summary className="cursor-pointer font-bold">{pay.title || t.seeLyrics}</summary>
               <p className="mt-3 text-sm leading-relaxed whitespace-pre-line text-muted">{pay.lyrics}</p>
             </details>
             <Checkout orderId={orderId} whatsappPhone={pay.whatsappPhone} priceMomo={pay.priceMomo} priceCard={pay.priceCard} />
@@ -152,13 +241,13 @@ export function OrderTracker({
         break;
       }
       content = (
-        <Panel icon="😕" title="Le paiement n'a pas abouti">
-          <p>Aucun montant n’a été débité. Vérifie ton solde ou ton numéro, puis réessaie.</p>
+        <Panel icon="😕" title={t.payFailed}>
+          <p>{t.notCharged}</p>
           <Link
-            href="/creer"
+            href={to("/creer")}
             className="flex h-14 items-center justify-center rounded-2xl bg-brand px-6 text-lg font-bold text-white shadow-md shadow-brand/30"
           >
-            Réessayer le paiement
+            {t.retry}
           </Link>
         </Panel>
       );
@@ -171,21 +260,20 @@ export function OrderTracker({
       const late = elapsed > LATE_CREATION_MS && snap.status !== "delivered";
       content = (
         <div className="flex flex-col gap-5 text-left">
-          <Panel icon={snap.status === "delivered" ? "🎉" : "🎶"} title={snap.status === "delivered" ? `La chanson de ${name} est prête !` : `On crée la chanson de ${name}`}>
-            <p>{snap.status === "delivered" ? "On l’ouvre…" : "Paiement reçu, merci ! 2 versions de ta chanson sont en préparation."}</p>
+          <Panel icon={snap.status === "delivered" ? "🎉" : "🎶"} title={snap.status === "delivered" ? t.songReady(name) : t.creating(name)}>
+            <p>{snap.status === "delivered" ? t.opening : t.received}</p>
           </Panel>
-          <CreationSteps status={snap.status} progress={Math.min(95, 8 + (elapsed / USUAL_CREATION_MS) * 87)} />
+          <CreationSteps t={t} status={snap.status} progress={Math.min(95, 8 + (elapsed / USUAL_CREATION_MS) * 87)} />
           {late ? (
             <p role="alert" className="rounded-2xl bg-gold/25 p-4 text-sm font-medium text-ink">
-              ⏳ Petit retard de notre côté. Notre équipe est prévenue et s’en occupe : ta chanson arrive, et si on n’y arrive
-              pas, on te rembourse. Tu peux nous écrire sur WhatsApp à tout moment.
+              {t.late}
             </p>
           ) : (
             <p className="text-center text-sm text-muted">
-              Ça prend en général 2 à 4 minutes. Tu peux fermer cette page : ta chanson t’attendra sur son lien et dans Mon espace.
+              {t.usual}
             </p>
           )}
-          {snap.publicCode && <SongLink url={`${appUrl.replace(/\/$/, "")}/s/${snap.publicCode}`} name={name} />}
+          {snap.publicCode && <SongLink t={t} url={`${appUrl.replace(/\/$/, "")}${to(`/s/${snap.publicCode}`)}`} name={name} />}
         </div>
       );
       break;
@@ -193,17 +281,17 @@ export function OrderTracker({
     case "generation_failed":
       content = (
         <div className="flex flex-col gap-5">
-          <Panel icon="🛠️" title="On a eu un souci avec ta chanson">
-            <p>Ton paiement est bien reçu. Notre équipe est prévenue et s’en occupe : ta chanson arrive, sinon on te rembourse.</p>
+          <Panel icon="🛠️" title={t.problem}>
+            <p>{t.problemText}</p>
           </Panel>
           {support && (
             <a
-              href={whatsappLink(support, `Bonjour, ma chanson pour ${name} a un souci (commande ${orderId.slice(0, 8)}).`)}
+              href={whatsappLink(support, t.problemMessage(name, orderId.slice(0, 8)))}
               target="_blank"
               rel="noopener noreferrer"
               className="flex h-14 items-center justify-center rounded-2xl bg-[#25d366] px-6 text-lg font-bold text-white shadow-md"
             >
-              Écrire à l’équipe sur WhatsApp
+              {t.writeTeam}
             </a>
           )}
         </div>
@@ -211,16 +299,16 @@ export function OrderTracker({
       break;
     case "refunded":
       content = (
-        <Panel icon="↩️" title="Commande remboursée">
-          <p>Cette commande a été remboursée.</p>
+        <Panel icon="↩️" title={t.refunded}>
+          <p>{t.refundedText}</p>
         </Panel>
       );
       break;
     default:
       content = (
-        <Panel icon="✍️" title="Le paiement n'a pas encore commencé">
-          <Link href="/creer" className="font-semibold text-brand underline">
-            Retourner à mes paroles
+        <Panel icon="✍️" title={t.notStarted}>
+          <Link href={to("/creer")} className="font-semibold text-brand underline">
+            {t.backToLyrics}
           </Link>
         </Panel>
       );
@@ -229,18 +317,18 @@ export function OrderTracker({
   return (
     <div className="flex flex-col gap-6 py-10" role="status" aria-live="polite">
       {content}
-      {offline && <p className="text-center text-sm text-muted">Connexion instable… on réessaie.</p>}
+      {offline && <p className="text-center text-sm text-muted">{t.offline}</p>}
       {!signedIn && (
         <Link
-          href={`/connexion?suite=${encodeURIComponent("/compte")}`}
+          href={`${to("/connexion")}?suite=${encodeURIComponent(to("/compte"))}`}
           className="flex items-center gap-3 rounded-2xl bg-white p-4 text-left shadow-sm ring-1 ring-sand"
         >
           <span className="text-2xl" aria-hidden="true">
             💾
           </span>
           <span className="min-w-0 flex-1">
-            <span className="block font-bold">Garde tes chansons dans ton espace</span>
-            <span className="block text-sm text-muted">Connexion en 1 clic avec Google ou ton e-mail.</span>
+            <span className="block font-bold">{t.keep}</span>
+            <span className="block text-sm text-muted">{t.keepHint}</span>
           </span>
           <span className="text-brand" aria-hidden="true">
             ›
@@ -265,12 +353,12 @@ function Panel({ icon, title, children }: { icon: string; title: string; childre
 }
 
 /** Les 3 étapes après le paiement, avec une barre qui avance pendant la création (estimation honnête). */
-function CreationSteps({ status, progress }: { status: OrderStatus; progress: number }) {
+function CreationSteps({ t, status, progress }: { t: Text; status: OrderStatus; progress: number }) {
   const ready = status === "delivered";
   const steps = [
-    { label: "Paiement reçu", state: "done" },
-    { label: "Création des 2 versions", state: ready ? "done" : "active" },
-    { label: "Ta chanson est prête", state: ready ? "done" : "todo" },
+    { label: t.steps[0], state: "done" },
+    { label: t.steps[1], state: ready ? "done" : "active" },
+    { label: t.steps[2], state: ready ? "done" : "todo" },
   ] as const;
   return (
     <ol className="flex flex-col gap-3 rounded-3xl bg-white p-4 shadow-sm ring-1 ring-sand">
@@ -286,7 +374,7 @@ function CreationSteps({ status, progress }: { status: OrderStatus; progress: nu
               {s.state === "done" ? "✓" : s.state === "active" ? "♪" : "·"}
             </span>
             <span className={s.state === "todo" ? "text-muted" : ""}>{s.label}</span>
-            <span className="sr-only">{s.state === "done" ? "(fait)" : s.state === "active" ? "(en cours)" : "(à venir)"}</span>
+            <span className="sr-only">{t.state[s.state]}</span>
           </span>
           {s.state === "active" && (
             <span className="ml-10 h-2 overflow-hidden rounded-full bg-sand" aria-hidden="true">
@@ -300,11 +388,11 @@ function CreationSteps({ status, progress }: { status: OrderStatus; progress: nu
 }
 
 /** Lien de la chanson, à garder : il marche déjà (la page attend puis affiche la chanson). */
-function SongLink({ url, name }: { url: string; name: string }) {
+function SongLink({ t, url, name }: { t: Text; url: string; name: string }) {
   const [copied, setCopied] = useState(false);
   return (
     <div className="flex flex-col gap-2 rounded-3xl bg-white p-4 shadow-sm ring-1 ring-sand">
-      <p className="font-semibold">🔗 Le lien de ta chanson</p>
+      <p className="font-semibold">{t.linkTitle}</p>
       <p className="truncate rounded-xl bg-cream px-3 py-2 text-sm text-muted">{url.replace(/^https?:\/\//, "")}</p>
       <div className="grid grid-cols-2 gap-2">
         <button
@@ -320,15 +408,15 @@ function SongLink({ url, name }: { url: string; name: string }) {
           }}
           className="h-11 rounded-full bg-cream text-sm font-bold ring-1 ring-sand"
         >
-          {copied ? "Copié ✓" : "Copier le lien"}
+          {copied ? t.copied : t.copy}
         </button>
         <a
-          href={`https://wa.me/?text=${encodeURIComponent(`Ma chanson Dédikace pour ${name} 🎶 ${url}`)}`}
+          href={`https://wa.me/?text=${encodeURIComponent(t.share(name, url))}`}
           target="_blank"
           rel="noopener noreferrer"
           className="flex h-11 items-center justify-center rounded-full bg-[#25d366] text-sm font-bold text-white"
         >
-          Me l’envoyer
+          {t.sendMe}
         </a>
       </div>
     </div>

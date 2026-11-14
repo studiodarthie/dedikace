@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { useLocale } from "@/lib/use-locale";
 
 // Cadrage de la photo avant la vidéo : on la déplace au doigt et on zoome (curseur ou pincement),
 // puis on envoie exactement le cadre vertical choisi (9:16).
@@ -53,6 +54,7 @@ export function PhotoCropper({
   onCancel: () => void;
   onConfirm: (photo: Blob) => void;
 }) {
+  const en = useLocale() === "en";
   const [img, setImg] = useState<ImageBitmap | null>(null);
   const [failed, setFailed] = useState(false);
   const [view, setView] = useState<View>({ zoom: 1, cx: 0, cy: 0 });
@@ -133,10 +135,10 @@ export function PhotoCropper({
     return (
       <div className="flex flex-col gap-3">
         <p role="alert" className="rounded-2xl bg-red-50 p-4 font-medium text-red-800 ring-1 ring-red-200">
-          On n’arrive pas à ouvrir cette photo. Essaie avec une autre.
+          {en ? "We can’t open this photo. Try another one." : "On n’arrive pas à ouvrir cette photo. Essaie avec une autre."}
         </p>
         <button type="button" onClick={onCancel} className="h-12 rounded-2xl bg-cream font-bold ring-1 ring-sand">
-          Choisir une autre photo
+          {en ? "Choose another photo" : "Choisir une autre photo"}
         </button>
       </div>
     );
@@ -144,7 +146,9 @@ export function PhotoCropper({
 
   return (
     <div className="flex flex-col gap-4">
-      <p className="text-center text-sm font-medium">Fais glisser la photo et zoome pour bien cadrer le visage.</p>
+      <p className="text-center text-sm font-medium">
+        {en ? "Drag the photo and zoom to frame the face nicely." : "Fais glisser la photo et zoome pour bien cadrer le visage."}
+      </p>
       <div className="relative mx-auto w-full max-w-[260px]">
         <canvas
           ref={canvas}
@@ -153,7 +157,7 @@ export function PhotoCropper({
           onPointerUp={onPointerUp}
           onPointerCancel={onPointerUp}
           className="aspect-[9/16] w-full cursor-grab touch-none rounded-2xl bg-ink active:cursor-grabbing"
-          aria-label="Aperçu du cadrage : fais glisser pour déplacer la photo"
+          aria-label={en ? "Framing preview: drag to move the photo" : "Aperçu du cadrage : fais glisser pour déplacer la photo"}
         />
         {!img && (
           <span
@@ -182,10 +186,10 @@ export function PhotoCropper({
         disabled={!img}
         className="flex h-14 items-center justify-center gap-2 rounded-2xl bg-brand px-6 text-lg font-bold text-white shadow-md shadow-brand/30 transition active:scale-[0.98] disabled:opacity-70"
       >
-        <span aria-hidden="true">🎬</span> Créer la vidéo
+        <span aria-hidden="true">🎬</span> {en ? "Create the video" : "Créer la vidéo"}
       </button>
       <button type="button" onClick={onCancel} className="text-sm font-medium text-muted underline">
-        Choisir une autre photo
+        {en ? "Choose another photo" : "Choisir une autre photo"}
       </button>
     </div>
   );

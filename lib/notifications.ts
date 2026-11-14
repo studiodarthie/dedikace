@@ -50,7 +50,7 @@ export async function notifyLaunchFailed(order: Order, error: unknown): Promise<
 export async function notifySongReady(orderId: string): Promise<void> {
   try {
     const [row] = await db
-      .select({ code: orders.publicCode, recipientName: orders.recipientName, email: users.email, name: users.name })
+      .select({ code: orders.publicCode, recipientName: orders.recipientName, locale: orders.locale, email: users.email, name: users.name })
       .from(orders)
       .innerJoin(users, eq(users.id, orders.userId))
       .where(eq(orders.id, orderId));
@@ -58,7 +58,8 @@ export async function notifySongReady(orderId: string): Promise<void> {
     await sendSongReady(row.email, {
       firstName: row.name?.trim().split(/\s+/)[0] || null,
       recipientName: row.recipientName,
-      url: `${APP_URL()}/s/${row.code}`,
+      url: `${APP_URL()}${row.locale === "en" ? "/en" : ""}/s/${row.code}`,
+      locale: row.locale,
     });
   } catch (error) {
     console.error("[notification] e-mail « chanson prête » échoué", error);

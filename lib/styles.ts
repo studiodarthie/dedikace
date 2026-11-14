@@ -36,6 +36,37 @@ const RETIRED_STYLES = [
   { id: "ndombolo", label: "Ndombolo", prompt: "High-energy ndombolo, fast sparkling sebene guitar, tight snare rolls, festive dance shouts, 135 bpm, powerful {voice} vocals" },
 ] as const;
 
+// Noms et phrases pour l'interface anglaise (les styles absents gardent leur nom français).
+const STYLE_LABELS_EN: Partial<Record<string, string>> = {
+  rumba: "Congolese rumba",
+  gospel: "African gospel",
+  afrosoul: "Inspirational Afro-soul",
+  epique: "Epic Afro-pop",
+  hommage: "Acoustic tribute",
+};
+
+export const STYLE_TAGLINES_EN: Record<(typeof STYLES)[number]["id"], string> = {
+  makossa: "Joyful guitars, Douala vibe",
+  bikutsi: "Fast and danceable, rhythm of the Centre",
+  rumba: "Smooth and elegant, singing guitars",
+  zouklove: "Caribbean slow dance, all softness",
+  gospel: "Choir and praise, full of hope",
+  afrobeats: "Modern and groovy",
+  amapiano: "Trendy, deep basslines",
+  afrozouk: "Romantic, with an African groove",
+  "coupe-decale": "Festive, party vibe",
+  afrosoul: "Piano and strings, goosebumps guaranteed",
+  epique: "Big and powerful, like in the movies",
+  hommage: "Acoustic guitar, calm and dignified",
+};
+
+/** Nom du style dans la langue de l'interface. */
+export function styleLabel(id: string, locale: "fr" | "en" = "fr"): string {
+  const style = getStyle(id);
+  if (!style) return id;
+  return (locale === "en" && STYLE_LABELS_EN[id]) || style.label;
+}
+
 export type Style = (typeof STYLES)[number] | (typeof RETIRED_STYLES)[number];
 export type StyleId = (typeof STYLES)[number]["id"];
 export type Voice = "male" | "female";

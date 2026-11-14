@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState, useSyncExternalStore } from "react";
+import { useLocale } from "@/lib/use-locale";
 
 const MAX_SECONDS = 60;
 
@@ -26,6 +27,7 @@ function useCanRecord() {
  */
 export function VoiceNote({ onText }: { onText: (text: string) => void }) {
   const canRecord = useCanRecord();
+  const en = useLocale() === "en";
   const [state, setState] = useState<State>({ kind: "idle" });
   const recorder = useRef<MediaRecorder | null>(null);
   const timer = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -53,7 +55,9 @@ export function VoiceNote({ onText }: { onText: (text: string) => void }) {
     } catch {
       setState({
         kind: "error",
-        message: "Ton téléphone a bloqué le micro. Autorise-le dans les réglages du navigateur, ou écris ton souvenir.",
+        message: en
+          ? "Your phone blocked the microphone. Allow it in your browser settings, or type your memory."
+          : "Ton téléphone a bloqué le micro. Autorise-le dans les réglages du navigateur, ou écris ton souvenir.",
       });
       return;
     }
@@ -87,18 +91,19 @@ export function VoiceNote({ onText }: { onText: (text: string) => void }) {
     try {
       const body = new FormData();
       body.append("audio", audio, "vocal");
+      body.append("locale", en ? "en" : "fr");
       const res = await fetch("/api/transcribe", { method: "POST", body });
       if (res.status === 429) {
-        return setState({ kind: "error", message: "Trop d’essais d’un coup. Attends une minute et réessaie." });
+        return setState({ kind: "error", message: en ? "Too many tries at once. Wait a minute and try again." : "Trop d’essais d’un coup. Attends une minute et réessaie." });
       }
       const data = (await res.json()) as { text?: string; error?: string };
       if (!res.ok || !data.text) {
-        return setState({ kind: "error", message: data.error ?? "On n'a pas pu lire ton vocal. Réessaie." });
+        return setState({ kind: "error", message: data.error ?? (en ? "We couldn’t read your voice note. Try again." : "On n'a pas pu lire ton vocal. Réessaie.") });
       }
       onText(data.text);
       setState({ kind: "idle" });
     } catch {
-      setState({ kind: "error", message: "Pas de connexion internet. Vérifie ton réseau et réessaie." });
+      setState({ kind: "error", message: en ? "No internet connection. Check your network and try again." : "Pas de connexion internet. Vérifie ton réseau et réessaie." });
     }
   }
 
@@ -111,7 +116,7 @@ export function VoiceNote({ onText }: { onText: (text: string) => void }) {
         className="flex h-14 items-center justify-center gap-3 rounded-2xl bg-ink px-4 font-bold text-white"
       >
         <span className="h-3 w-3 animate-pulse rounded-full bg-red-500" aria-hidden="true" />
-        Arrêter et envoyer
+        {en ? "Stop and send" : "Arrêter et envoyer"}
         <span className="font-normal text-white/70 tabular-nums">0:{String(left).padStart(2, "0")}</span>
       </button>
     );
@@ -128,11 +133,11 @@ export function VoiceNote({ onText }: { onText: (text: string) => void }) {
         {state.kind === "sending" ? (
           <>
             <span className="h-5 w-5 animate-spin rounded-full border-2 border-white border-t-transparent" aria-hidden="true" />
-            On écoute ton vocal…
+            {en ? "Listening to your voice note…" : "On écoute ton vocal…"}
           </>
         ) : (
           <>
-            <span aria-hidden="true">🎤</span> Raconte en vocal (1 min max)
+            <span aria-hidden="true">🎤</span> {en ? "Tell it in a voice note (1 min max)" : "Raconte en vocal (1 min max)"}
           </>
         )}
       </button>

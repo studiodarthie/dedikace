@@ -11,12 +11,16 @@ import { formatXaf, whatsappLink } from "@/lib/format";
 import {
   LANGUAGES,
   MEMORY_IDEAS,
+  MEMORY_IDEAS_EN,
   OCCASIONS,
   type OccasionId,
 } from "@/lib/occasions";
 import { rememberOrder } from "@/lib/my-orders";
 import { trackPixel } from "@/lib/pixels";
-import { STYLE_TAGLINES, STYLES, type StyleId } from "@/lib/styles";
+import { STYLE_TAGLINES, STYLE_TAGLINES_EN, STYLES, styleLabel, type StyleId } from "@/lib/styles";
+import { localePath, type Locale } from "@/lib/i18n";
+import { useLocale } from "@/lib/use-locale";
+import { RELATIONS, W, type WizardText } from "./wizard-text";
 import { VoiceNote } from "./VoiceNote";
 import { playExclusive } from "@/lib/single-audio";
 import { CreateSkeleton } from "@/components/Skeletons";
@@ -27,18 +31,6 @@ const STORAGE_KEY = "dedikace:brouillon:v1";
 const MAX_ANECDOTES_CHARS = 500;
 const MAX_ANECDOTES = 3;
 const SUPPORT_PHONE = process.env.NEXT_PUBLIC_SUPPORT_WHATSAPP ?? "";
-// « Pour qui ? » : libellé affiché → valeur envoyée aux paroles (champ relation).
-const RELATIONS = [
-  { emoji: "👩🏾", label: "Maman", value: "ma mère" },
-  { emoji: "👨🏾", label: "Papa", value: "mon père" },
-  { emoji: "❤️", label: "Ma chérie", value: "ma chérie" },
-  { emoji: "💙", label: "Mon chéri", value: "mon chéri" },
-  { emoji: "👧🏾", label: "Ma sœur", value: "ma sœur" },
-  { emoji: "👦🏾", label: "Mon frère", value: "mon frère" },
-  { emoji: "🧒🏾", label: "Mon enfant", value: "mon enfant" },
-  { emoji: "🤝🏾", label: "Mon ami(e)", value: "mon ami(e)" },
-  { emoji: "💼", label: "Collègue", value: "mon collègue" },
-];
 
 type Form = {
   occasion: string;
@@ -68,20 +60,22 @@ type Draft = {
   editLyrics?: string;
 };
 
-const EMPTY_FORM: Form = {
+// Interface en anglais : chanson et refrain en anglais par défaut.
+const emptyForm = (locale: Locale): Form => ({
   occasion: "",
   recipientName: "",
   relation: "",
   senderName: "",
   anecdotes: [""],
   styleId: "",
-  songLanguage: "fr",
-  chorusLanguage: "fr",
+  songLanguage: locale === "en" ? "en" : "fr",
+  chorusLanguage: locale === "en" ? "en" : "fr",
   voice: "female",
   whatsappPhone: "+237 ",
-};
+});
 
-function loadDraft(defaults: Defaults = {}): Draft {
+function loadDraft(locale: Locale, defaults: Defaults = {}): Draft {
+  const EMPTY_FORM = emptyForm(locale);
   try {
     const raw = window.localStorage.getItem(STORAGE_KEY);
     if (raw) {
@@ -141,19 +135,15 @@ const cleanPhone = (v: string) => v.replace(/[\s.\-()]/g, "");
 const anecdotesLength = (list: string[]) =>
   list.reduce((n, a) => n + a.trim().length, 0);
 
-function stepError(step: number, f: Form): string | null {
-  if (step === 0 && !f.occasion) return "Choisis une occasion.";
+function stepError(step: number, f: Form, t: WizardText): string | null {
+  if (step === 0 && !f.occasion) return t.errOccasion;
   if (step === 1) {
-    if (!f.recipientName.trim()) return "Écris le prénom de la personne.";
-    if (!f.anecdotes.some((a) => a.trim()))
-      return "Ajoute au moins un souvenir ou un détail.";
-    if (anecdotesLength(f.anecdotes) > MAX_ANECDOTES_CHARS)
-      return "Tes souvenirs dépassent 500 caractères.";
+    if (!f.recipientName.trim()) return t.errName;
+    if (!f.anecdotes.some((a) => a.trim())) return t.errMemory;
+    if (anecdotesLength(f.anecdotes) > MAX_ANECDOTES_CHARS) return t.errTooLong;
   }
-  if (step === 2 && !f.styleId) return "Choisis un style de musique.";
-  if (step === 3 && !/^\+[1-9]\d{7,14}$/.test(cleanPhone(f.whatsappPhone))) {
-    return "Écris ton numéro WhatsApp avec l'indicatif, par exemple +237 6XX XX XX XX.";
-  }
+  if (step === 2 && !f.styleId) return t.errStyle;
+  if (step === 3 && !/^\+[1-9]\d{7,14}$/.test(cleanPhone(f.whatsappPhone))) return t.errPhone;
   return null;
 }
 
@@ -169,21 +159,14 @@ type Defaults = { senderName?: string; whatsappPhone?: string; occasion?: string
 
 export function CreateWizard({ defaults, ...prices }: Prices & { defaults?: Defaults }) {
   const isClient = useIsClient();
+  const locale = useLocale();
   if (!isClient) {
     return (
       <CreateSkeleton />
     );
   }
-  return <Wizard initial={loadDraft(defaults)} {...prices} />;
+  return <Wizard initial={loadDraft(locale, defaults)} {...prices} />;
 }
-
-const STEP_TITLES = [
-  "L'occasion",
-  "La personne",
-  "La musique",
-  "Ton contact",
-  "Tes paroles",
-];
 
 function Wizard({
   initial,
@@ -191,6 +174,9 @@ function Wizard({
   priceCard,
   launchEnds,
 }: { initial: Draft } & Prices) {
+  const locale = useLocale();
+  const t = W[locale];
+  const en = locale === "en";
   const [step, setStep] = useState(initial.step);
   const [form, setForm] = useState<Form>(initial.form);
   const [saved, setSaved] = useState<Lyrics | undefined>(initial.saved);
@@ -247,7 +233,7 @@ function Wizard({
       );
     if (list.length < MAX_ANECDOTES)
       return update("anecdotes", [...list, idea]);
-    setError("3 souvenirs au maximum. Retire-en un pour en ajouter un autre.");
+    setError(t.errMaxMemories);
   };
 
   // Texte d'un vocal : première case vide, sinon nouvelle case, sinon à la suite de la dernière.
@@ -255,9 +241,7 @@ function Wizard({
     const list = form.anecdotes;
     const room = MAX_ANECDOTES_CHARS - anecdotesLength(list);
     if (room <= 0)
-      return setError(
-        "Tes souvenirs dépassent déjà 500 caractères. Raccourcis-les avant d'ajouter un vocal.",
-      );
+      return setError(t.errVoiceFull);
     const clip = text.slice(0, room);
     const empty = list.findIndex((a) => !a.trim());
     if (empty >= 0)
@@ -286,7 +270,7 @@ function Wizard({
   };
 
   const next = () => {
-    const err = stepError(step, form);
+    const err = stepError(step, form, t);
     if (err) return setError(err);
     if (step === 3) return void createLyrics();
     goTo(step + 1);
@@ -299,21 +283,21 @@ function Wizard({
       const res = await fetch("/api/lyrics", {
         method: "POST",
         headers: { "content-type": "application/json" },
-        body: JSON.stringify(body),
+        body: JSON.stringify({ ...body, locale }),
       });
       // Limite anti-abus du pare-feu Vercel (réponse sans JSON).
       if (res.status === 429) {
-        setError("Trop d’essais d’un coup. Attends une minute et réessaie.");
+        setError(t.errTooMany);
         return null;
       }
       const data = (await res.json()) as Partial<Lyrics> & { error?: string };
       if (!res.ok) {
-        setError(data.error ?? "Une erreur est survenue. Réessaie.");
+        setError(data.error ?? t.errGeneric);
         return null;
       }
       return data as Lyrics;
     } catch {
-      setError("Pas de connexion internet. Vérifie ton réseau et réessaie.");
+      setError(t.errOffline);
       return null;
     }
   }
@@ -347,9 +331,7 @@ function Wizard({
     if (!saved) return;
     if (
       dirty &&
-      !window.confirm(
-        "Tes modifications seront remplacées par de nouvelles paroles. Continuer ?",
-      )
+      !window.confirm(t.confirmRewrite)
     )
       return;
     setBusy("rewrite");
@@ -366,7 +348,7 @@ function Wizard({
   async function saveEdits(): Promise<boolean> {
     if (!saved || !dirty) return true;
     if (!title.trim() || !lyrics.trim()) {
-      setError("Le titre et les paroles ne peuvent pas être vides.");
+      setError(t.errEmpty);
       return false;
     }
     setBusy("save");
@@ -394,24 +376,24 @@ function Wizard({
   }
 
   function restart() {
-    if (!window.confirm("Tout effacer et recommencer ?")) return;
+    if (!window.confirm(t.confirmRestart)) return;
     clearDraft();
-    setForm(EMPTY_FORM);
+    setForm(emptyForm(locale));
     setSaved(undefined);
     setTitle("");
     setLyrics("");
     goTo(0);
   }
 
-  if (busy === "create") return <Writing name={form.recipientName} />;
+  if (busy === "create") return <Writing name={form.recipientName} t={t} />;
 
   return (
     <div ref={topRef} className="flex scroll-mt-4 flex-col gap-6 pt-2">
-      <Progress step={step} />
+      <Progress step={step} titles={t.steps} />
 
       {step === 0 && (
-        <Step title="C'est pour quelle occasion ?">
-          <TrustBanner price={priceMomo} priceCard={priceCard} launchEnds={launchEnds} />
+        <Step title={t.titleOccasion}>
+          <TrustBanner price={priceMomo} priceCard={priceCard} launchEnds={launchEnds} t={t} locale={locale} />
           <div className="grid grid-cols-2 gap-3">
             {OCCASIONS.map((o) => (
               <Choice
@@ -422,7 +404,7 @@ function Wizard({
                 <span className="block text-3xl" aria-hidden="true">
                   {o.emoji}
                 </span>
-                <span className="mt-1 block leading-tight">{o.label}</span>
+                <span className="mt-1 block leading-tight">{en ? o.labelEn : o.label}</span>
               </Choice>
             ))}
           </div>
@@ -430,10 +412,10 @@ function Wizard({
       )}
 
       {step === 1 && (
-        <Step title="Pour qui est la chanson ?">
-          <Field group label="C'est pour…">
+        <Step title={t.titleWho}>
+          <Field group label={t.forWho} optionalText={t.optional}>
             <div className="grid grid-cols-3 gap-2">
-              {RELATIONS.map((r) => (
+              {RELATIONS[locale].map((r) => (
                 <Choice
                   key={r.value}
                   selected={form.relation === r.value}
@@ -450,39 +432,40 @@ function Wizard({
             <input
               className={`${inputClass} mt-1`}
               value={
-                RELATIONS.some((r) => r.value === form.relation)
+                RELATIONS[locale].some((r) => r.value === form.relation)
                   ? ""
                   : form.relation
               }
               onChange={(e) => update("relation", e.target.value)}
               maxLength={40}
-              aria-label="Autre lien avec la personne"
-              placeholder="Autre ? Ex. ma tante, mon parrain"
+              aria-label={t.otherRelation}
+              placeholder={t.otherRelationPlaceholder}
             />
           </Field>
-          <Field label="Son prénom" hint="Il sera chanté dans le refrain.">
+          <Field label={t.nameLabel} hint={t.nameHint} optionalText={t.optional}>
             <input
               className={inputClass}
               value={form.recipientName}
               onChange={(e) => update("recipientName", e.target.value)}
               maxLength={40}
               autoComplete="off"
-              placeholder="Ex. Mireille"
+              placeholder={t.namePlaceholder}
             />
           </Field>
           <Field
             group
-            label="Ce qui rend cette personne unique"
-            hint={`${anecdotesLength(form.anecdotes)}/${MAX_ANECDOTES_CHARS} caractères. Plus c'est précis (un plat, un surnom, un lieu), plus la chanson est belle.`}
+            label={t.uniqueLabel}
+            hint={t.uniqueHint(anecdotesLength(form.anecdotes), MAX_ANECDOTES_CHARS)}
+            optionalText={t.optional}
           >
             <VoiceNote onText={addVoiceText} />
             {form.occasion && (
               <div className="flex flex-col gap-2">
                 <p className="text-sm text-muted">
-                  Ou touche une idée, puis complète-la si tu veux :
+                  {t.ideasIntro}
                 </p>
                 <div className="flex flex-wrap gap-2">
-                  {MEMORY_IDEAS[form.occasion as OccasionId]?.map((idea) => {
+                  {(en ? MEMORY_IDEAS_EN : MEMORY_IDEAS)[form.occasion as OccasionId]?.map((idea) => {
                     const picked = form.anecdotes.some(
                       (a) => a.trim() === idea,
                     );
@@ -520,18 +503,14 @@ function Wizard({
                         ),
                       )
                     }
-                    aria-label={`Souvenir ${i + 1}`}
-                    placeholder={
-                      i === 0
-                        ? "Ou écris ton propre souvenir. Ex. Tu prépares le meilleur ndolé de Douala"
-                        : "Un autre souvenir"
-                    }
+                    aria-label={t.memory(i + 1)}
+                    placeholder={i === 0 ? t.memoryPlaceholder : t.memoryPlaceholderMore}
                     maxLength={MAX_ANECDOTES_CHARS}
                   />
                   {form.anecdotes.length > 1 && (
                     <button
                       type="button"
-                      aria-label="Retirer ce souvenir"
+                      aria-label={t.removeMemory}
                       onClick={() =>
                         update(
                           "anecdotes",
@@ -551,12 +530,12 @@ function Wizard({
                   onClick={() => update("anecdotes", [...form.anecdotes, ""])}
                   className="w-fit rounded-xl px-2 py-1 font-semibold text-brand"
                 >
-                  + Ajouter un souvenir
+                  {t.addMemory}
                 </button>
               )}
             </div>
           </Field>
-          <Field label="Ton prénom" optional hint="Pour signer la chanson.">
+          <Field label={t.senderLabel} optional optionalText={t.optional} hint={t.senderHint}>
             <input
               className={inputClass}
               value={form.senderName}
@@ -569,8 +548,8 @@ function Wizard({
       )}
 
       {step === 2 && (
-        <Step title="Quelle musique ?">
-          <Field group label="Langue de la chanson">
+        <Step title={t.titleMusic}>
+          <Field group label={t.songLanguage} optionalText={t.optional}>
             <div className="grid grid-cols-3 gap-2">
               {LANGUAGES.map((l) => (
                 <Choice
@@ -584,16 +563,12 @@ function Wizard({
                     }))
                   }
                 >
-                  {l.label}
+                  {en ? l.labelEn : l.label}
                 </Choice>
               ))}
             </div>
           </Field>
-          <Field
-            group
-            label="Langue du refrain"
-            hint="Garde la même, ou mélange : couplets en français, refrain en pidgin…"
-          >
+          <Field group label={t.chorusLanguage} hint={t.chorusHint} optionalText={t.optional}>
             <div className="grid grid-cols-3 gap-2">
               {LANGUAGES.map((l) => (
                 <Choice
@@ -601,35 +576,37 @@ function Wizard({
                   selected={form.chorusLanguage === l.id}
                   onClick={() => update("chorusLanguage", l.id)}
                 >
-                  {l.label}
+                  {en ? l.labelEn : l.label}
                   {l.id === form.songLanguage && (
                     <span className="block text-xs font-normal opacity-80">
-                      même
+                      {t.same}
                     </span>
                   )}
                 </Choice>
               ))}
             </div>
           </Field>
-          <Field group label="Style" hint="Touche ▶ pour écouter 15 secondes de chaque style.">
+          <Field group label={t.style} hint={t.styleHint} optionalText={t.optional}>
             <StylePicker
+              t={t}
+              locale={locale}
               value={form.styleId}
               onChange={(id) => update("styleId", id)}
             />
           </Field>
-          <Field group label="Voix">
+          <Field group label={t.voice} optionalText={t.optional}>
             <div className="grid grid-cols-2 gap-2">
               <Choice
                 selected={form.voice === "female"}
                 onClick={() => update("voice", "female")}
               >
-                Femme
+                {t.female}
               </Choice>
               <Choice
                 selected={form.voice === "male"}
                 onClick={() => update("voice", "male")}
               >
-                Homme
+                {t.male}
               </Choice>
             </div>
           </Field>
@@ -637,11 +614,8 @@ function Wizard({
       )}
 
       {step === 3 && (
-        <Step title="Où t'envoyer la chanson ?">
-          <Field
-            label="Ton numéro WhatsApp"
-            hint="Avec l'indicatif du pays : +237 au Cameroun, +33 en France…"
-          >
+        <Step title={t.titleContact}>
+          <Field label={t.phoneLabel} hint={t.phoneHint} optionalText={t.optional}>
             <input
               className={inputClass}
               type="tel"
@@ -653,18 +627,17 @@ function Wizard({
             />
           </Field>
           <p className="rounded-2xl bg-sand/60 p-4 text-sm text-muted">
-            Les paroles sont <strong className="text-ink">gratuites</strong>. Tu
-            ne paies que si elles te plaisent.
+            {t.freeNote[0]}
+            <strong className="text-ink">{t.freeNote[1]}</strong>
+            {t.freeNote[2]}
           </p>
         </Step>
       )}
 
       {step === 4 && saved && (
-        <Step title="Voici tes paroles">
-          <p className="-mt-2 text-muted">
-            Lis-les, modifie ce que tu veux, ou demande une autre version.
-          </p>
-          <Field label="Titre">
+        <Step title={t.titleLyrics}>
+          <p className="-mt-2 text-muted">{t.lyricsIntro}</p>
+          <Field label={t.lyricsTitle} optionalText={t.optional}>
             <input
               className={inputClass}
               value={title}
@@ -672,7 +645,7 @@ function Wizard({
               maxLength={120}
             />
           </Field>
-          <Field label="Paroles">
+          <Field label={t.lyricsLabel} optionalText={t.optional}>
             <textarea
               className={`${inputClass} min-h-[28rem] leading-relaxed`}
               value={lyrics}
@@ -687,9 +660,7 @@ function Wizard({
               disabled={!!busy || saved.rewritesLeft === 0}
               className="h-12 rounded-2xl bg-white font-semibold ring-1 ring-sand disabled:opacity-50"
             >
-              {busy === "rewrite"
-                ? "Réécriture…"
-                : `Réécrire (${saved.rewritesLeft})`}
+              {busy === "rewrite" ? t.rewriting : t.rewrite(saved.rewritesLeft)}
             </button>
             <button
               type="button"
@@ -697,11 +668,7 @@ function Wizard({
               disabled={!!busy || !dirty}
               className="h-12 rounded-2xl bg-white font-semibold ring-1 ring-sand disabled:opacity-50"
             >
-              {busy === "save"
-                ? "Enregistrement…"
-                : dirty
-                  ? "Enregistrer"
-                  : "Enregistré ✓"}
+              {busy === "save" ? t.saving : dirty ? t.save : t.saved}
             </button>
           </div>
         </Step>
@@ -727,7 +694,7 @@ function Wizard({
       <div className="flex flex-col gap-3">
         {step < 4 ? (
           <PrimaryButton onClick={next}>
-            {step === 3 ? "Écrire mes paroles gratuites" : "Continuer"}
+            {step === 3 ? t.writeLyrics : t.next}
           </PrimaryButton>
         ) : checkout && saved && !dirty ? (
           <div ref={checkoutRef} className="scroll-mt-4">
@@ -741,9 +708,9 @@ function Wizard({
         ) : (
           <>
             <PrimaryButton onClick={openCheckout} disabled={!!busy}>
-              Créer ma chanson pour {formatXaf(priceMomo)}
+              {t.createFor(formatXaf(priceMomo, locale))}
             </PrimaryButton>
-            <PayBadges className="justify-center" />
+            <PayBadges className="justify-center" label={t.payBadges} />
           </>
         )}
         <div className="flex items-center justify-between">
@@ -753,7 +720,7 @@ function Wizard({
               onClick={() => goTo(step - 1)}
               className="px-2 py-2 font-semibold text-muted"
             >
-              ← {step === 4 ? "Modifier mes infos" : "Retour"}
+              ← {step === 4 ? t.editInfo : t.back}
             </button>
           ) : (
             <span />
@@ -764,7 +731,7 @@ function Wizard({
               onClick={restart}
               className="px-2 py-2 text-sm text-muted underline"
             >
-              Recommencer
+              {t.restart}
             </button>
           )}
         </div>
@@ -777,15 +744,7 @@ function Wizard({
 
 type PayChannel = "mtn" | "orange" | "card";
 
-const CHANNELS: { id: PayChannel; label: string; hint: string }[] = [
-  { id: "mtn", label: "MTN MoMo", hint: "Validation sur ton téléphone" },
-  { id: "orange", label: "Orange Money", hint: "Validation sur ton téléphone" },
-  {
-    id: "card",
-    label: "Carte bancaire",
-    hint: "Visa, Mastercard — idéal depuis l'étranger",
-  },
-];
+const CHANNEL_IDS: PayChannel[] = ["mtn", "orange", "card"];
 
 /** Bloc de paiement, réutilisé sur /commande/[id] pour finaliser une commande depuis « Mon espace ». */
 export function Checkout({
@@ -794,6 +753,8 @@ export function Checkout({
   priceMomo,
   priceCard,
 }: { orderId: string; whatsappPhone: string } & Prices) {
+  const locale = useLocale();
+  const t = W[locale];
   const [channel, setChannel] = useState<PayChannel>("mtn");
   // Le numéro WhatsApp camerounais sert souvent aussi pour le Mobile Money.
   const [phone, setPhone] = useState(
@@ -802,14 +763,12 @@ export function Checkout({
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const price = channel === "card" ? priceCard : priceMomo;
-  const label = CHANNELS.find((c) => c.id === channel)!.label;
+  const label = t.channels[channel].label;
 
   async function submit() {
     const local = phone.replace(/[\s.\-()]/g, "").replace(/^(\+|00)?237/, "");
     if (channel !== "card" && !/^6\d{8}$/.test(local)) {
-      return setError(
-        "Écris ton numéro Mobile Money à 9 chiffres, par exemple 6XX XX XX XX.",
-      );
+      return setError(t.errMomo);
     }
     setBusy(true);
     setError(null);
@@ -819,8 +778,8 @@ export function Checkout({
         headers: { "content-type": "application/json" },
         body: JSON.stringify(
           channel === "card"
-            ? { orderId, channel }
-            : { orderId, channel, phone: local },
+            ? { orderId, channel, locale }
+            : { orderId, channel, phone: local, locale },
         ),
       });
       const data = (await res.json()) as {
@@ -828,13 +787,13 @@ export function Checkout({
         error?: string;
       };
       if (!res.ok) {
-        setError(data.error ?? "Le paiement n'a pas pu démarrer. Réessaie.");
+        setError(data.error ?? t.errPayStart);
         setBusy(false);
         return;
       }
-      window.location.assign(data.redirectUrl ?? `/commande/${orderId}`);
+      window.location.assign(data.redirectUrl ?? localePath(locale, `/commande/${orderId}`));
     } catch {
-      setError("Pas de connexion internet. Vérifie ton réseau et réessaie.");
+      setError(t.errOffline);
       setBusy(false);
     }
   }
@@ -842,15 +801,15 @@ export function Checkout({
   return (
     <section
       className="flex flex-col gap-4 rounded-3xl bg-white p-4 shadow-sm ring-1 ring-sand"
-      aria-label="Paiement"
+      aria-label={t.payment}
     >
-      <h2 className="text-2xl font-extrabold">Comment veux-tu payer ?</h2>
+      <h2 className="text-2xl font-extrabold">{t.howPay}</h2>
       <div
         className="flex flex-col gap-2"
         role="group"
-        aria-label="Moyen de paiement"
+        aria-label={t.payMethod}
       >
-        {CHANNELS.map((c) => (
+        {CHANNEL_IDS.map((id) => ({ id, ...t.channels[id] })).map((c) => (
           <Choice
             key={c.id}
             selected={channel === c.id}
@@ -865,7 +824,7 @@ export function Checkout({
                 </span>
               </span>
               <span className="shrink-0 font-bold">
-                {formatXaf(c.id === "card" ? priceCard : priceMomo)}
+                {formatXaf(c.id === "card" ? priceCard : priceMomo, locale)}
               </span>
             </span>
           </Choice>
@@ -873,8 +832,9 @@ export function Checkout({
       </div>
       {channel !== "card" && (
         <Field
-          label={`Ton numéro ${label}`}
-          hint="Tu recevras une demande de paiement à valider avec ton code secret."
+          label={t.yourNumber(label)}
+          hint={t.momoHint}
+          optionalText={t.optional}
         >
           <div className="flex items-center gap-2">
             <span className="rounded-xl bg-sand px-3 py-3 font-semibold">
@@ -904,32 +864,24 @@ export function Checkout({
         </p>
       )}
       <PrimaryButton onClick={submit} disabled={busy}>
-        {busy ? "Un instant…" : `Payer ${formatXaf(price)}`}
+        {busy ? t.wait : t.pay(formatXaf(price, locale))}
       </PrimaryButton>
       <ul className="flex flex-col gap-1.5 text-sm text-muted">
+        <li>{t.secure}</li>
+        <li>{t.delivery}</li>
+        <li>{t.redo}</li>
         <li>
-          🔒 Paiement sécurisé par Tranzak, tu valides avec ton code secret.
-        </li>
-        <li>
-          🎶 2 versions de ta chanson en 2 minutes environ, envoyées sur
-          WhatsApp.
-        </li>
-        <li>
-          🔁 Elle ne te plaît pas ? On la refait gratuitement, une fois, depuis
-          la page de ta chanson.
-        </li>
-        <li>
-          ↩️ Un problème avec ta chanson ?{" "}
+          {t.refund[0]}
           <a
-            href="/remboursement"
+            href={localePath(locale, "/remboursement")}
             target="_blank"
             className="font-semibold text-ink underline"
           >
-            On te rembourse
+            {t.refund[1]}
           </a>
-          .
+          {t.refund[2]}
         </li>
-        <SupportLine />
+        <SupportLine t={t} />
       </ul>
     </section>
   );
@@ -944,9 +896,13 @@ export function Checkout({
 function StylePicker({
   value,
   onChange,
+  t,
+  locale,
 }: {
   value: string;
   onChange: (id: StyleId) => void;
+  t: WizardText;
+  locale: Locale;
 }) {
   const audio = useRef<HTMLAudioElement | null>(null);
   const [playing, setPlaying] = useState<string | null>(null);
@@ -988,16 +944,16 @@ function StylePicker({
         <div key={s.id} className="flex items-stretch gap-2">
           <div className="flex min-w-0 flex-1 [&>button]:w-full">
             <Choice selected={value === s.id} onClick={() => onChange(s.id)} align="left">
-              <span className="block font-bold">{s.label}</span>
+              <span className="block font-bold">{styleLabel(s.id, locale)}</span>
               <span className="block text-sm font-normal text-muted">
-                {STYLE_TAGLINES[s.id]}
+                {(locale === "en" ? STYLE_TAGLINES_EN : STYLE_TAGLINES)[s.id]}
               </span>
             </Choice>
           </div>
           <button
             type="button"
             onClick={() => toggle(s.id)}
-            aria-label={playing === s.id ? `Arrêter l'extrait ${s.label}` : `Écouter un extrait ${s.label}`}
+            aria-label={playing === s.id ? t.stopSample(styleLabel(s.id, locale)) : t.playSample(styleLabel(s.id, locale))}
             className={`flex w-14 shrink-0 items-center justify-center rounded-2xl transition active:scale-95 ${
               playing === s.id ? "bg-ink text-white" : "bg-white text-brand ring-1 ring-sand"
             }`}
@@ -1023,25 +979,25 @@ function StylePicker({
 const inputClass =
   "w-full rounded-xl bg-white px-4 py-3 text-base ring-1 ring-sand placeholder:text-muted/60 focus:ring-2 focus:ring-brand focus:outline-none";
 
-function Progress({ step }: { step: number }) {
+function Progress({ step, titles }: { step: number; titles: string[] }) {
   return (
     <div>
       <div className="mb-2 flex justify-between text-sm font-semibold text-muted">
-        <span>{STEP_TITLES[step]}</span>
+        <span>{titles[step]}</span>
         <span>
-          {Math.min(step + 1, 5)}/{STEP_TITLES.length}
+          {Math.min(step + 1, 5)}/{titles.length}
         </span>
       </div>
       <div
         className="h-2 overflow-hidden rounded-full bg-sand"
         role="progressbar"
         aria-valuemin={1}
-        aria-valuemax={STEP_TITLES.length}
+        aria-valuemax={titles.length}
         aria-valuenow={step + 1}
       >
         <div
           className="h-full rounded-full bg-brand transition-all"
-          style={{ width: `${((step + 1) / STEP_TITLES.length) * 100}%` }}
+          style={{ width: `${((step + 1) / titles.length) * 100}%` }}
         />
       </div>
     </div>
@@ -1063,12 +1019,14 @@ function Field({
   label,
   hint,
   optional,
+  optionalText,
   group,
   children,
 }: {
   label: string;
   hint?: string;
   optional?: boolean;
+  optionalText: string;
   // Plusieurs boutons : un <label> ferait cliquer le premier quand on touche le texte.
   group?: boolean;
   children: ReactNode;
@@ -1082,7 +1040,7 @@ function Field({
       <span className="font-semibold">
         {label}{" "}
         {optional && (
-          <span className="font-normal text-muted">(facultatif)</span>
+          <span className="font-normal text-muted">{optionalText}</span>
         )}
       </span>
       {children}
@@ -1120,11 +1078,11 @@ function Choice({
 }
 
 /** Pastilles des moyens de paiement (texte coloré, pas de logos officiels). */
-function PayBadges({ className = "" }: { className?: string }) {
+function PayBadges({ className = "", label }: { className?: string; label: string }) {
   return (
     <div
       className={`flex flex-wrap items-center gap-1.5 text-xs font-bold ${className}`}
-      aria-label="Moyens de paiement acceptés"
+      aria-label={label}
     >
       <span className="rounded-md bg-[#ffcc00] px-2 py-1 text-ink">
         MTN MoMo
@@ -1139,45 +1097,50 @@ function PayBadges({ className = "" }: { className?: string }) {
   );
 }
 
-function TrustBanner({ price, priceCard, launchEnds }: { price: number; priceCard: number; launchEnds?: string | null }) {
+function TrustBanner({
+  price,
+  priceCard,
+  launchEnds,
+  t,
+  locale,
+}: {
+  price: number;
+  priceCard: number;
+  launchEnds?: string | null;
+  t: WizardText;
+  locale: Locale;
+}) {
   return (
     <div className="flex flex-col gap-2.5 rounded-2xl bg-white p-4 ring-1 ring-sand">
       <p className="font-semibold">
-        ✍🏾 Tes paroles sont <span className="text-leaf">gratuites</span>.
+        {t.trustFree[0]}
+        <span className="text-leaf">{t.trustFree[1]}</span>
+        {t.trustFree[2]}
       </p>
       <p className="-mt-1.5 text-sm text-muted">
-        Tu paies seulement si elles te plaisent : {formatXaf(price)} pour 2
-        versions de ta chanson
-        {priceCard !== price && <> ({formatXaf(priceCard)} par carte)</>}.
+        {t.trustPay(formatXaf(price, locale), priceCard !== price ? formatXaf(priceCard, locale) : null)}
       </p>
       {launchEnds && (
-        <p className="-mt-1 w-fit rounded-full bg-gold/25 px-3 py-1 text-sm font-bold text-brand-dark">
-          🎉 Prix de lancement jusqu’au {launchEnds}
-        </p>
+        <p className="-mt-1 w-fit rounded-full bg-gold/25 px-3 py-1 text-sm font-bold text-brand-dark">{t.launch(launchEnds)}</p>
       )}
-      <p className="-mt-1.5 text-sm text-muted">
-        🔁 La chanson ne te plaît pas ? On la refait gratuitement, une fois.
-      </p>
-      <PayBadges />
+      <p className="-mt-1.5 text-sm text-muted">{t.trustRedo}</p>
+      <PayBadges label={t.payBadges} />
     </div>
   );
 }
 
-function SupportLine() {
+function SupportLine({ t }: { t: WizardText }) {
   if (!/^\+\d{8,15}$/.test(SUPPORT_PHONE)) return null;
   return (
     <li>
-      💬 Une question ?{" "}
+      {t.question}
       <a
-        href={whatsappLink(
-          SUPPORT_PHONE,
-          "Bonjour Dédikace, j'ai une question avant de payer :",
-        )}
+        href={whatsappLink(SUPPORT_PHONE, t.questionMessage)}
         target="_blank"
         rel="noopener noreferrer"
         className="font-semibold text-leaf underline"
       >
-        Écris-nous sur WhatsApp
+        {t.writeUs}
       </a>
     </li>
   );
@@ -1204,22 +1167,13 @@ function PrimaryButton({
   );
 }
 
-const WRITING_MESSAGES = [
-  "On cherche les bons mots…",
-  "On trouve les rimes…",
-  "On prépare le refrain…",
-  "Presque fini…",
-];
-
-function Writing({ name }: { name: string }) {
+function Writing({ name, t }: { name: string; t: WizardText }) {
   const [i, setI] = useState(0);
+  const count = t.writing.length;
   useEffect(() => {
-    const id = setInterval(
-      () => setI((n) => Math.min(n + 1, WRITING_MESSAGES.length - 1)),
-      2500,
-    );
+    const id = setInterval(() => setI((n) => Math.min(n + 1, count - 1)), 2500);
     return () => clearInterval(id);
-  }, []);
+  }, [count]);
   return (
     <div
       className="flex flex-1 flex-col items-center justify-center gap-6 py-20 text-center"
@@ -1235,9 +1189,11 @@ function Writing({ name }: { name: string }) {
         ))}
       </div>
       <p className="text-2xl font-bold">
-        On écrit la chanson de {name.trim() || "ton proche"}
+        {t.writingTitle(name.trim())}
       </p>
-      <p className="text-muted">{WRITING_MESSAGES[i]} (environ 10 secondes)</p>
+      <p className="text-muted">
+        {t.writing[i]} {t.writingTime}
+      </p>
     </div>
   );
 }

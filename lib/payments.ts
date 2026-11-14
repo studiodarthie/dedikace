@@ -57,6 +57,8 @@ export async function startPayment(input: {
   orderId: string;
   channel: PayChannel;
   phone?: string;
+  /** Langue de la page : le client revient sur /commande/… ou /en/commande/…. */
+  locale?: "fr" | "en";
 }): Promise<StartedPayment> {
   const order = await getOrderById(input.orderId);
   if (!order) throw new PaymentError("Commande introuvable.", 404);
@@ -77,7 +79,7 @@ export async function startPayment(input: {
   await db.update(orders).set({ priceXaf: amountXaf }).where(eq(orders.id, order.id));
   await trackEvent("payment_started", order.id);
 
-  const returnUrl = `${env.NEXT_PUBLIC_APP_URL}/commande/${order.id}`;
+  const returnUrl = `${env.NEXT_PUBLIC_APP_URL}${input.locale === "en" ? "/en" : ""}/commande/${order.id}`;
   const description = `Chanson personnalisée pour ${order.recipientName}`.slice(0, 255);
 
   let request: TranzakRequest;

@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { bodyLocale, translateError } from "@/lib/i18n-errors";
 import { PaymentError, startPayment } from "@/lib/payments";
 
 export const maxDuration = 30;
@@ -16,10 +17,12 @@ const Input = z.discriminatedUnion("channel", [
 ]);
 
 export async function POST(request: Request) {
-  const parsed = Input.safeParse(await request.json().catch(() => null));
+  const body: unknown = await request.json().catch(() => null);
+  const locale = bodyLocale(body);
+  const fail = (message: string, status: number) => Response.json({ error: translateError(message, locale) }, { status });
+  const parsed = Input.safeParse(body);
   if (!parsed.success) {
-    const message = parsed.error.issues.find((i) => i.path[0] === "phone")?.message ?? "Requête invalide.";
-    return Response.json({ error: message }, { status: 400 });
+    return fail(parsed.error.issues.find((i) => i.path[0] === "phone")?.message ?? "Requête invalide.", 400);
   }
   try {
     const data = parsed.data;
@@ -27,11 +30,12 @@ export async function POST(request: Request) {
       orderId: data.orderId,
       channel: data.channel,
       phone: data.channel === "card" ? undefined : data.phone,
+      locale,
     });
     return Response.json(result);
   } catch (error) {
-    if (error instanceof PaymentError) return Response.json({ error: error.message }, { status: error.status });
+    if (error instanceof PaymentError) return fail(error.message, error.status);
     console.error("[paiement]", error);
-    return Response.json({ error: "Oups, le paiement n'a pas pu démarrer. Réessaie dans un instant." }, { status: 500 });
+    return fail("Oups, le paiement n'a pas pu démarrer. Réessaie dans un instant.", 500);
   }
 }

@@ -16,8 +16,9 @@ export type OccasionPage = {
   description: string;
   h1: string;
   intro: string[];
-  /** Nom court pour les liens (« Anniversaire »). */
+  /** Nom court pour les liens (« Anniversaire »), et en anglais. */
   name: string;
+  nameEn: string;
   emoji: string;
   cta: string;
   styles: StyleId[];
@@ -31,6 +32,7 @@ export const OCCASION_PAGES: OccasionPage[] = [
     slug: "anniversaire",
     occasion: "anniversaire",
     name: "Anniversaire",
+    nameEn: "Birthday",
     emoji: "🎂",
     title: "Chanson d'anniversaire personnalisée avec le prénom",
     description:
@@ -62,6 +64,7 @@ export const OCCASION_PAGES: OccasionPage[] = [
     slug: "mariage",
     occasion: "mariage",
     name: "Mariage",
+    nameEn: "Wedding",
     emoji: "💒",
     title: "Chanson de mariage personnalisée pour les mariés",
     description:
@@ -93,6 +96,7 @@ export const OCCASION_PAGES: OccasionPage[] = [
     slug: "dot",
     occasion: "dot",
     name: "Dot",
+    nameEn: "Traditional wedding",
     emoji: "💍",
     title: "Chanson pour la dot : un cadeau unique pour la famille",
     description:
@@ -123,6 +127,7 @@ export const OCCASION_PAGES: OccasionPage[] = [
     slug: "hommage",
     occasion: "deuil",
     name: "Hommage",
+    nameEn: "Tribute",
     emoji: "🕊️",
     title: "Chanson d'hommage personnalisée pour un être cher",
     description:
@@ -154,6 +159,7 @@ export const OCCASION_PAGES: OccasionPage[] = [
     slug: "reussite-examen",
     occasion: "reussite",
     name: "Réussite",
+    nameEn: "Success",
     emoji: "🎓",
     title: "Chanson pour fêter une réussite : Bac, BEPC, diplôme",
     description:
@@ -184,6 +190,7 @@ export const OCCASION_PAGES: OccasionPage[] = [
     slug: "declaration-amour",
     occasion: "amour",
     name: "Déclaration d’amour",
+    nameEn: "Love declaration",
     emoji: "❤️",
     title: "Chanson d'amour personnalisée pour sa chérie ou son chéri",
     description:
@@ -214,6 +221,7 @@ export const OCCASION_PAGES: OccasionPage[] = [
     slug: "excuses",
     occasion: "excuses",
     name: "Excuses",
+    nameEn: "Apology",
     emoji: "🙏🏾",
     title: "Chanson pour s'excuser : demande pardon en musique",
     description:
@@ -244,6 +252,7 @@ export const OCCASION_PAGES: OccasionPage[] = [
     slug: "encouragement",
     occasion: "encouragement",
     name: "Encouragement",
+    nameEn: "Encouragement",
     emoji: "💪🏾",
     title: "Chanson d'encouragement personnalisée pour donner de la force",
     description:

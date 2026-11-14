@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { bodyLocale, translateError } from "@/lib/i18n-errors";
 import { sendLyricsReady } from "@/inngest/client";
 import { auth } from "@/lib/auth";
 import { generateLyrics, LyricsError, type LyricsBrief } from "@/lib/claude";
@@ -113,13 +114,7 @@ async function generateAndSave(order: Order, kind: "first" | "rewrite") {
   return success(saved);
 }
 
-export async function POST(request: Request) {
-  let body: unknown;
-  try {
-    body = await request.json();
-  } catch {
-    return json(400, { error: "Requête invalide." });
-  }
+async function handle(request: Request, body: unknown): Promise<Response> {
 
   const parsed = Input.safeParse(body);
   if (!parsed.success) {
@@ -146,6 +141,7 @@ export async function POST(request: Request) {
         chorusLanguage: input.chorusLanguage,
         voice: input.voice,
         whatsappPhone: input.whatsappPhone,
+        locale: bodyLocale(body),
       });
       const check = moderateText(input.recipientName, input.relation, input.senderName, ...input.anecdotes);
       if (!check.ok) {
@@ -182,4 +178,20 @@ export async function POST(request: Request) {
     console.error("[api/lyrics]", error);
     return json(500, { error: "Une erreur est survenue. Réessaie dans un instant." });
   }
+}
+
+export async function POST(request: Request) {
+  let body: unknown;
+  try {
+    body = await request.json();
+  } catch {
+    return json(400, { error: "Requête invalide." });
+  }
+  const response = await handle(request, body);
+  const locale = bodyLocale(body);
+  if (locale === "fr" || response.ok) return response;
+  // Page en anglais : message d'erreur traduit.
+  const data = (await response.json()) as { error?: string };
+  if (data.error) data.error = translateError(data.error, locale);
+  return json(response.status, data);
 }

@@ -9,6 +9,7 @@ import { db } from "@/lib/db";
 import { accounts, sessions, users, verificationTokens } from "@/lib/db/schema";
 import { sendMagicLink } from "@/lib/email";
 import { env } from "@/lib/env";
+import { localeFromPath, localePath } from "@/lib/i18n";
 
 // Comptes clients (docs/PLAN_COMPTES.md) et back-office partagent la même connexion :
 // tout le monde peut se connecter, mais seules les adresses de ADMIN_EMAILS ouvrent /admin (requireAdmin).
@@ -77,7 +78,7 @@ export function safeNext(value: unknown, fallback = "/compte"): string {
 /** Pages de l'espace client : renvoie vers /connexion si personne n'est connecté. */
 export async function requireUser(next: string): Promise<CurrentUser> {
   const user = await getCurrentUser();
-  if (!user) redirect(`/connexion?suite=${encodeURIComponent(next)}`);
+  if (!user) redirect(`${localePath(localeFromPath(next), "/connexion")}?suite=${encodeURIComponent(next)}`);
   return user;
 }
 

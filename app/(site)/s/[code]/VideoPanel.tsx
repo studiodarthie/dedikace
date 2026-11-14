@@ -3,6 +3,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { getRememberedOrders } from "@/lib/my-orders";
 import { PhotoCropper } from "./PhotoCropper";
+import { useLocale } from "@/lib/use-locale";
 
 type State = {
   owner: boolean;
@@ -30,6 +31,7 @@ async function fetchStatus(code: string): Promise<State | null> {
  * Tout le monde peut regarder et télécharger la vidéo prête ; seul l'acheteur la crée.
  */
 export function VideoPanel({ code, recipientName }: { code: string; recipientName: string }) {
+  const en = useLocale() === "en";
   const [state, setState] = useState<State | null>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -68,12 +70,13 @@ export function VideoPanel({ code, recipientName }: { code: string; recipientNam
       body.append("code", code);
       body.append("ids", getRememberedOrders().join(","));
       body.append("photo", photo, "photo.jpg");
+      body.append("locale", en ? "en" : "fr");
       const res = await fetch("/api/video", { method: "POST", body });
       const data = (await res.json().catch(() => ({}))) as { error?: string };
-      if (!res.ok) setError(data.error ?? "Ça n'a pas marché. Réessaie.");
+      if (!res.ok) setError(data.error ?? (en ? "That didn’t work. Try again." : "Ça n'a pas marché. Réessaie."));
       await refresh();
     } catch {
-      setError("On n'a pas pu envoyer la photo. Vérifie ta connexion et réessaie.");
+      setError(en ? "We couldn’t send the photo. Check your connection and try again." : "On n'a pas pu envoyer la photo. Vérifie ta connexion et réessaie.");
     } finally {
       setBusy(false);
       if (input.current) input.current.value = "";
@@ -103,10 +106,12 @@ export function VideoPanel({ code, recipientName }: { code: string; recipientNam
     <section aria-labelledby="video" className="flex flex-col gap-4 rounded-3xl bg-white p-4 shadow-sm ring-1 ring-sand">
       <div className="flex flex-col gap-1">
         <h2 id="video" className="text-xl font-extrabold">
-          🎬 La vidéo pour ton statut
+          {en ? "🎬 The video for your status" : "🎬 La vidéo pour ton statut"}
         </h2>
         <p className="text-sm text-muted">
-          30 secondes avec une photo de {recipientName}, son prénom et le refrain. Parfait pour le statut WhatsApp.
+          {en
+            ? `30 seconds with a photo of ${recipientName}, their name and the chorus. Perfect for your WhatsApp status.`
+            : `30 secondes avec une photo de ${recipientName}, son prénom et le refrain. Parfait pour le statut WhatsApp.`}
         </p>
       </div>
 
@@ -123,10 +128,12 @@ export function VideoPanel({ code, recipientName }: { code: string; recipientNam
             href={state.download}
             className="flex h-14 items-center justify-center gap-2 rounded-2xl bg-[#25d366] px-6 text-lg font-bold text-white shadow-md transition active:scale-[0.98]"
           >
-            <span aria-hidden="true">⬇️</span> Télécharger la vidéo
+            <span aria-hidden="true">⬇️</span> {en ? "Download the video" : "Télécharger la vidéo"}
           </a>
           <p className="text-sm text-muted">
-            Puis dans WhatsApp : <strong className="text-ink">Actus → Mon statut → Galerie</strong>, et choisis la vidéo.
+            {en ? "Then in WhatsApp: " : "Puis dans WhatsApp : "}
+            <strong className="text-ink">{en ? "Updates → My status → Gallery" : "Actus → Mon statut → Galerie"}</strong>
+            {en ? ", and pick the video." : ", et choisis la vidéo."}
           </p>
         </>
       )}
@@ -134,13 +141,15 @@ export function VideoPanel({ code, recipientName }: { code: string; recipientNam
       {working && (
         <p role="status" className="flex items-center gap-3 rounded-2xl bg-sand/60 p-4 font-medium">
           <span className="h-5 w-5 shrink-0 animate-spin rounded-full border-2 border-brand border-t-transparent" aria-hidden="true" />
-          On prépare ta vidéo… environ 1 minute. Tu peux rester sur cette page.
+          {en ? "Making your video… about 1 minute. You can stay on this page." : "On prépare ta vidéo… environ 1 minute. Tu peux rester sur cette page."}
         </p>
       )}
 
       {state.status === "failed" && (
         <p role="alert" className="rounded-2xl bg-red-50 p-4 font-medium text-red-800 ring-1 ring-red-200">
-          La vidéo n’a pas pu être créée. Réessaie avec une autre photo, ou écris-nous sur WhatsApp.
+          {en
+            ? "The video couldn’t be created. Try another photo, or message us on WhatsApp."
+            : "La vidéo n’a pas pu être créée. Réessaie avec une autre photo, ou écris-nous sur WhatsApp."}
         </p>
       )}
 
@@ -170,13 +179,13 @@ export function VideoPanel({ code, recipientName }: { code: string; recipientNam
             {busy ? (
               <>
                 <span className="h-5 w-5 animate-spin rounded-full border-2 border-current border-t-transparent" aria-hidden="true" />
-                Envoi de la photo…
+                {en ? "Sending the photo…" : "Envoi de la photo…"}
               </>
             ) : state.status === "ready" ? (
-              "Changer de photo"
+              en ? "Change photo" : "Changer de photo"
             ) : (
               <>
-                <span aria-hidden="true">📷</span> Choisir une photo
+                <span aria-hidden="true">📷</span> {en ? "Choose a photo" : "Choisir une photo"}
               </>
             )}
           </button>

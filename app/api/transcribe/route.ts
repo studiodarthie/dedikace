@@ -1,4 +1,6 @@
 import { MusicError, transcribeVoice } from "@/lib/elevenlabs";
+import type { Locale } from "@/lib/i18n";
+import { translateError } from "@/lib/i18n-errors";
 
 // Vocal « Raconte tes souvenirs » (docs/PLAN_ONBOARDING.md, phase 2) → texte modifiable dans le formulaire.
 // La clé ElevenLabs reste côté serveur. Limite anti-abus : règle du pare-feu Vercel sur /api/transcribe.
@@ -8,14 +10,14 @@ export const maxDuration = 60;
 const MAX_BYTES = 3 * 1024 * 1024; // ~60 s de vocal, même en mp4 sur iPhone ; sous la limite Vercel de 4,5 Mo
 const MAX_TEXT = 500;
 
-function fail(error: string, status: number) {
-  return Response.json({ error }, { status });
-}
-
 export async function POST(req: Request) {
   let audio: FormDataEntryValue | null;
+  let locale: Locale = "fr";
+  const fail = (error: string, status: number) => Response.json({ error: translateError(error, locale) }, { status });
   try {
-    audio = (await req.formData()).get("audio");
+    const form = await req.formData();
+    audio = form.get("audio");
+    if (form.get("locale") === "en") locale = "en";
   } catch {
     return fail("Le vocal n'a pas pu être envoyé. Réessaie.", 400);
   }

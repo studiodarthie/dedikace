@@ -17,7 +17,10 @@ const nextConfig: NextConfig = {
   poweredByHeader: false,
   // Styles retirés : l'ancienne page renvoie vers le style qui la remplace (référencement conservé).
   async redirects() {
-    return [{ source: "/style/ndombolo", destination: "/style/zouklove", permanent: true }];
+    return [
+      { source: "/style/ndombolo", destination: "/style/zouklove", permanent: true },
+      { source: "/en/style/ndombolo", destination: "/en/style/zouklove", permanent: true },
+    ];
   },
   async headers() {
     return [{ source: "/:path*", headers: securityHeaders }];

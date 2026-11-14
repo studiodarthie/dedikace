@@ -87,7 +87,7 @@ async function OrderDetail({ params }: { params: PageProps<"/admin/commandes/[id
           <dt className="text-muted">Style</dt>
           <dd>
             {getStyle(order.styleId)?.label ?? order.styleId} · voix {order.voice === "female" ? "féminine" : "masculine"} · chanson {languageLabel(order.songLanguage)} · refrain{" "}
-            {languageLabel(order.chorusLanguage)}
+            {languageLabel(order.chorusLanguage)} · site en {order.locale === "en" ? "anglais" : "français"}
           </dd>
           <dt className="text-muted">De la part de</dt>
           <dd>{order.senderName ?? "—"}</dd>

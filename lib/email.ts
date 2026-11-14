@@ -37,9 +37,27 @@ async function sendAdminEmail(subject: string, text: string): Promise<void> {
 }
 
 /** « Ta chanson est prête » (clients avec un espace). Lève une erreur si l'envoi échoue. */
-export async function sendSongReady(to: string, data: { firstName: string | null; recipientName: string; url: string }): Promise<void> {
+export async function sendSongReady(
+  to: string,
+  data: { firstName: string | null; recipientName: string; url: string; locale?: "fr" | "en" },
+): Promise<void> {
   if (!env.RESEND_API_KEY || !env.EMAIL_FROM) throw new Error("RESEND_API_KEY et EMAIL_FROM manquantes.");
   resend ??= new Resend(env.RESEND_API_KEY);
+  if (data.locale === "en") {
+    const hi = data.firstName ? `Hi ${data.firstName} 👋` : "Hi 👋";
+    const e = (s: string) => s.replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]!);
+    const { error } = await resend.emails.send({
+      from: env.EMAIL_FROM,
+      to,
+      subject: `🎶 The song for ${data.recipientName} is ready!`,
+      text: [hi, "", `The song for ${data.recipientName} is ready: 2 versions to listen to and share.`, data.url, "", "Don’t forget the video for your WhatsApp status, on the same page.", "", "The Dédikace team"].join("\n"),
+      html: `${logo()}<p>${e(hi)}</p><p>The song for <strong>${e(data.recipientName)}</strong> is ready: 2 versions to listen to and share.</p>
+<p><a href="${data.url}" style="display:inline-block;padding:12px 20px;background:#e0451b;color:#fff;border-radius:999px;text-decoration:none;font-weight:bold">Listen to my song</a></p>
+<p style="color:#666;font-size:13px">Don’t forget the video for your WhatsApp status, on the same page. The Dédikace team</p>`,
+    });
+    if (error) throw new Error(`E-mail « chanson prête » échoué : ${error.message}`);
+    return;
+  }
   const hello = data.firstName ? `Salut ${data.firstName} 👋` : "Salut 👋";
   const esc = (s: string) => s.replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]!);
   const { error } = await resend.emails.send({
@@ -57,10 +75,29 @@ export async function sendSongReady(to: string, data: { firstName: string | null
 /** Relance d'une commande non payée (clients avec un espace). Lève une erreur si l'envoi échoue. */
 export async function sendPaymentReminder(
   to: string,
-  data: { firstName: string | null; recipientName: string; url: string; failed: boolean },
+  data: { firstName: string | null; recipientName: string; url: string; failed: boolean; locale?: "fr" | "en" },
 ): Promise<void> {
   if (!env.RESEND_API_KEY || !env.EMAIL_FROM) throw new Error("RESEND_API_KEY et EMAIL_FROM manquantes.");
   resend ??= new Resend(env.RESEND_API_KEY);
+  if (data.locale === "en") {
+    const hi = data.firstName ? `Hi ${data.firstName} 👋` : "Hi 👋";
+    const msg = data.failed
+      ? `Your payment didn’t go through, but your lyrics for ${data.recipientName} are safely kept.`
+      : `The lyrics of your song for ${data.recipientName} are ready and waiting for you.`;
+    const phone = env.NEXT_PUBLIC_SUPPORT_WHATSAPP;
+    const e = (s: string) => s.replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]!);
+    const { error } = await resend.emails.send({
+      from: env.EMAIL_FROM,
+      to,
+      subject: data.failed ? "Your payment didn’t go through: your lyrics are waiting" : `Your song for ${data.recipientName} is waiting 🎶`,
+      text: [hi, "", msg, "You can read them again and start your song here:", data.url, "", `A question? Message us on WhatsApp at ${phone}.`, "", "The Dédikace team"].join("\n"),
+      html: `${logo()}<p>${e(hi)}</p><p>${e(msg)}</p>
+<p><a href="${data.url}" style="display:inline-block;padding:12px 20px;background:#e0451b;color:#fff;border-radius:999px;text-decoration:none;font-weight:bold">Start my song</a></p>
+<p style="color:#666;font-size:13px">A question? Message us on WhatsApp at ${e(phone)}. The Dédikace team</p>`,
+    });
+    if (error) throw new Error(`Relance par e-mail échouée : ${error.message}`);
+    return;
+  }
   const hello = data.firstName ? `Salut ${data.firstName} 👋` : "Salut 👋";
   const line = data.failed
     ? `Ton paiement n'est pas passé, mais tes paroles pour ${data.recipientName} sont bien gardées.`
@@ -95,6 +132,21 @@ export async function sendMagicLink(to: string, url: string): Promise<void> {
     throw new Error("RESEND_API_KEY et EMAIL_FROM doivent être renseignées pour la connexion par e-mail.");
   }
   resend ??= new Resend(env.RESEND_API_KEY);
+  // Demande faite depuis une page en anglais : l'adresse de retour commence par /en.
+  const callback = new URL(url).searchParams.get("callbackUrl") ?? "";
+  if (/^(https?:\/\/[^/]+)?\/en(\/|$|\?)/.test(callback)) {
+    const { error } = await resend.emails.send({
+      from: env.EMAIL_FROM,
+      to,
+      subject: "Your Dédikace sign-in link",
+      text: `Click this link to sign in to your Dédikace space:\n${url}\n\nIt is valid for 24 hours and works only once. If you didn’t ask for it, ignore this email.`,
+      html: `${logo()}<p>Click this button to sign in to your Dédikace space:</p>
+<p><a href="${url}" style="display:inline-block;padding:12px 20px;background:#e0451b;color:#fff;border-radius:999px;text-decoration:none;font-weight:bold">Sign me in</a></p>
+<p style="color:#666;font-size:13px">The link is valid for 24 hours and works only once. If you didn’t ask for it, ignore this email.</p>`,
+    });
+    if (error) throw new Error(`Envoi du lien de connexion échoué : ${error.message}`);
+    return;
+  }
   const { error } = await resend.emails.send({
     from: env.EMAIL_FROM,
     to,

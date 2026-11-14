@@ -1,18 +1,29 @@
 "use client";
 
 import { useState } from "react";
+import { useLocale } from "@/lib/use-locale";
 
 type Tone = "tendre" | "drole" | "simple";
 
-const TONES: { id: Tone; label: string; emoji: string }[] = [
-  { id: "tendre", label: "Tendre", emoji: "❤️" },
-  { id: "drole", label: "Drôle", emoji: "😂" },
-  { id: "simple", label: "Simple", emoji: "🎶" },
+const TONES: { id: Tone; label: string; labelEn: string; emoji: string }[] = [
+  { id: "tendre", label: "Tendre", labelEn: "Tender", emoji: "❤️" },
+  { id: "drole", label: "Drôle", labelEn: "Funny", emoji: "😂" },
+  { id: "simple", label: "Simple", labelEn: "Simple", emoji: "🎶" },
 ];
 
 /** Messages tout prêts (sans accord masculin/féminin : on ne connaît pas le genre). */
-function buildMessage(tone: Tone, name: string, from: string | null, url: string): string {
+function buildMessage(tone: Tone, name: string, from: string | null, url: string, en: boolean): string {
   const sign = from ? `\n— ${from}` : "";
+  if (en) {
+    switch (tone) {
+      case "tendre":
+        return `${name} ❤️\nI had a song written just for you, with our memories.\nTurn up the sound and listen to the end 🎶\n${url}${sign}`;
+      case "drole":
+        return `${name}, alert 🚨\nYou’re the star of a song! 😂🎤\nTurn it up and listen:\n${url}${sign}`;
+      default:
+        return `🎶 A song just for you, ${name}! Listen here:\n${url}${sign}`;
+    }
+  }
   switch (tone) {
     case "tendre":
       return `${name} ❤️\nJ'ai fait écrire une chanson rien que pour toi, avec nos souvenirs.\nMets le son et écoute jusqu'au bout 🎶\n${url}${sign}`;
@@ -25,19 +36,22 @@ function buildMessage(tone: Tone, name: string, from: string | null, url: string
 
 /** « Envoyer la surprise » : choix du ton, aperçu du message, envoi par WhatsApp, conseils de partage. */
 export function SurprisePanel({ recipientName, senderName, pageUrl }: { recipientName: string; senderName: string | null; pageUrl: string }) {
+  const en = useLocale() === "en";
   const [tone, setTone] = useState<Tone>("tendre");
-  const message = buildMessage(tone, recipientName, senderName, pageUrl);
+  const message = buildMessage(tone, recipientName, senderName, pageUrl, en);
 
   return (
     <section aria-labelledby="surprise" className="flex flex-col gap-4 rounded-3xl bg-white p-4 shadow-sm ring-1 ring-sand">
       <div className="flex flex-col gap-1">
         <h2 id="surprise" className="text-xl font-extrabold">
-          🎁 Envoie la surprise à {recipientName}
+          {en ? `🎁 Send the surprise to ${recipientName}` : `🎁 Envoie la surprise à ${recipientName}`}
         </h2>
-        <p className="text-sm text-muted">Choisis le ton du message, on l’ouvre dans WhatsApp.</p>
+        <p className="text-sm text-muted">
+          {en ? "Choose the message’s tone, we open it in WhatsApp." : "Choisis le ton du message, on l’ouvre dans WhatsApp."}
+        </p>
       </div>
 
-      <div className="grid grid-cols-3 gap-2" role="radiogroup" aria-label="Ton du message">
+      <div className="grid grid-cols-3 gap-2" role="radiogroup" aria-label={en ? "Message tone" : "Ton du message"}>
         {TONES.map((t) => (
           <button
             key={t.id}
@@ -52,7 +66,7 @@ export function SurprisePanel({ recipientName, senderName, pageUrl }: { recipien
             <span className="text-xl" aria-hidden="true">
               {t.emoji}
             </span>
-            {t.label}
+            {en ? t.labelEn : t.label}
           </button>
         ))}
       </div>
@@ -67,27 +81,51 @@ export function SurprisePanel({ recipientName, senderName, pageUrl }: { recipien
         rel="noopener noreferrer"
         className="flex h-14 items-center justify-center gap-2 rounded-2xl bg-[#25d366] px-6 text-lg font-bold text-white shadow-md transition active:scale-[0.98]"
       >
-        Envoyer sur WhatsApp
+        {en ? "Send on WhatsApp" : "Envoyer sur WhatsApp"}
       </a>
 
       <ul className="flex flex-col gap-2 text-sm">
         <li className="flex gap-2">
           <span aria-hidden="true">📲</span>
           <span>
-            <strong>Mets le lien en statut</strong> avec un petit mot : tout ton entourage va l’écouter.
+            {en ? (
+              <>
+                <strong>Post the link as your status</strong> with a short note: everyone around you will listen.
+              </>
+            ) : (
+              <>
+                <strong>Mets le lien en statut</strong> avec un petit mot : tout ton entourage va l’écouter.
+              </>
+            )}
           </span>
         </li>
         <li className="flex gap-2">
           <span aria-hidden="true">🔊</span>
           <span>
-            <strong>Fais-la écouter en direct</strong> pendant la fête : branche ton téléphone sur une enceinte.
+            {en ? (
+              <>
+                <strong>Play it live</strong> at the party: plug your phone into a speaker.
+              </>
+            ) : (
+              <>
+                <strong>Fais-la écouter en direct</strong> pendant la fête : branche ton téléphone sur une enceinte.
+              </>
+            )}
           </span>
         </li>
         <li className="flex gap-2">
           <span aria-hidden="true">⬇️</span>
           <span>
-            <strong>Envoie aussi le MP3</strong> (bouton « Télécharger » plus haut) : {recipientName} pourra l’écouter
-            même sans internet.
+            {en ? (
+              <>
+                <strong>Also send the MP3</strong> (“Download” button above): {recipientName} can listen even without internet.
+              </>
+            ) : (
+              <>
+                <strong>Envoie aussi le MP3</strong> (bouton « Télécharger » plus haut) : {recipientName} pourra l’écouter
+                même sans internet.
+              </>
+            )}
           </span>
         </li>
       </ul>

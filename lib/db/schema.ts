@@ -63,6 +63,8 @@ export const orders = pgTable(
     status: orderStatus("status").notNull().default("draft"),
     priceXaf: integer("price_xaf").notNull().default(3000),
     country: text("country").notNull().default("CM"),
+    // Langue de l'interface au moment de la commande : e-mails, relances et liens dans la même langue.
+    locale: text("locale", { enum: ["fr", "en"] }).notNull().default("fr"),
     moderationNote: text("moderation_note"),
     // Compte client (facultatif). Compte supprimé : la commande reste, le lien est effacé.
     userId: text("user_id").references(() => users.id, { onDelete: "set null" }),

@@ -3,13 +3,14 @@ import Link from "next/link";
 import { COMPANY, LegalPage, SUPPORT_PHONE, SupportLink } from "@/components/LegalPage";
 import { formatXaf } from "@/lib/format";
 import { currentPrices } from "@/lib/pricing";
+import { alternates } from "@/lib/i18n";
 
 // Version courte, voulue par le porteur du projet le 14 novembre 2026 (pas de relecture par un juriste).
 // On ne cite pas les outils techniques utilisés : seul l'hébergeur figure aux mentions légales (obligation légale).
 export const metadata: Metadata = {
   title: "Conditions générales",
   description: "Les conditions d'utilisation et de vente de Dédikace, en clair.",
-  alternates: { canonical: "/cgu" },
+  alternates: alternates("fr", "/cgu"),
 };
 
 export default async function CguPage() {

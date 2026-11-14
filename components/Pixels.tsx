@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import Script from "next/script";
+import { useLocale } from "@/lib/use-locale";
 import { useEffect, useRef, useSyncExternalStore } from "react";
 import { getConsent, resetConsent, setConsent, subscribeConsent, type Consent } from "@/lib/consent";
 
@@ -45,6 +46,7 @@ export function Pixels({ metaId }: { metaId?: string }) {
 }
 
 function CookieBanner() {
+  const en = useLocale() === "en";
   return (
     <div
       role="dialog"
@@ -53,10 +55,11 @@ function CookieBanner() {
     >
       <div className="flex flex-col gap-3 rounded-2xl bg-white p-4 text-sm shadow-xl ring-1 shadow-ink/15 ring-sand">
         <p>
-          🍪 On aimerait utiliser des cookies de mesure (Meta : Facebook, Instagram) pour savoir quelles pubs t’amènent ici.
-          Le site marche pareil si tu refuses.{" "}
-          <Link href="/confidentialite#cookies" className="font-semibold underline">
-            En savoir plus
+          {en
+            ? "🍪 We’d like to use measurement cookies (Meta: Facebook, Instagram) to know which ads bring you here. The site works the same if you refuse."
+            : "🍪 On aimerait utiliser des cookies de mesure (Meta : Facebook, Instagram) pour savoir quelles pubs t’amènent ici. Le site marche pareil si tu refuses."}{" "}
+          <Link href={en ? "/en/confidentialite#cookies" : "/confidentialite#cookies"} className="font-semibold underline">
+            {en ? "Learn more" : "En savoir plus"}
           </Link>
         </p>
         <div className="grid grid-cols-2 gap-2">
@@ -65,14 +68,14 @@ function CookieBanner() {
             onClick={() => setConsent("no")}
             className="h-11 rounded-full bg-sand font-bold text-ink transition active:scale-[0.98]"
           >
-            Refuser
+            {en ? "Refuse" : "Refuser"}
           </button>
           <button
             type="button"
             onClick={() => setConsent("yes")}
             className="h-11 rounded-full bg-ink font-bold text-white transition active:scale-[0.98]"
           >
-            Accepter
+            {en ? "Accept" : "Accepter"}
           </button>
         </div>
       </div>

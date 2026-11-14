@@ -3,6 +3,7 @@
 import { z } from "zod";
 import { claimOrders, deleteAccount, updateProfile } from "@/lib/account";
 import { getCurrentUser, signOut } from "@/lib/auth";
+import { translateError } from "@/lib/i18n-errors";
 
 export async function claimMyOrders(orderIds: string[]): Promise<number> {
   const user = await getCurrentUser();
@@ -28,6 +29,15 @@ const ProfileInput = z.object({
 });
 
 export async function saveProfile(_: ProfileState, formData: FormData): Promise<ProfileState> {
+  const locale = formData.get("locale") === "en" ? "en" : "fr";
+  const result = await saveProfileFr(formData);
+  return {
+    ok: result.ok && translateError(result.ok, locale),
+    error: result.error && translateError(result.error, locale),
+  };
+}
+
+async function saveProfileFr(formData: FormData): Promise<ProfileState> {
   const user = await getCurrentUser();
   if (!user) return { error: "Ta session a expiré. Reconnecte-toi." };
   const input = ProfileInput.safeParse({ name: formData.get("name") ?? "", phone: formData.get("phone") ?? "" });
@@ -41,13 +51,13 @@ export async function saveProfile(_: ProfileState, formData: FormData): Promise<
   return { ok: "C'est enregistré !" };
 }
 
-export async function logoutAction(): Promise<void> {
-  await signOut({ redirectTo: "/" });
+export async function logoutAction(formData: FormData): Promise<void> {
+  await signOut({ redirectTo: formData.get("locale") === "en" ? "/en" : "/" });
 }
 
 export async function deleteMyAccount(formData: FormData): Promise<void> {
   const user = await getCurrentUser();
   if (!user || formData.get("confirm") !== "oui") return;
   await deleteAccount(user.id);
-  await signOut({ redirectTo: "/" });
+  await signOut({ redirectTo: formData.get("locale") === "en" ? "/en" : "/" });
 }
