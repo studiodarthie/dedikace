@@ -90,13 +90,17 @@ function loadDraft(defaults: Defaults = {}): Draft {
       const known = (id: string) => LANGUAGES.some((l) => l.id === id);
       if (!known(form.songLanguage)) form.songLanguage = "fr";
       if (!known(form.chorusLanguage)) form.chorusLanguage = form.songLanguage;
+      // Arrivée depuis une page « chanson d'anniversaire »… sur un brouillon pas encore commencé.
+      if (step === 0 && !form.occasion && defaults.occasion) {
+        return { ...draft, step: 1, form: { ...form, occasion: defaults.occasion, styleId: form.styleId || defaults.styleId || "" } };
+      }
       return { ...draft, step, form };
     }
   } catch {
     // localStorage indisponible (navigation privée) ou brouillon illisible : on repart de zéro.
   }
   const filled = Object.fromEntries(Object.entries(defaults).filter(([, v]) => v));
-  return { step: 0, form: { ...EMPTY_FORM, ...filled } };
+  return { step: defaults.occasion ? 1 : 0, form: { ...EMPTY_FORM, ...filled } };
 }
 
 function saveDraft(draft: Draft) {
@@ -150,8 +154,11 @@ function stepError(step: number, f: Form): string | null {
 
 type Prices = { priceMomo: number; priceCard: number };
 
-/** Prérempli depuis le profil du client connecté, seulement pour une nouvelle chanson. */
-type Defaults = { senderName?: string; whatsappPhone?: string };
+/**
+ * Prérempli pour une nouvelle chanson : profil du client connecté, et occasion ou style
+ * venus d'une page de présentation (/chanson/anniversaire, /style/makossa…).
+ */
+type Defaults = { senderName?: string; whatsappPhone?: string; occasion?: string; styleId?: string };
 
 export function CreateWizard({ defaults, ...prices }: Prices & { defaults?: Defaults }) {
   const isClient = useIsClient();

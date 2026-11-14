@@ -4,8 +4,10 @@ import Image from "next/image";
 import Link from "next/link";
 import { Suspense } from "react";
 import { env } from "@/lib/env";
+import { OCCASION_PAGES } from "@/lib/seo-pages";
 import { HeaderCta } from "@/components/HeaderCta";
 import { CookieSettingsLink, Pixels } from "@/components/Pixels";
+import { WebAnalytics } from "@/components/WebAnalytics";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
 import "./globals.css";
 
@@ -14,9 +16,26 @@ const outfit = Outfit({ variable: "--font-outfit", subsets: ["latin"], display: 
 
 export const metadata: Metadata = {
   metadataBase: new URL(env.NEXT_PUBLIC_APP_URL),
-  title: { default: "Dédikace — Ton nom dans une chanson", template: "%s · Dédikace" },
+  title: { default: "Dédikace — Chanson personnalisée avec ton prénom", template: "%s · Dédikace" },
   description:
-    "Une chanson personnalisée en quelques minutes, sur des rythmes d'Afrique centrale : anniversaire, mariage, dot, hommage, réussite…",
+    "Offre une chanson personnalisée avec le prénom au refrain : anniversaire, mariage, dot, hommage, réussite. Makossa, bikutsi, afrobeats, rumba. Paroles gratuites, prête en 2 minutes, paiement Mobile Money.",
+  applicationName: "Dédikace",
+  keywords: [
+    "chanson personnalisée",
+    "chanson avec prénom",
+    "chanson d'anniversaire personnalisée",
+    "chanson pour la dot",
+    "chanson de mariage",
+    "chanson hommage",
+    "cadeau original Cameroun",
+    "makossa",
+    "bikutsi",
+    "afrobeats",
+  ],
+  openGraph: { type: "website", siteName: "Dédikace", locale: "fr_CM" },
+  twitter: { card: "summary_large_image" },
+  formatDetection: { telephone: false },
+  verification: process.env.GOOGLE_SITE_VERIFICATION ? { google: process.env.GOOGLE_SITE_VERIFICATION } : undefined,
 };
 
 export const viewport: Viewport = {
@@ -74,6 +93,18 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         </header>
         <main className="flex w-full flex-1 flex-col">{children}</main>
         <footer className="mx-auto w-full max-w-6xl px-4 pt-6 pb-24 text-sm text-muted md:px-8">
+          <nav aria-label="Chansons par occasion" className="flex flex-col gap-2 border-t border-sand py-6">
+            <p className="font-bold text-ink">Une chanson personnalisée pour…</p>
+            <ul className="flex flex-wrap gap-x-4 gap-y-2">
+              {OCCASION_PAGES.map((p) => (
+                <li key={p.slug}>
+                  <Link href={`/chanson/${p.slug}`} className="hover:text-ink hover:underline">
+                    {p.name}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </nav>
           <nav aria-label="Informations légales" className="flex flex-wrap gap-x-4 gap-y-2 border-t border-sand pt-6">
             <Link href="/cgu" className="underline">
               Conditions
@@ -95,6 +126,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
         <Suspense fallback={null}>
           <Pixels metaId={env.META_PIXEL_ID} />
         </Suspense>
+        <WebAnalytics />
       </body>
     </html>
   );

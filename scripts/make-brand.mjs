@@ -15,7 +15,7 @@ for (const [from, to] of [
   ["dedikace-icone-app.svg", "icone.svg"],
   ["dedikace-icone-app-sombre.svg", "icone-sombre.svg"],
 ]) fs.copyFileSync(`logo/${from}`, `public/brand/${to}`);
-fs.copyFileSync("logo/dedikace-logo-blanc.svg", "assets/brand/logo-blanc.svg");
+for (const f of ["logo-blanc.svg", "logo-couleur.svg", "icone.svg"]) fs.copyFileSync(`public/brand/${f}`, `assets/brand/${f}`);
 fs.copyFileSync("logo/dedikace-icone-app.svg", "app/icon.svg");
 
 const png = (svg, size) => sharp(svg, { density: 300 }).resize(size, size).png().toBuffer();

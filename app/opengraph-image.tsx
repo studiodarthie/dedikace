@@ -7,10 +7,12 @@ export const alt = "Dédikace — Ton nom dans une chanson";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
+// Lus une fois au chargement du module (méthode documentée) : l'image reste fabriquée au déploiement.
+const logo = await readFile(path.join(process.cwd(), "assets/brand/logo-couleur.svg"));
+const icon = await readFile(path.join(process.cwd(), "assets/brand/icone.svg"));
+const font = await readFile(path.join(process.cwd(), "assets/fonts/Outfit-ExtraBold.ttf"));
+
 export default async function OpengraphImage() {
-  const logo = await readFile(path.join(process.cwd(), "public/brand/logo-couleur.svg"));
-  const icon = await readFile(path.join(process.cwd(), "public/brand/icone.svg"));
-  const font = await readFile(path.join(process.cwd(), "assets/fonts/Outfit-ExtraBold.ttf"));
   const src = (svg: Buffer) => `data:image/svg+xml;base64,${svg.toString("base64")}`;
   return new ImageResponse(
     (

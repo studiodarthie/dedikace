@@ -1,10 +1,21 @@
 import { existsSync } from "node:fs";
 import path from "node:path";
+import type { Metadata } from "next";
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { ExamplePlayer, type ExampleTrack } from "@/components/ExamplePlayer";
 import { env } from "@/lib/env";
 import { formatXaf } from "@/lib/format";
+import { JsonLd } from "@/components/JsonLd";
+import { faqSchema, organization, serviceSchema, SITE_NAME, SITE_URL } from "@/lib/seo";
+import { STYLE_PAGES } from "@/lib/seo-pages";
+import { getStyle } from "@/lib/styles";
+
+// Canonique et adresse de partage propres à l'accueil (les autres pages ont les leurs).
+export const metadata: Metadata = {
+  alternates: { canonical: "/" },
+  openGraph: { url: "/", siteName: "Dédikace", locale: "fr_CM", type: "website" },
+};
 
 // Exemples audio de l'accueil : extraits de 80 s créés par npm run make:examples (public/examples/).
 const EXAMPLES: Omit<ExampleTrack, "image">[] = [
@@ -82,14 +93,14 @@ const OCCASIONS = [
 ];
 
 const OCCASION_CARDS = [
-  { emoji: "🎂", title: "Anniversaire", text: "Son prénom au refrain, toute la salle qui chante." },
-  { emoji: "💍", title: "Dot", text: "Pour la remise de la dot, devant toute la famille." },
-  { emoji: "💒", title: "Mariage", text: "Pour l’entrée des mariés ou la première danse." },
-  { emoji: "🎓", title: "Réussite", text: "BEPC, Bac, diplôme : fête le travail accompli." },
-  { emoji: "🕊️", title: "Hommage", text: "Un chant doux pour honorer ceux qui sont partis." },
-  { emoji: "❤️", title: "Déclaration", text: "Dis-lui enfin ce que tu ressens, en musique." },
-  { emoji: "🤝", title: "Excuses", text: "Quand les mots seuls ne suffisent pas." },
-  { emoji: "💪🏾", title: "Encouragement", text: "Avant un examen, un nouveau départ ou un moment dur." },
+  { emoji: "🎂", title: "Anniversaire", slug: "anniversaire", text: "Son prénom au refrain, toute la salle qui chante." },
+  { emoji: "💍", title: "Dot", slug: "dot", text: "Pour la remise de la dot, devant toute la famille." },
+  { emoji: "💒", title: "Mariage", slug: "mariage", text: "Pour l’entrée des mariés ou la première danse." },
+  { emoji: "🎓", title: "Réussite", slug: "reussite-examen", text: "BEPC, Bac, diplôme : fête le travail accompli." },
+  { emoji: "🕊️", title: "Hommage", slug: "hommage", text: "Un chant doux pour honorer ceux qui sont partis." },
+  { emoji: "❤️", title: "Déclaration", slug: "declaration-amour", text: "Dis-lui enfin ce que tu ressens, en musique." },
+  { emoji: "🤝", title: "Excuses", slug: "excuses", text: "Quand les mots seuls ne suffisent pas." },
+  { emoji: "💪🏾", title: "Encouragement", slug: "encouragement", text: "Avant un examen, un nouveau départ ou un moment dur." },
 ];
 
 const STEPS = [
@@ -161,6 +172,21 @@ export default function Home() {
 
   return (
     <div className="flex flex-col gap-16 md:gap-32">
+      <JsonLd
+        data={{
+          "@context": "https://schema.org",
+          "@graph": [
+            organization,
+            { "@type": "WebSite", "@id": `${SITE_URL}/#site`, name: SITE_NAME, url: SITE_URL, inLanguage: "fr", publisher: { "@id": `${SITE_URL}/#organisation` } },
+            serviceSchema(
+              "Chanson personnalisée avec ton prénom",
+              "Une chanson unique avec le prénom au refrain, sur des rythmes d'Afrique centrale, pour un anniversaire, un mariage, une dot ou un hommage.",
+              SITE_URL,
+            ),
+            faqSchema(FAQ),
+          ],
+        }}
+      />
       {/* Accroche : tout l'écran sur ordinateur, compacte sur téléphone (le bandeau reste visible) */}
       <section className="relative flex flex-col md:min-h-[calc(100svh-4rem)]">
         <div
@@ -253,18 +279,32 @@ export default function Home() {
           <SectionTitle id="occasions" kicker="Pour qui ?" title="Pour tous les moments qui comptent" />
           <ul className="grid grid-cols-2 gap-3 md:grid-cols-4 md:gap-5">
             {OCCASION_CARDS.map((o) => (
-              <li
-                key={o.title}
-                className="flex flex-col gap-1 rounded-2xl bg-white p-4 shadow-sm ring-1 ring-sand transition md:gap-2 md:p-7 md:hover:-translate-y-1 md:hover:shadow-md"
-              >
-                <span className="text-3xl md:text-5xl" aria-hidden="true">
-                  {o.emoji}
-                </span>
-                <p className="font-bold md:text-xl">{o.title}</p>
-                <p className="text-sm text-muted md:text-base">{o.text}</p>
+              <li key={o.title}>
+                <Link
+                  href={`/chanson/${o.slug}`}
+                  className="flex h-full flex-col gap-1 rounded-2xl bg-white p-4 shadow-sm ring-1 ring-sand transition active:bg-sand/40 md:gap-2 md:p-7 md:hover:-translate-y-1 md:hover:shadow-md"
+                >
+                  <span className="text-3xl md:text-5xl" aria-hidden="true">
+                    {o.emoji}
+                  </span>
+                  <span className="font-bold md:text-xl">{o.title}</span>
+                  <span className="text-sm text-muted md:text-base">{o.text}</span>
+                </Link>
               </li>
             ))}
           </ul>
+          <nav aria-label="Tous nos rythmes" className="flex flex-col items-center gap-3">
+            <p className="font-bold">Tous nos rythmes</p>
+            <ul className="flex flex-wrap justify-center gap-2">
+              {STYLE_PAGES.map((p) => (
+                <li key={p.id}>
+                  <Link href={`/style/${p.id}`} className="block rounded-full bg-white px-3 py-1.5 text-sm font-semibold ring-1 ring-sand">
+                    {getStyle(p.id)?.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </nav>
         </section>
       </Container>
 
