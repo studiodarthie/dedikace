@@ -1,0 +1,1 @@
+ALTER TABLE "orders" ADD COLUMN "stuck_alerted_at" timestamp with time zone;

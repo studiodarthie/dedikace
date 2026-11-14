@@ -61,6 +61,19 @@ Décisions du porteur du projet (13 novembre 2026) :
 - Paroles calées sur le plan de composition envoyé à ElevenLabs (`sectionTimeline`) : 30 s à partir de 1,5 s avant
   le premier refrain. Testé de bout en bout en local (photo → vidéo prête → lecteur 720×1280, 30 s).
 
+## Étape 4 bis — Fiabilité après paiement (fait le 14 novembre 2026)
+
+Incident : commande « Jeff » payée (Orange Money) à 01:01, création jamais lancée : INNGEST_EVENT_KEY n'était réglée
+que pour Preview sur Vercel. Clé ajoutée en Production, chanson relancée et livrée à 01:21.
+- [x] E-mail « 💰 Vente » à l'équipe à chaque paiement confirmé (`lib/notifications.ts`).
+- [x] Lancement raté après paiement : alerte immédiate, la vérification du paiement n'échoue plus pour ça.
+- [x] Surveillance Inngest toutes les 5 min (`inngest/watchdog.ts`) : payée sans chanson depuis 10 min → relancée
+      + alerte ; en création depuis 20 min → alerte. Une alerte par commande (`orders.stuck_alerted_at`).
+- [x] Back-office : bandeau rouge si un réglage indispensable manque en production.
+- [x] Page d'attente : 3 étapes, barre d'avancement, « 2 à 4 minutes », lien de la chanson à copier ou s'envoyer,
+      message de retard honnête après 10 min, bouton WhatsApp en cas de souci ; la chanson s'ouvre toute seule.
+- [x] E-mail « 🎶 Ta chanson est prête » pour les clients qui ont un espace.
+
 ## Étape 5 — Offre premium à 7 000 FCFA (~1,5 j)
 
 - [ ] Au paiement : choix « Classique 3 000 FCFA » / « Premium 7 000 FCFA » (carte : 4 000 / 8 000 FCFA).

@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+import { connection } from "next/server";
 import { Suspense } from "react";
 import { z } from "zod";
 import { getCurrentUser } from "@/lib/auth";
@@ -7,6 +8,8 @@ import { env } from "@/lib/env";
 import { getOrderById } from "@/lib/orders";
 import { getLatestPayment } from "@/lib/payments";
 import { OrderTracker } from "./OrderTracker";
+
+const PAID = new Set(["paid", "generating", "delivered", "generation_failed"]);
 
 export const metadata: Metadata = { title: "Ta commande", robots: { index: false, follow: false } };
 
@@ -19,6 +22,7 @@ export default function OrderPage({ params }: PageProps<"/commande/[id]">) {
 }
 
 async function OrderContent({ params }: { params: PageProps<"/commande/[id]">["params"] }) {
+  await connection(); // Page propre à chaque commande, jamais pré-rendue.
   const { id } = await params;
   if (!z.uuid().safeParse(id).success) notFound();
   const order = await getOrderById(id);
@@ -33,11 +37,13 @@ async function OrderContent({ params }: { params: PageProps<"/commande/[id]">["p
         status: order.status,
         recipientName: order.recipientName,
         channel: payment?.channel,
-        publicCode: order.status === "delivered" ? order.publicCode : undefined,
+        publicCode: PAID.has(order.status) ? order.publicCode : undefined,
+        paidAt: payment?.status === "successful" ? payment.verifiedAt?.toISOString() : undefined,
       }}
       priceXaf={order.priceXaf}
       supportPhone={process.env.NEXT_PUBLIC_SUPPORT_WHATSAPP ?? ""}
       signedIn={!!user}
+      appUrl={env.NEXT_PUBLIC_APP_URL}
       pay={
         toPay
           ? {

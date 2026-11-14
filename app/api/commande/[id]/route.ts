@@ -16,12 +16,13 @@ export async function GET(_request: Request, { params }: RouteContext<"/api/comm
   let order = await getOrderById(id);
   if (!order) return Response.json({ error: "Commande introuvable." }, { status: 404 });
 
-  const payment = await getLatestPayment(order.id);
+  let payment = await getLatestPayment(order.id);
   if (payment && (order.status === "pending_payment" || order.status === "paid")) {
     const age = Date.now() - payment.createdAt.getTime();
     try {
       await syncPayment(payment, { forceRefresh: payment.status === "pending" && age > FORCE_REFRESH_AFTER_MS });
       order = (await getOrderById(id)) ?? order;
+      payment = (await getLatestPayment(order.id)) ?? payment;
     } catch (error) {
       console.error("[attente] vérification Tranzak impossible", error);
     }
@@ -30,7 +31,8 @@ export async function GET(_request: Request, { params }: RouteContext<"/api/comm
   return Response.json(
     {
       status: order.status,
-      publicCode: order.status === "delivered" ? order.publicCode : undefined,
+      publicCode: ["paid", "generating", "delivered", "generation_failed"].includes(order.status) ? order.publicCode : undefined,
+      paidAt: payment?.status === "successful" ? payment.verifiedAt?.toISOString() : undefined,
       recipientName: order.recipientName,
       channel: payment?.channel,
     },

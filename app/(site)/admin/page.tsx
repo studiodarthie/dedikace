@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { Suspense } from "react";
 import { getTodayStats, listOrders } from "@/lib/admin";
+import { missingProductionSettings } from "@/lib/notifications";
 import { listToRemind } from "@/lib/reminders";
 import { requireAdmin } from "@/lib/auth";
 import { orderStatus, type OrderStatus } from "@/lib/db/schema";
@@ -66,6 +67,13 @@ async function Dashboard({ searchParams }: { searchParams: PageProps<"/admin">["
           ))}
         </dl>
       </section>
+
+      {missingProductionSettings().length > 0 && (
+        <p role="alert" className="rounded-2xl bg-brand p-4 font-semibold text-white">
+          ⚠️ Réglage manquant sur Vercel (Production) : {missingProductionSettings().join(", ")}. Les commandes peuvent
+          rester bloquées tant que ce n’est pas corrigé.
+        </p>
+      )}
 
       <Link
         href="/admin/relances"

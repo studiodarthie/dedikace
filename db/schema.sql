@@ -107,6 +107,8 @@ create index orders_user_id_idx on orders (user_id, created_at desc);
 -- Relance des paroles non payées (docs/PLAN_CROISSANCE.md, étape 1).
 alter table orders add column reminded_at timestamptz;          -- WhatsApp envoyé à la main (back-office)
 alter table orders add column reminder_emailed_at timestamptz;  -- e-mail automatique 1 h après (clients avec espace)
+-- Surveillance des commandes payées qui n'avancent pas (inngest/watchdog.ts) : une alerte par commande.
+alter table orders add column stuck_alerted_at timestamptz;
 
 create table accounts (
   user_id text not null references users(id) on delete cascade,

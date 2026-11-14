@@ -13,11 +13,17 @@ type Snapshot = {
   status: OrderStatus;
   recipientName: string;
   channel?: "mtn" | "orange" | "card" | "manual";
+  /** Code de la page de la chanson : connu dès le paiement (la page attend puis affiche la chanson). */
   publicCode?: string;
+  /** Heure de confirmation du paiement (ISO), pour la barre d'avancement. */
+  paidAt?: string;
 };
 
 const POLL_MS = 5_000;
 const SLOW_PAYMENT_MS = 3 * 60_000;
+/** Durée habituelle d'une création (2 versions) et seuil au-delà duquel on annonce un retard. */
+const USUAL_CREATION_MS = 3 * 60_000;
+const LATE_CREATION_MS = 10 * 60_000;
 const PAID_STATUSES: OrderStatus[] = ["paid", "generating", "delivered", "generation_failed"];
 
 /** Prompt 11 : suit la commande toutes les 5 s et ouvre la chanson dès qu'elle est prête. */
@@ -28,6 +34,7 @@ export function OrderTracker({
   supportPhone,
   pay,
   signedIn,
+  appUrl,
 }: {
   orderId: string;
   initial: Snapshot;
@@ -36,12 +43,24 @@ export function OrderTracker({
   /** Paroles prêtes mais pas payées : de quoi finaliser ici (lien « Finaliser » de Mon espace). */
   pay?: { title: string; lyrics: string; whatsappPhone: string; priceMomo: number; priceCard: number };
   signedIn: boolean;
+  /** Adresse du site (dedikace.app), pour le lien de la chanson. */
+  appUrl: string;
 }) {
   const router = useRouter();
   const [snap, setSnap] = useState(initial);
   const [offline, setOffline] = useState(false);
-  const [startedAt] = useState(() => Date.now());
-  const [now, setNow] = useState(startedAt);
+  // Horloge lancée seulement dans le navigateur (le serveur n'a pas la même heure : pas d'écart à l'affichage).
+  const [startedAt, setStartedAt] = useState(0);
+  const [now, setNow] = useState(0);
+  useEffect(() => {
+    const tick = () => {
+      const t = Date.now();
+      setStartedAt((s) => s || t);
+      setNow(t);
+    };
+    const id = setInterval(tick, 1000);
+    return () => clearInterval(id);
+  }, []);
 
   const toPay = snap.status === "lyrics_ready" || snap.status === "payment_failed";
   const done = toPay || snap.status === "generation_failed" || snap.status === "refunded";
@@ -50,9 +69,8 @@ export function OrderTracker({
   useEffect(() => rememberOrder(orderId), [orderId]);
 
   useEffect(() => {
-    if (done || snap.publicCode) return;
+    if (done || snap.status === "delivered") return;
     const id = setInterval(async () => {
-      setNow(Date.now());
       try {
         const res = await fetch(`/api/commande/${orderId}`, { cache: "no-store" });
         if (!res.ok) throw new Error(String(res.status));
@@ -63,7 +81,7 @@ export function OrderTracker({
       }
     }, POLL_MS);
     return () => clearInterval(id);
-  }, [orderId, done, snap.publicCode]);
+  }, [orderId, done, snap.status]);
 
   // Paiement reçu (vérifié chez Tranzak côté serveur) : le brouillon ne sert plus, et on prévient les pixels.
   useEffect(() => {
@@ -72,9 +90,10 @@ export function OrderTracker({
     trackPurchaseOnce(orderId, priceXaf);
   }, [snap.status, orderId, priceXaf]);
 
+  // Chanson prête : on ouvre sa page toute seule.
   useEffect(() => {
-    if (snap.publicCode) router.replace(`/s/${snap.publicCode}`);
-  }, [snap.publicCode, router]);
+    if (snap.status === "delivered" && snap.publicCode) router.replace(`/s/${snap.publicCode}`);
+  }, [snap.status, snap.publicCode, router]);
 
   const name = snap.recipientName;
   const support = /^\+\d{8,15}$/.test(supportPhone) ? supportPhone : null;
@@ -106,7 +125,7 @@ export function OrderTracker({
           ) : (
             <p>Termine le paiement sur la page de ta banque. Cette page se met à jour toute seule.</p>
           )}
-          {now - startedAt > SLOW_PAYMENT_MS && (
+          {startedAt > 0 && now - startedAt > SLOW_PAYMENT_MS && (
             <Link href="/creer" className="font-semibold text-brand underline">
               Ça ne marche pas ? Réessayer le paiement
             </Link>
@@ -145,26 +164,49 @@ export function OrderTracker({
       );
       break;
     case "paid":
-      content = (
-        <Panel icon="✅" title="Paiement reçu, merci !">
-          <p>On lance la création de la chanson de {name}.</p>
-        </Panel>
-      );
-      break;
     case "generating":
-    case "delivered":
+    case "delivered": {
+      const since = snap.paidAt ? Date.parse(snap.paidAt) : startedAt;
+      const elapsed = now && since ? Math.max(0, now - since) : 0;
+      const late = elapsed > LATE_CREATION_MS && snap.status !== "delivered";
       content = (
-        <Panel icon="🎶" title={`On crée la chanson de ${name}`}>
-          <p>2 versions, environ 2 minutes. Garde cette page ouverte : elle s’ouvrira toute seule.</p>
-          <Dots />
-        </Panel>
+        <div className="flex flex-col gap-5 text-left">
+          <Panel icon={snap.status === "delivered" ? "🎉" : "🎶"} title={snap.status === "delivered" ? `La chanson de ${name} est prête !` : `On crée la chanson de ${name}`}>
+            <p>{snap.status === "delivered" ? "On l’ouvre…" : "Paiement reçu, merci ! 2 versions de ta chanson sont en préparation."}</p>
+          </Panel>
+          <CreationSteps status={snap.status} progress={Math.min(95, 8 + (elapsed / USUAL_CREATION_MS) * 87)} />
+          {late ? (
+            <p role="alert" className="rounded-2xl bg-gold/25 p-4 text-sm font-medium text-ink">
+              ⏳ Petit retard de notre côté. Notre équipe est prévenue et s’en occupe : ta chanson arrive, et si on n’y arrive
+              pas, on te rembourse. Tu peux nous écrire sur WhatsApp à tout moment.
+            </p>
+          ) : (
+            <p className="text-center text-sm text-muted">
+              Ça prend en général 2 à 4 minutes. Tu peux fermer cette page : ta chanson t’attendra sur son lien et dans Mon espace.
+            </p>
+          )}
+          {snap.publicCode && <SongLink url={`${appUrl.replace(/\/$/, "")}/s/${snap.publicCode}`} name={name} />}
+        </div>
       );
       break;
+    }
     case "generation_failed":
       content = (
-        <Panel icon="🛠️" title="On a eu un souci avec ta chanson">
-          <p>Ton paiement est bien reçu. Notre équipe est prévenue et s’en occupe très vite.</p>
-        </Panel>
+        <div className="flex flex-col gap-5">
+          <Panel icon="🛠️" title="On a eu un souci avec ta chanson">
+            <p>Ton paiement est bien reçu. Notre équipe est prévenue et s’en occupe : ta chanson arrive, sinon on te rembourse.</p>
+          </Panel>
+          {support && (
+            <a
+              href={whatsappLink(support, `Bonjour, ma chanson pour ${name} a un souci (commande ${orderId.slice(0, 8)}).`)}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex h-14 items-center justify-center rounded-2xl bg-[#25d366] px-6 text-lg font-bold text-white shadow-md"
+            >
+              Écrire à l’équipe sur WhatsApp
+            </a>
+          )}
+        </div>
       );
       break;
     case "refunded":
@@ -222,12 +264,73 @@ function Panel({ icon, title, children }: { icon: string; title: string; childre
   );
 }
 
-function Dots() {
+/** Les 3 étapes après le paiement, avec une barre qui avance pendant la création (estimation honnête). */
+function CreationSteps({ status, progress }: { status: OrderStatus; progress: number }) {
+  const ready = status === "delivered";
+  const steps = [
+    { label: "Paiement reçu", state: "done" },
+    { label: "Création des 2 versions", state: ready ? "done" : "active" },
+    { label: "Ta chanson est prête", state: ready ? "done" : "todo" },
+  ] as const;
   return (
-    <div className="flex justify-center gap-2" aria-hidden="true">
-      {[0, 1, 2].map((d) => (
-        <span key={d} className="h-3 w-3 animate-bounce rounded-full bg-brand" style={{ animationDelay: `${d * 150}ms` }} />
+    <ol className="flex flex-col gap-3 rounded-3xl bg-white p-4 shadow-sm ring-1 ring-sand">
+      {steps.map((s) => (
+        <li key={s.label} className="flex flex-col gap-2">
+          <span className="flex items-center gap-3 font-semibold">
+            <span
+              className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-sm ${
+                s.state === "done" ? "bg-leaf text-white" : s.state === "active" ? "bg-brand text-white" : "bg-sand text-muted"
+              }`}
+              aria-hidden="true"
+            >
+              {s.state === "done" ? "✓" : s.state === "active" ? "♪" : "·"}
+            </span>
+            <span className={s.state === "todo" ? "text-muted" : ""}>{s.label}</span>
+            <span className="sr-only">{s.state === "done" ? "(fait)" : s.state === "active" ? "(en cours)" : "(à venir)"}</span>
+          </span>
+          {s.state === "active" && (
+            <span className="ml-10 h-2 overflow-hidden rounded-full bg-sand" aria-hidden="true">
+              <span className="block h-full rounded-full bg-brand transition-[width] duration-1000" style={{ width: `${progress}%` }} />
+            </span>
+          )}
+        </li>
       ))}
+    </ol>
+  );
+}
+
+/** Lien de la chanson, à garder : il marche déjà (la page attend puis affiche la chanson). */
+function SongLink({ url, name }: { url: string; name: string }) {
+  const [copied, setCopied] = useState(false);
+  return (
+    <div className="flex flex-col gap-2 rounded-3xl bg-white p-4 shadow-sm ring-1 ring-sand">
+      <p className="font-semibold">🔗 Le lien de ta chanson</p>
+      <p className="truncate rounded-xl bg-cream px-3 py-2 text-sm text-muted">{url.replace(/^https?:\/\//, "")}</p>
+      <div className="grid grid-cols-2 gap-2">
+        <button
+          type="button"
+          onClick={async () => {
+            try {
+              await navigator.clipboard.writeText(url);
+              setCopied(true);
+              setTimeout(() => setCopied(false), 2500);
+            } catch {
+              setCopied(false);
+            }
+          }}
+          className="h-11 rounded-full bg-cream text-sm font-bold ring-1 ring-sand"
+        >
+          {copied ? "Copié ✓" : "Copier le lien"}
+        </button>
+        <a
+          href={`https://wa.me/?text=${encodeURIComponent(`Ma chanson Dédikace pour ${name} 🎶 ${url}`)}`}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="flex h-11 items-center justify-center rounded-full bg-[#25d366] text-sm font-bold text-white"
+        >
+          Me l’envoyer
+        </a>
+      </div>
     </div>
   );
 }

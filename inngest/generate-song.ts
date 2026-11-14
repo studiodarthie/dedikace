@@ -1,5 +1,6 @@
 import { NonRetriableError } from "inngest";
 import { sendAdminAlert } from "@/lib/email";
+import { notifySongReady } from "@/lib/notifications";
 import { generateSong, MusicError } from "@/lib/elevenlabs";
 import { getOrderById, setStatus } from "@/lib/orders";
 import {
@@ -109,6 +110,8 @@ export const generateSongFunction = inngest.createFunction(
     await step.run("livrer", async () => {
       await setStatus(orderId, "delivered");
     });
+    // Première création : e-mail « ta chanson est prête » si le client a un espace (ne bloque jamais).
+    if (generation === 1) await step.run("prévenir le client", () => notifySongReady(orderId));
 
     return { orderId, generation, status: "delivered" };
   },

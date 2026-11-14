@@ -7,6 +7,16 @@ let resend: Resend | undefined;
 /** Alerte envoyée aux adresses de ADMIN_EMAILS. Ne lève jamais d'erreur : une alerte ratée ne doit rien bloquer. */
 export async function sendAdminAlert(subject: string, text: string): Promise<void> {
   console.error(`[alerte] ${subject}\n${text}`);
+  await sendAdminEmail(subject, text);
+}
+
+/** Information pour l'équipe (ex. nouvelle vente). Ne lève jamais d'erreur. */
+export async function sendAdminNotice(subject: string, text: string): Promise<void> {
+  console.info(`[info] ${subject}`);
+  await sendAdminEmail(subject, text);
+}
+
+async function sendAdminEmail(subject: string, text: string): Promise<void> {
   if (!env.RESEND_API_KEY || !env.EMAIL_FROM || env.ADMIN_EMAILS.length === 0) return;
   try {
     resend ??= new Resend(env.RESEND_API_KEY);
@@ -20,6 +30,24 @@ export async function sendAdminAlert(subject: string, text: string): Promise<voi
   } catch (error) {
     console.error("[alerte] envoi Resend échoué", error);
   }
+}
+
+/** « Ta chanson est prête » (clients avec un espace). Lève une erreur si l'envoi échoue. */
+export async function sendSongReady(to: string, data: { firstName: string | null; recipientName: string; url: string }): Promise<void> {
+  if (!env.RESEND_API_KEY || !env.EMAIL_FROM) throw new Error("RESEND_API_KEY et EMAIL_FROM manquantes.");
+  resend ??= new Resend(env.RESEND_API_KEY);
+  const hello = data.firstName ? `Salut ${data.firstName} 👋` : "Salut 👋";
+  const esc = (s: string) => s.replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]!);
+  const { error } = await resend.emails.send({
+    from: env.EMAIL_FROM,
+    to,
+    subject: `🎶 La chanson pour ${data.recipientName} est prête !`,
+    text: [hello, "", `La chanson pour ${data.recipientName} est prête : 2 versions à écouter et à partager.`, data.url, "", "Pense à la vidéo pour ton statut WhatsApp, sur la même page.", "", "L'équipe Dédikace"].join("\n"),
+    html: `<p>${esc(hello)}</p><p>La chanson pour <strong>${esc(data.recipientName)}</strong> est prête : 2 versions à écouter et à partager.</p>
+<p><a href="${data.url}" style="display:inline-block;padding:12px 20px;background:#e0451b;color:#fff;border-radius:999px;text-decoration:none;font-weight:bold">Écouter ma chanson</a></p>
+<p style="color:#666;font-size:13px">Pense à la vidéo pour ton statut WhatsApp, sur la même page. L'équipe Dédikace</p>`,
+  });
+  if (error) throw new Error(`E-mail « chanson prête » échoué : ${error.message}`);
 }
 
 /** Relance d'une commande non payée (clients avec un espace). Lève une erreur si l'envoi échoue. */

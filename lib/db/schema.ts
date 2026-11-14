@@ -69,6 +69,8 @@ export const orders = pgTable(
     // Relance des paroles non payées : WhatsApp envoyé à la main depuis le back-office, e-mail automatique.
     remindedAt: timestamp("reminded_at", { withTimezone: true }),
     reminderEmailedAt: timestamp("reminder_emailed_at", { withTimezone: true }),
+    // Surveillance (inngest/watchdog.ts) : alerte « commande payée bloquée » envoyée une seule fois.
+    stuckAlertedAt: timestamp("stuck_alerted_at", { withTimezone: true }),
     createdAt: createdAt(),
     updatedAt: timestamp("updated_at", { withTimezone: true })
       .notNull()

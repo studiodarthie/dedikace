@@ -7,6 +7,7 @@ import { orders, payments, songs, type Order, type Payment } from "@/lib/db/sche
 import { sendAdminAlert } from "@/lib/email";
 import { env } from "@/lib/env";
 import { formatXaf } from "@/lib/format";
+import { notifyLaunchFailed, notifySale } from "@/lib/notifications";
 import { getOrderById, OrderError, setStatus, trackEvent } from "@/lib/orders";
 import {
   chargeByWebRedirect,
@@ -204,7 +205,14 @@ async function confirmPayment(payment: Payment, details: TranzakRequest): Promis
     return true;
   }
   await trackEvent("payment_succeeded", order.id);
-  await sendOrderPaid(order.id, 1);
+  await notifySale(order, updated);
+  try {
+    await sendOrderPaid(order.id, 1);
+  } catch (error) {
+    // Le paiement est bien confirmé : on ne fait pas échouer la vérification. Alerte immédiate,
+    // puis renvoi automatique (ensureGenerationStarted à chaque passage de la page d'attente, et inngest/watchdog.ts).
+    await notifyLaunchFailed(order, error);
+  }
   return true;
 }
 
@@ -232,5 +240,7 @@ async function ensureGenerationStarted(orderId: string): Promise<void> {
     .from(songs)
     .where(and(eq(songs.orderId, orderId), eq(songs.generation, 1)))
     .limit(1);
-  if (!song) await sendOrderPaid(orderId, 1);
+  if (!song) {
+    await sendOrderPaid(orderId, 1).catch((error) => console.error("[paiement] renvoi de la création échoué", error));
+  }
 }
