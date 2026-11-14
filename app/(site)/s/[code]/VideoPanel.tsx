@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { getRememberedOrders } from "@/lib/my-orders";
+import { PhotoCropper } from "./PhotoCropper";
 
 type State = {
   owner: boolean;
@@ -24,20 +25,6 @@ async function fetchStatus(code: string): Promise<State | null> {
   }
 }
 
-/** Réduit la photo sur le téléphone (1440 px max, JPEG) avant l'envoi : rapide même en 3G. */
-async function shrink(file: File): Promise<Blob> {
-  const bitmap = await createImageBitmap(file, { imageOrientation: "from-image" });
-  const scale = Math.min(1, 1440 / Math.max(bitmap.width, bitmap.height));
-  const canvas = document.createElement("canvas");
-  canvas.width = Math.round(bitmap.width * scale);
-  canvas.height = Math.round(bitmap.height * scale);
-  canvas.getContext("2d")!.drawImage(bitmap, 0, 0, canvas.width, canvas.height);
-  bitmap.close();
-  return new Promise((resolve, reject) =>
-    canvas.toBlob((b) => (b ? resolve(b) : reject(new Error("photo illisible"))), "image/jpeg", 0.85),
-  );
-}
-
 /**
  * Vidéo statut WhatsApp : l'acheteur choisit une photo, on fabrique 30 s verticales avec le refrain.
  * Tout le monde peut regarder et télécharger la vidéo prête ; seul l'acheteur la crée.
@@ -46,6 +33,7 @@ export function VideoPanel({ code, recipientName }: { code: string; recipientNam
   const [state, setState] = useState<State | null>(null);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [pending, setPending] = useState<File | null>(null);
   const input = useRef<HTMLInputElement>(null);
 
   const refresh = useCallback(async () => {
@@ -71,14 +59,15 @@ export function VideoPanel({ code, recipientName }: { code: string; recipientNam
     return () => clearInterval(id);
   }, [working, refresh]);
 
-  async function upload(file: File) {
+  async function upload(photo: Blob) {
+    setPending(null);
     setError(null);
     setBusy(true);
     try {
       const body = new FormData();
       body.append("code", code);
       body.append("ids", getRememberedOrders().join(","));
-      body.append("photo", await shrink(file), "photo.jpg");
+      body.append("photo", photo, "photo.jpg");
       const res = await fetch("/api/video", { method: "POST", body });
       const data = (await res.json().catch(() => ({}))) as { error?: string };
       if (!res.ok) setError(data.error ?? "Ça n'a pas marché. Réessaie.");
@@ -101,7 +90,11 @@ export function VideoPanel({ code, recipientName }: { code: string; recipientNam
       className="hidden"
       onChange={(e) => {
         const file = e.target.files?.[0];
-        if (file) void upload(file);
+        if (file) {
+          setError(null);
+          setPending(file);
+        }
+        e.target.value = "";
       }}
     />
   );
@@ -151,9 +144,21 @@ export function VideoPanel({ code, recipientName }: { code: string; recipientNam
         </p>
       )}
 
-      {state.owner && !working && state.rendersLeft > 0 && (
+      {state.owner && pending && (
+        <PhotoCropper
+          file={pending}
+          onConfirm={(photo) => void upload(photo)}
+          onCancel={() => {
+            setPending(null);
+            input.current?.click();
+          }}
+        />
+      )}
+
+      {picker}
+
+      {state.owner && !working && !pending && state.rendersLeft > 0 && (
         <>
-          {picker}
           <button
             type="button"
             onClick={() => input.current?.click()}
