@@ -199,3 +199,64 @@ body {
     height: 100%;
   }
 }
+
+/* Titre de l'accueil : les lettres de la ligne orange arrivent et repartent comme des papillons
+   (components/home/HeroTitle.tsx). Chaque lettre a sa trajectoire : --x, --y (départ) et --r (rotation). */
+.fly-in {
+  animation: fly-in 1.25s cubic-bezier(0.25, 0.8, 0.3, 1) both;
+}
+.fly-out {
+  animation: fly-out 0.65s cubic-bezier(0.5, 0, 0.75, 0.4) both;
+}
+.fly-rest {
+  animation: fly-rest 3.6s ease-in-out infinite;
+}
+@keyframes fly-in {
+  0% {
+    opacity: 0;
+    transform: translate(var(--x), var(--y)) rotate(var(--r)) scale(0.35);
+  }
+  35% {
+    opacity: 1;
+  }
+  55% {
+    transform: translate(calc(var(--x) * -0.35), -0.22em) rotate(calc(var(--r) * -0.45)) scale(1.08);
+  }
+  78% {
+    transform: translate(calc(var(--x) * 0.1), 0.05em) rotate(calc(var(--r) * 0.12)) scale(0.98);
+  }
+  100% {
+    opacity: 1;
+    transform: none;
+  }
+}
+@keyframes fly-out {
+  0% {
+    opacity: 1;
+    transform: none;
+  }
+  45% {
+    opacity: 0.6;
+    transform: translate(calc(var(--x) * 0.4 + 0.15em), -0.15em) rotate(calc(var(--r) * 0.6)) scale(0.9);
+  }
+  100% {
+    opacity: 0;
+    transform: translate(calc(var(--x) * 1.2 + 0.6em), -0.45em) rotate(var(--r)) scale(0.4);
+  }
+}
+@keyframes fly-rest {
+  0%,
+  100% {
+    transform: translateY(0) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-0.05em) rotate(var(--wobble));
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .fly-in,
+  .fly-out,
+  .fly-rest {
+    animation: none !important;
+  }
+}
