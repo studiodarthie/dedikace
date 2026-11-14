@@ -88,6 +88,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           <SiteFooter
             occasions={OCCASION_PAGES.map(({ slug, name, nameEn }) => ({ slug, name, nameEn }))}
             cookies={<CookieSettingsLink enabled={!!env.META_PIXEL_ID} />}
+            supportPhone={env.NEXT_PUBLIC_SUPPORT_WHATSAPP}
           />
           <WhatsAppButton />
           <HtmlLang />

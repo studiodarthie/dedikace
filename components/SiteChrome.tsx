@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { useEffect, useId, useState } from "react";
 import { localePath, stripLocale, type Locale } from "@/lib/i18n";
 import { useLocale } from "@/lib/use-locale";
+import { whatsappLink } from "@/lib/format";
 
 // Morceaux de l'en-tête et du pied de page qui changent avec la langue (/en/… → anglais).
 
@@ -181,43 +182,67 @@ export function AccountLink() {
 
 export type FooterOccasion = { slug: string; name: string; nameEn: string };
 
-export function SiteFooter({ occasions, cookies }: { occasions: FooterOccasion[]; cookies: React.ReactNode }) {
+/**
+ * Pied de page : les occasions (liens utiles à Google), puis une bande simple
+ * logo · liens · copyright. Sur téléphone, tout est empilé et centré.
+ */
+export function SiteFooter({
+  occasions,
+  cookies,
+  supportPhone,
+}: {
+  occasions: FooterOccasion[];
+  cookies: React.ReactNode;
+  supportPhone: string;
+}) {
   const locale = useLocale();
   const en = locale === "en";
   const to = (p: string) => localePath(locale, p);
+  const link = "transition hover:text-ink";
+  const contact = /^\+\d{8,15}$/.test(supportPhone) ? whatsappLink(supportPhone) : null;
   return (
-    <footer className="mx-auto w-full max-w-6xl px-4 pt-6 pb-24 text-sm text-muted md:px-8">
-      <nav aria-label={en ? "Songs by occasion" : "Chansons par occasion"} className="flex flex-col gap-2 border-t border-sand py-6">
-        <p className="font-bold text-ink">{en ? "A personalised song for…" : "Une chanson personnalisée pour…"}</p>
-        <ul className="flex flex-wrap gap-x-4 gap-y-2">
+    <footer className="mt-10 border-t border-sand/70 bg-white/50 pb-28 text-sm text-muted md:pb-24">
+      <nav aria-label={en ? "Songs by occasion" : "Chansons par occasion"} className="mx-auto w-full max-w-6xl px-4 pt-8 md:px-8">
+        <ul className="flex flex-wrap justify-center gap-x-4 gap-y-2 text-[13px] md:justify-start">
+          <li className="font-semibold text-ink/70">{en ? "A song for:" : "Une chanson pour :"}</li>
           {occasions.map((p) => (
             <li key={p.slug}>
-              <Link href={to(`/chanson/${p.slug}`)} className="hover:text-ink hover:underline">
+              <Link href={to(`/chanson/${p.slug}`)} className={link}>
                 {en ? p.nameEn : p.name}
               </Link>
             </li>
           ))}
         </ul>
       </nav>
-      <nav aria-label={en ? "Legal information" : "Informations légales"} className="flex flex-wrap gap-x-4 gap-y-2 border-t border-sand pt-6">
-        <Link href={to("/cgu")} className="underline">
-          {en ? "Terms" : "Conditions"}
+      <div className="mx-auto mt-6 flex w-full max-w-6xl flex-col items-center gap-5 border-t border-sand/60 px-4 pt-6 text-center md:mt-8 md:flex-row md:justify-between md:gap-8 md:px-8 md:text-left">
+        <Link href={to("/")} aria-label={en ? "Dédikace, home" : "Dédikace, accueil"} className="shrink-0 opacity-80 transition hover:opacity-100">
+          {/* eslint-disable-next-line @next/next/no-img-element -- petit SVG, pas besoin d'optimisation */}
+          <img src="/brand/logo-couleur.svg" alt="Dédikace" width={432} height={100} className="h-6 w-auto" />
         </Link>
-        <Link href={to("/confidentialite")} className="underline">
-          {en ? "Privacy" : "Confidentialité"}
-        </Link>
-        <Link href={to("/remboursement")} className="underline">
-          {en ? "Refunds" : "Remboursement"}
-        </Link>
-        <Link href={to("/cgu#mentions-legales")} className="underline">
-          {en ? "Legal notice" : "Mentions légales"}
-        </Link>
-        <Link href={to("/compte")} className="underline">
-          {en ? "My space" : "Mon espace"}
-        </Link>
-        {cookies}
-        <span className="ml-auto">© Darthie Studios</span>
-      </nav>
+        <nav aria-label={en ? "Legal information" : "Informations légales"} className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-[15px]">
+          <Link href={to("/confidentialite")} className={link}>
+            {en ? "Privacy" : "Confidentialité"}
+          </Link>
+          <Link href={to("/cgu")} className={link}>
+            {en ? "Terms" : "CGU"}
+          </Link>
+          <Link href={to("/remboursement")} className={link}>
+            {en ? "Refunds" : "Remboursement"}
+          </Link>
+          <Link href={to("/compte")} className={link}>
+            {en ? "My space" : "Mon espace"}
+          </Link>
+          {contact && (
+            <a href={contact} target="_blank" rel="noopener noreferrer" className={link}>
+              {en ? "Contact" : "Contact"}
+            </a>
+          )}
+          {cookies}
+        </nav>
+        <p className="shrink-0 text-[13px] md:text-sm">
+          © 2026 Dédikace. {en ? "Your life in songs." : "Ta vie en chansons."}
+        </p>
+      </div>
     </footer>
   );
 }

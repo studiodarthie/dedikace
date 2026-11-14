@@ -87,7 +87,7 @@ function CookieBanner() {
 export function CookieSettingsLink({ enabled }: { enabled: boolean }) {
   if (!enabled) return null;
   return (
-    <button type="button" onClick={resetConsent} className="underline">
+    <button type="button" onClick={resetConsent} className="transition hover:text-ink">
       Cookies
     </button>
   );
