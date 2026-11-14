@@ -2,6 +2,7 @@ import { existsSync } from "node:fs";
 import path from "node:path";
 import Link from "next/link";
 import type { ReactNode } from "react";
+import { HeroTitle } from "@/components/home/HeroTitle";
 import { ExamplePlayer, type ExampleTrack } from "@/components/ExamplePlayer";
 import { formatXaf } from "@/lib/format";
 import { JsonLd } from "@/components/JsonLd";
@@ -179,8 +180,13 @@ const T = {
     serviceDescription:
       "Une chanson unique avec le prénom au refrain, sur des rythmes d'Afrique centrale, pour un anniversaire, un mariage, une dot ou un hommage.",
     launch: (price: string, end: string) => `🎉 Prix de lancement : ${price} jusqu’au ${end}`,
-    h1a: "Ton nom dans",
-    h1b: "une chanson.",
+    h1: "Une belle chanson personnalisée pour célébrer, remercier ou se souvenir, prête en 3 minutes",
+    hero: [
+      { top: "Une belle chanson", bottom: "pour célébrer" },
+      { top: "Ta belle chanson", bottom: "en 3 minutes" },
+      { top: "Une belle chanson", bottom: "pour remercier" },
+      { top: "Une belle chanson", bottom: "pour se souvenir" },
+    ],
     lead: "Raconte tes souvenirs, on en fait une vraie chanson sur des rythmes de chez nous.",
     promises: ["✓ Paroles gratuites", "✓ Prête en 3 min", "✓ Refaite gratuitement 1 fois", "✓ MoMo · Orange Money · carte"],
     listen: "Écouter un exemple",
@@ -207,8 +213,13 @@ const T = {
     serviceDescription:
       "A unique song with the name in the chorus, on Central African rhythms, for a birthday, a wedding, a traditional wedding or a tribute.",
     launch: (price: string, end: string) => `🎉 Launch price: ${price} until ${end}`,
-    h1a: "Your name in",
-    h1b: "a song.",
+    h1: "A beautiful personalised song to celebrate, to say thank you or to remember, ready in 3 minutes",
+    hero: [
+      { top: "A beautiful song", bottom: "to celebrate" },
+      { top: "Your beautiful song", bottom: "in 3 minutes" },
+      { top: "A beautiful song", bottom: "to say thank you" },
+      { top: "A beautiful song", bottom: "to remember" },
+    ],
     lead: "Share your memories, we turn them into a real song on rhythms from home.",
     promises: ["✓ Free lyrics", "✓ Ready in 3 min", "✓ 1 free redo", "✓ MoMo · Orange Money · card"],
     listen: "Listen to an example",
@@ -317,11 +328,7 @@ export async function HomePage({ locale }: { locale: Locale }) {
             {STICKERS.map((s) => (
               <Sticker key={s.label} emoji={s.emoji} label={en ? s.labelEn : s.label} className={`lg:hidden ${s.narrow ? "" : "max-[399px]:hidden"} ${s.mobile}`} />
             ))}
-            <h1 className="text-[clamp(2.1rem,11.5vw,3.4rem)] leading-[1.02] font-extrabold tracking-tight md:text-7xl lg:text-8xl">
-              {t.h1a}
-              <br />
-              <span className="bg-gradient-to-r from-brand to-gold bg-clip-text text-transparent">{t.h1b}</span>
-            </h1>
+            <HeroTitle lines={t.hero} label={t.h1} />
           </div>
           <p className="max-w-xl text-base text-muted md:text-2xl md:leading-relaxed">
             {t.lead}
