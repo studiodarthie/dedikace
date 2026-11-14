@@ -6,6 +6,7 @@ import { z } from "zod";
 import { getCurrentUser } from "@/lib/auth";
 import { env } from "@/lib/env";
 import { getOrderById } from "@/lib/orders";
+import { pricesAt } from "@/lib/pricing";
 import { getLatestPayment } from "@/lib/payments";
 import { OrderTracker } from "./OrderTracker";
 
@@ -28,6 +29,7 @@ async function OrderContent({ params }: { params: PageProps<"/commande/[id]">["p
   const order = await getOrderById(id);
   if (!order) notFound();
   const [payment, user] = await Promise.all([getLatestPayment(order.id), getCurrentUser()]);
+  const prices = pricesAt(new Date());
   const toPay = (order.status === "lyrics_ready" || order.status === "payment_failed") && order.lyrics;
 
   return (
@@ -50,8 +52,8 @@ async function OrderContent({ params }: { params: PageProps<"/commande/[id]">["p
               title: order.title ?? "",
               lyrics: order.lyrics ?? "",
               whatsappPhone: order.whatsappPhone,
-              priceMomo: env.PRICE_MOMO_XAF,
-              priceCard: env.PRICE_CARD_XAF,
+              priceMomo: prices.momo,
+              priceCard: prices.card,
             }
           : undefined
       }

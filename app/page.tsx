@@ -4,12 +4,12 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import type { ReactNode } from "react";
 import { ExamplePlayer, type ExampleTrack } from "@/components/ExamplePlayer";
-import { env } from "@/lib/env";
 import { formatXaf } from "@/lib/format";
 import { JsonLd } from "@/components/JsonLd";
 import { faqSchema, organization, serviceSchema, SITE_NAME, SITE_URL } from "@/lib/seo";
 import { STYLE_PAGES } from "@/lib/seo-pages";
 import { getStyle } from "@/lib/styles";
+import { currentPrices, type Prices } from "@/lib/pricing";
 
 // Canonique et adresse de partage propres à l'accueil (les autres pages ont les leurs).
 export const metadata: Metadata = {
@@ -109,10 +109,10 @@ const STEPS = [
   { icon: "🎶", title: "Reçois ta chanson", text: "2 versions d'environ 3 minutes, à partager sur WhatsApp." },
 ];
 
-const FAQ = [
+const faq = (prices: Prices) => [
   {
     q: "Combien ça coûte ?",
-    a: `${formatXaf(env.PRICE_MOMO_XAF)} par MTN MoMo ou Orange Money, ${formatXaf(env.PRICE_CARD_XAF)} par carte bancaire. Les paroles sont gratuites : tu ne paies que si elles te plaisent.`,
+    a: `${formatXaf(prices.momo)} par MTN MoMo ou Orange Money, ${formatXaf(prices.card)} par carte bancaire${prices.launchEnds ? ` (prix de lancement, jusqu’au ${prices.launchEnds})` : ""}. Les paroles sont gratuites : tu ne paies que si elles te plaisent.`,
   },
   { q: "Combien de temps faut-il attendre ?", a: "Environ 2 minutes après le paiement. Tu reçois un lien à ouvrir et à partager." },
   {
@@ -163,7 +163,9 @@ function Container({ children, className = "" }: { children: ReactNode; classNam
   return <div className={`mx-auto w-full max-w-6xl px-4 md:px-8 ${className}`}>{children}</div>;
 }
 
-export default function Home() {
+export default async function Home() {
+  const prices = await currentPrices();
+  const FAQ = faq(prices);
   // Photo de pochette facultative : public/examples/<scene>.jpg (sinon, illustration animée).
   const tracks: ExampleTrack[] = EXAMPLES.filter((ex) => hasExample(ex.file)).map((ex) => ({
     ...ex,
@@ -182,6 +184,7 @@ export default function Home() {
               "Chanson personnalisée avec ton prénom",
               "Une chanson unique avec le prénom au refrain, sur des rythmes d'Afrique centrale, pour un anniversaire, un mariage, une dot ou un hommage.",
               SITE_URL,
+              prices.momo,
             ),
             faqSchema(FAQ),
           ],
@@ -198,10 +201,16 @@ export default function Home() {
         ))}
 
         <Container className="flex flex-1 flex-col items-center justify-center gap-5 pt-6 pb-8 text-center md:gap-8 md:py-16">
-          <p className="flex items-center gap-2 rounded-full bg-white px-3 py-1 text-[11px] font-bold tracking-wide text-muted uppercase shadow-sm ring-1 ring-sand md:px-4 md:py-1.5 md:text-xs">
-            <span className="h-2 w-2 rounded-full bg-brand" aria-hidden="true" />
-            Makossa · Bikutsi · Afrobeats<span className="max-[399px]:hidden"> · Rumba</span>
-          </p>
+          {prices.launchEnds ? (
+            <p className="flex items-center gap-2 rounded-full bg-gold/25 px-3 py-1 text-xs font-bold text-brand-dark shadow-sm ring-1 ring-gold/40 md:px-4 md:py-1.5 md:text-sm">
+              🎉 Prix de lancement : {formatXaf(prices.momo)} jusqu’au {prices.launchEnds}
+            </p>
+          ) : (
+            <p className="flex items-center gap-2 rounded-full bg-white px-3 py-1 text-[11px] font-bold tracking-wide text-muted uppercase shadow-sm ring-1 ring-sand md:px-4 md:py-1.5 md:text-xs">
+              <span className="h-2 w-2 rounded-full bg-brand" aria-hidden="true" />
+              Makossa · Bikutsi · Afrobeats<span className="max-[399px]:hidden"> · Rumba</span>
+            </p>
+          )}
           <div className="relative w-full py-10 lg:py-0">
             {STICKERS.map((s) => (
               <Sticker key={s.label} emoji={s.emoji} label={s.label} className={`lg:hidden ${s.narrow ? "" : "max-[399px]:hidden"} ${s.mobile}`} />

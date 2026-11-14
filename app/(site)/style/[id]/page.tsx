@@ -6,6 +6,7 @@ import { Breadcrumb, CtaButton, FaqList, LinkCloud, Promises, Steps } from "@/co
 import { breadcrumbSchema, faqSchema, serviceSchema, SITE_URL } from "@/lib/seo";
 import { occasionPageFor, STYLE_PAGES, stylePage, type Faq } from "@/lib/seo-pages";
 import { getStyle, STYLE_TAGLINES } from "@/lib/styles";
+import { currentPrices } from "@/lib/pricing";
 
 // Une page par style musical (« chanson makossa personnalisée »…), fabriquée au déploiement.
 export function generateStaticParams() {
@@ -58,7 +59,7 @@ async function Content({ params }: { params: PageProps<"/style/[id]">["params"] 
         data={{
           "@context": "https://schema.org",
           "@graph": [
-            serviceSchema(page.title, page.description, `${SITE_URL}/style/${page.id}`),
+            serviceSchema(page.title, page.description, `${SITE_URL}/style/${page.id}`, (await currentPrices()).momo),
             faqSchema(faq),
             breadcrumbSchema([
               { name: "Accueil", path: "/" },

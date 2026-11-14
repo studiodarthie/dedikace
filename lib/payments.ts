@@ -8,6 +8,7 @@ import { sendAdminAlert } from "@/lib/email";
 import { env } from "@/lib/env";
 import { formatXaf } from "@/lib/format";
 import { notifyLaunchFailed, notifySale } from "@/lib/notifications";
+import { pricesAt } from "@/lib/pricing";
 import { getOrderById, OrderError, setStatus, trackEvent } from "@/lib/orders";
 import {
   chargeByWebRedirect,
@@ -22,7 +23,8 @@ export type PayChannel = "mtn" | "orange" | "card";
 
 /** Prix en XAF entiers (CLAUDE.md règle 4), lus côté serveur uniquement. */
 export function priceFor(channel: PayChannel): number {
-  return channel === "card" ? env.PRICE_CARD_XAF : env.PRICE_MOMO_XAF;
+  const prices = pricesAt(new Date());
+  return channel === "card" ? prices.card : prices.momo;
 }
 
 const PAYABLE = new Set(["lyrics_ready", "pending_payment", "payment_failed"]);

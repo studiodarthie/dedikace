@@ -1,8 +1,8 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
-import { env } from "@/lib/env";
 import { formatXaf } from "@/lib/format";
 import type { Faq } from "@/lib/seo-pages";
+import { currentPrices } from "@/lib/pricing";
 
 // Briques communes des pages de présentation (/chanson/…, /style/…) : bouton, étapes, FAQ, liens.
 
@@ -18,13 +18,14 @@ export function CtaButton({ href, children }: { href: string; children: ReactNod
   );
 }
 
-export function Promises() {
+export async function Promises() {
+  const prices = await currentPrices();
   return (
     <ul className="flex flex-wrap gap-x-4 gap-y-1 text-sm font-medium text-muted">
       <li>✓ Paroles gratuites</li>
       <li>✓ Prête en 2 min</li>
       <li>✓ 2 versions</li>
-      <li>✓ {formatXaf(env.PRICE_MOMO_XAF)} par MoMo ou Orange Money</li>
+      <li>✓ {formatXaf(prices.momo)} par MoMo ou Orange Money{prices.launchEnds && ` (prix de lancement jusqu’au ${prices.launchEnds})`}</li>
     </ul>
   );
 }

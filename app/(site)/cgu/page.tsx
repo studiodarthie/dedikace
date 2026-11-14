@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { COMPANY, LegalPage, SUPPORT_PHONE, SupportLink } from "@/components/LegalPage";
-import { env } from "@/lib/env";
 import { formatXaf } from "@/lib/format";
+import { currentPrices } from "@/lib/pricing";
 
 // Version courte, voulue par le porteur du projet le 14 novembre 2026 (pas de relecture par un juriste).
 // On ne cite pas les outils techniques utilisés : seul l'hébergeur figure aux mentions légales (obligation légale).
@@ -12,7 +12,8 @@ export const metadata: Metadata = {
   alternates: { canonical: "/cgu" },
 };
 
-export default function CguPage() {
+export default async function CguPage() {
+  const prices = await currentPrices();
   return (
     <LegalPage title="Conditions générales" updated="14 novembre 2026">
       <p>
@@ -29,8 +30,8 @@ export default function CguPage() {
 
       <h2>2. Prix et paiement</h2>
       <p>
-        Le prix est affiché avant le paiement ({formatXaf(env.PRICE_MOMO_XAF)} par Mobile Money au moment de cette
-        mise à jour). Le paiement passe par un prestataire sécurisé : on ne voit jamais ton code secret ni ta carte. La
+        Le prix est affiché avant le paiement ({formatXaf(prices.momo)} par Mobile Money
+        {prices.launchEnds ? ` pendant l’offre de lancement, jusqu’au ${prices.launchEnds}` : " au moment de cette mise à jour"}). Le paiement passe par un prestataire sécurisé : on ne voit jamais ton code secret ni ta carte. La
         création démarre dès que le paiement est confirmé.
       </p>
 

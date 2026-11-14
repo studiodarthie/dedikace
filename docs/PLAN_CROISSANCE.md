@@ -78,6 +78,7 @@ que pour Preview sur Vercel. Clé ajoutée en Production, chanson relancée et l
 
 - [x] Nouveau logo partout (en-tête, favicon, icônes d'app, manifeste, image de partage, vidéo statut, e-mails) — `scripts/make-brand.mjs`
 - [x] Cadrage de la photo avant la vidéo statut (glisser, zoom, pincement)
+- [x] Prix de lancement réel : 2 000 FCFA MoMo / 3 000 FCFA carte jusqu'au 25 novembre 2026 23 h 59 (Douala), retour automatique à 3 000 / 4 000 — `lib/pricing.ts` (LAUNCH_OFFER). Suivre « Paroles créées → Paiement lancé » au tableau de bord pour décider du prix après.
 - [x] CGU raccourcies ; outils techniques décrits par catégorie (seul l'hébergeur reste nommé, obligation légale)
 - [x] Référencement : 8 pages occasion (`/chanson/…`), 12 pages style (`/style/…`), plan du site, robots, données
       structurées (Organisation, Service avec prix, FAQ, fil d'Ariane), liens internes, formulaire pré-rempli (`/creer?occasion=…`)

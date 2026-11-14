@@ -152,7 +152,7 @@ function stepError(step: number, f: Form): string | null {
 
 // ---------- Composant principal ----------
 
-type Prices = { priceMomo: number; priceCard: number };
+type Prices = { priceMomo: number; priceCard: number; /** Offre de lancement en cours : date de fin affichée. */ launchEnds?: string | null };
 
 /**
  * Prérempli pour une nouvelle chanson : profil du client connecté, et occasion ou style
@@ -185,6 +185,7 @@ function Wizard({
   initial,
   priceMomo,
   priceCard,
+  launchEnds,
 }: { initial: Draft } & Prices) {
   const [step, setStep] = useState(initial.step);
   const [form, setForm] = useState<Form>(initial.form);
@@ -406,7 +407,7 @@ function Wizard({
 
       {step === 0 && (
         <Step title="C'est pour quelle occasion ?">
-          <TrustBanner price={priceMomo} priceCard={priceCard} />
+          <TrustBanner price={priceMomo} priceCard={priceCard} launchEnds={launchEnds} />
           <div className="grid grid-cols-2 gap-3">
             {OCCASIONS.map((o) => (
               <Choice
@@ -1128,7 +1129,7 @@ function PayBadges({ className = "" }: { className?: string }) {
   );
 }
 
-function TrustBanner({ price, priceCard }: { price: number; priceCard: number }) {
+function TrustBanner({ price, priceCard, launchEnds }: { price: number; priceCard: number; launchEnds?: string | null }) {
   return (
     <div className="flex flex-col gap-2.5 rounded-2xl bg-white p-4 ring-1 ring-sand">
       <p className="font-semibold">
@@ -1139,6 +1140,11 @@ function TrustBanner({ price, priceCard }: { price: number; priceCard: number })
         versions de ta chanson
         {priceCard !== price && <> ({formatXaf(priceCard)} par carte)</>}.
       </p>
+      {launchEnds && (
+        <p className="-mt-1 w-fit rounded-full bg-gold/25 px-3 py-1 text-sm font-bold text-brand-dark">
+          🎉 Prix de lancement jusqu’au {launchEnds}
+        </p>
+      )}
       <p className="-mt-1.5 text-sm text-muted">
         🔁 La chanson ne te plaît pas ? On la refait gratuitement, une fois.
       </p>

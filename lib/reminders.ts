@@ -4,6 +4,7 @@ import { db } from "@/lib/db";
 import { orders, users } from "@/lib/db/schema";
 import { sendPaymentReminder } from "@/lib/email";
 import { env } from "@/lib/env";
+import { pricesAt } from "@/lib/pricing";
 import { formatXaf } from "@/lib/format";
 
 // Relance des paroles non payées (docs/PLAN_CROISSANCE.md, étape 1).
@@ -41,13 +42,14 @@ export function reminderMessage(o: Pick<ReminderRow, "id" | "status" | "recipien
     o.status === "payment_failed"
       ? `Ton paiement pour la chanson de ${o.recipientName} n'est pas passé, mais tes paroles sont bien gardées ✍🏾`
       : `Les paroles de ta chanson pour ${o.recipientName} sont prêtes et elles t'attendent ✍🏾🎶`;
+  const prices = pricesAt(new Date());
   return [
     `${hello} C'est Dédikace.`,
     line,
     "",
     `Tu peux les relire et lancer ta chanson ici : ${orderUrl(o.id)}`,
     "",
-    `${formatXaf(env.PRICE_MOMO_XAF)} pour 2 versions, par MTN MoMo ou Orange Money. Une question ? Réponds ici 🙂`,
+    `${formatXaf(prices.momo)} pour 2 versions, par MTN MoMo ou Orange Money${prices.launchEnds ? ` (prix de lancement jusqu'au ${prices.launchEnds})` : ""}. Une question ? Réponds ici 🙂`,
   ].join("\n");
 }
 

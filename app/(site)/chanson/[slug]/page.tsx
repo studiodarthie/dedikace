@@ -7,6 +7,7 @@ import { MEMORY_IDEAS } from "@/lib/occasions";
 import { breadcrumbSchema, faqSchema, serviceSchema, SITE_URL } from "@/lib/seo";
 import { OCCASION_PAGES, occasionPage, stylePage } from "@/lib/seo-pages";
 import { getStyle, STYLE_TAGLINES } from "@/lib/styles";
+import { currentPrices } from "@/lib/pricing";
 
 // Une page par occasion, fabriquée au déploiement ; adresse inconnue → 404 (référencement : « chanson d'anniversaire avec prénom »…).
 export function generateStaticParams() {
@@ -45,7 +46,7 @@ async function Content({ params }: { params: PageProps<"/chanson/[slug]">["param
         data={{
           "@context": "https://schema.org",
           "@graph": [
-            serviceSchema(page.title, page.description, url),
+            serviceSchema(page.title, page.description, url, (await currentPrices()).momo),
             faqSchema(page.faq),
             breadcrumbSchema([
               { name: "Accueil", path: "/" },

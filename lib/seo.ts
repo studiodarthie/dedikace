@@ -17,7 +17,7 @@ export const organization = {
 };
 
 /** Le service vendu, avec son prix en FCFA (aucune note ni avis inventés). */
-export function serviceSchema(name: string, description: string, url: string) {
+export function serviceSchema(name: string, description: string, url: string, priceXaf: number) {
   return {
     "@type": "Service",
     name,
@@ -28,7 +28,7 @@ export function serviceSchema(name: string, description: string, url: string) {
     areaServed: [{ "@type": "Country", name: "Cameroun" }, "Afrique centrale", "Diaspora africaine"],
     offers: {
       "@type": "Offer",
-      price: env.PRICE_MOMO_XAF,
+      price: priceXaf,
       priceCurrency: "XAF",
       availability: "https://schema.org/InStock",
       url: `${SITE_URL}/creer`,
