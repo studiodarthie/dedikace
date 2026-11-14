@@ -18,29 +18,6 @@ import { localePath, type Locale } from "@/lib/i18n";
 // illustrated : dessin animé plutôt que la photo de la scène (évite deux fois la même photo).
 const EXAMPLES: (Omit<ExampleTrack, "image"> & { illustrated?: boolean; en: Pick<ExampleTrack, "title" | "style" | "tags"> })[] = [
   {
-    file: "anniversaire-makossa.mp3",
-    title: "Maman Marie, joyeux anniversaire",
-    style: "Makossa",
-    emoji: "🎂",
-    tags: ["Anniversaire", "Fête"],
-    length: "1:20",
-    scene: "anniversaire",
-    cover: "from-gold to-brand",
-    en: { title: "Mama Marie, happy birthday", style: "Makossa · sung in French", tags: ["Birthday", "Party"] },
-  },
-  {
-    file: "anniversaire-coupe-decale.mp3",
-    title: "Cédric, trente ans de fête",
-    style: "Coupé-décalé",
-    emoji: "🎉",
-    tags: ["Anniversaire", "Fête"],
-    length: "1:20",
-    scene: "anniversaire",
-    illustrated: true,
-    cover: "from-brand to-gold",
-    en: { title: "Cédric, trente ans de fête", style: "Coupé-décalé · female voice · sung in French", tags: ["Birthday", "Party"] },
-  },
-  {
     file: "mariage-jeff.mp3",
     title: "Jeff, c’est ton grand jour",
     style: "Afrobeats · voix féminine · chanson en anglais · refrain en français",
