@@ -74,6 +74,22 @@ que pour Preview sur Vercel. Clé ajoutée en Production, chanson relancée et l
       message de retard honnête après 10 min, bouton WhatsApp en cas de souci ; la chanson s'ouvre toute seule.
 - [x] E-mail « 🎶 Ta chanson est prête » pour les clients qui ont un espace.
 
+## Étape 4 ter — Lancement : identité, référencement, son studio, pilotage (fait le 14 novembre 2026)
+
+- [x] Nouveau logo partout (en-tête, favicon, icônes d'app, manifeste, image de partage, vidéo statut, e-mails) — `scripts/make-brand.mjs`
+- [x] Cadrage de la photo avant la vidéo statut (glisser, zoom, pincement)
+- [x] CGU raccourcies ; outils techniques décrits par catégorie (seul l'hébergeur reste nommé, obligation légale)
+- [x] Référencement : 8 pages occasion (`/chanson/…`), 12 pages style (`/style/…`), plan du site, robots, données
+      structurées (Organisation, Service avec prix, FAQ, fil d'Ariane), liens internes, formulaire pré-rempli (`/creer?occasion=…`)
+- [x] Son plus « studio » : styles détaillés, dynamique par section, MP3 192 kb/s, parolier plus exigeant ;
+      2 styles ajoutés (Afro-soul inspirant, Afro-pop épique) ; 12 extraits refaits
+- [x] Statistiques de visite Vercel (sans cookie) et mesure de vitesse
+- [x] Tableau de bord admin : périodes, objectif 600 000 FCFA, CA par jour, parcours, ventes par occasion, style,
+      moyen de paiement, heures, qualité, alertes, recherche, export CSV
+- [x] En-têtes de sécurité (HSTS, anti-iframe, permissions)
+- [ ] Google Search Console : vérifier le domaine (TXT chez Cloudflare) et envoyer `sitemap.xml` (action du porteur)
+- [ ] Écouter les extraits « afrosoul » et « epique » ; retirer un style qui sonne faux
+
 ## Étape 5 — Offre premium à 7 000 FCFA (~1,5 j)
 
 - [ ] Au paiement : choix « Classique 3 000 FCFA » / « Premium 7 000 FCFA » (carte : 4 000 / 8 000 FCFA).
