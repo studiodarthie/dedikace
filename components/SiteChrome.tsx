@@ -190,10 +190,13 @@ export function SiteFooter({
   occasions,
   cookies,
   supportPhone,
+  year,
 }: {
   occasions: FooterOccasion[];
   cookies: React.ReactNode;
   supportPhone: string;
+  /** Année en cours, calculée côté serveur (components/FooterYear). */
+  year: React.ReactNode;
 }) {
   const locale = useLocale();
   const en = locale === "en";
@@ -240,7 +243,7 @@ export function SiteFooter({
           {cookies}
         </nav>
         <p className="shrink-0 text-[13px] md:text-sm">
-          © 2026 Dédikace. {en ? "Your life in songs." : "Ta vie en chansons."}
+          © {year} Dédikace. {en ? "Your mood in songs." : "Ton mood en chansons."}
         </p>
       </div>
     </footer>

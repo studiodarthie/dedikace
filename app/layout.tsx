@@ -7,6 +7,7 @@ import { OCCASION_PAGES } from "@/lib/seo-pages";
 import { HeaderCta } from "@/components/HeaderCta";
 import { AccountLink, HomeLink, HtmlLang, LanguageSuggestion, LanguageSwitch, MainNav, SiteFooter } from "@/components/SiteChrome";
 import { CookieSettingsLink, Pixels } from "@/components/Pixels";
+import { FooterYear } from "@/components/FooterYear";
 import { SingleAudio } from "@/components/SingleAudio";
 import { WebAnalytics } from "@/components/WebAnalytics";
 import { WhatsAppButton } from "@/components/WhatsAppButton";
@@ -89,6 +90,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
             occasions={OCCASION_PAGES.map(({ slug, name, nameEn }) => ({ slug, name, nameEn }))}
             cookies={<CookieSettingsLink enabled={!!env.META_PIXEL_ID} />}
             supportPhone={env.NEXT_PUBLIC_SUPPORT_WHATSAPP}
+            year={<FooterYear />}
           />
           <WhatsAppButton />
           <HtmlLang />
