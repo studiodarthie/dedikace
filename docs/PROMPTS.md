@@ -23,6 +23,10 @@ Règles de forme :
 
 Règles de fond :
 - Intègre naturellement les anecdotes fournies, sans en inventer d'autres.
+- Écris comme un parolier professionnel : des images concrètes tirées des anecdotes, pas de clichés vides.
+- Le refrain est l'accroche : une phrase forte et mémorable, reprise à l'identique à chaque [Refrain].
+- Le pont apporte un angle nouveau (un vœu, une promesse, un souvenir clé) et prépare le dernier refrain.
+- Le titre est court (2 à 6 mots) et reprend l'accroche du refrain.
 - Ton : joyeux pour une fête, tendre pour l'amour, fier pour une réussite,
   solennel et apaisé pour un deuil (jamais triste au point d'être lourd).
 - Interdit : vulgarité, contenu sexuel, politique, religion polémique, personnalités publiques,
@@ -57,20 +61,26 @@ Langue du refrain : {chorus_language}
 
 ```json
 [
-  { "id": "makossa", "label": "Makossa", "prompt": "Cameroonian makossa, bright clean electric guitar, bouncing bass, 118 bpm, joyful {voice} vocals" },
-  { "id": "bikutsi", "label": "Bikutsi", "prompt": "Fast Cameroonian bikutsi, 6/8 feel, rapid guitar ostinato, 140 bpm, energetic {voice} vocals" },
-  { "id": "rumba", "label": "Rumba congolaise", "prompt": "Congolese rumba, smooth crooning {voice} vocals, interlocking clean guitars, sebene ending" },
-  { "id": "ndombolo", "label": "Ndombolo", "prompt": "High-energy ndombolo, fast sebene guitar, festive dance calls, 135 bpm, {voice} vocals" },
-  { "id": "gospel", "label": "Gospel africain", "prompt": "African gospel praise, choir backing, keys and bass, uplifting {voice} lead vocals" },
-  { "id": "afrobeats", "label": "Afrobeats", "prompt": "Modern afrobeats, warm {voice} vocals, percussive groove, 105 bpm" },
-  { "id": "amapiano", "label": "Amapiano", "prompt": "Amapiano, log drum bass, airy pads, 112 bpm, smooth {voice} vocals" },
-  { "id": "afrozouk", "label": "Afro-zouk", "prompt": "Afro-zouk love song, soft synths, romantic {voice} vocals, 90 bpm" },
-  { "id": "coupe-decale", "label": "Coupé-décalé", "prompt": "Coupé-décalé, fast percussion, festive call-and-response, {voice} vocals" },
-  { "id": "hommage", "label": "Hommage acoustique", "prompt": "Gentle acoustic guitar ballad, solemn and peaceful, soft {voice} vocals" }
+  { "id": "makossa", "label": "Makossa", "prompt": "Cameroonian makossa, bright clean interlocking electric guitars, melodic bouncing bass lines, crisp congas and hi-hats, warm brass stabs, 118 bpm, joyful {voice} lead vocals, call-and-response backing vocals" },
+  { "id": "bikutsi", "label": "Bikutsi", "prompt": "Fast Cameroonian bikutsi, driving 6/8 feel, rapid muted guitar ostinato, plucked balafon-like melodies, punchy kick and shakers, 140 bpm, energetic {voice} vocals, chanted group responses" },
+  { "id": "rumba", "label": "Rumba congolaise", "prompt": "Congolese rumba, smooth crooning {voice} lead vocals, interlocking clean guitars, warm round bass, soft congas, lush vocal harmonies, rising sebene guitar finale" },
+  { "id": "ndombolo", "label": "Ndombolo", "prompt": "High-energy ndombolo, fast sparkling sebene guitar, tight snare rolls, festive dance shouts, 135 bpm, powerful {voice} vocals" },
+  { "id": "gospel", "label": "Gospel africain", "prompt": "African gospel praise, full choir backing, organ and grand piano, groovy bass, joyful hand claps, uplifting {voice} lead vocals" },
+  { "id": "afrobeats", "label": "Afrobeats", "prompt": "Modern afrobeats, warm melodic {voice} vocals, syncopated percussion and shakers, plucked guitar riff, deep sub bass, airy synth pads, 105 bpm" },
+  { "id": "amapiano", "label": "Amapiano", "prompt": "Amapiano, deep log drum bass, shuffling shakers, jazzy piano chords, airy pads, 112 bpm, smooth {voice} vocals" },
+  { "id": "afrozouk", "label": "Afro-zouk", "prompt": "Afro-zouk love song, lush soft synths, gentle guitar licks, swaying groove, 90 bpm, romantic {voice} vocals, tender harmonies" },
+  { "id": "coupe-decale", "label": "Coupé-décalé", "prompt": "Coupé-décalé, fast driving percussion, bright synth leads, festive call-and-response chants, 128 bpm, hype {voice} vocals" },
+  { "id": "afrosoul", "label": "Afro-soul inspirant", "prompt": "Inspirational afro-soul, cinematic grand piano, swelling string orchestra, warm bass, soulful gospel harmonies, slow build to an anthemic chorus, 78 bpm, powerful emotional {voice} vocals" },
+  { "id": "epique", "label": "Afro-pop épique", "prompt": "Epic afro-pop anthem, big stadium drums, bright electric guitars, orchestral hits and strings, huge sing-along chorus, 100 bpm, triumphant {voice} vocals" },
+  { "id": "hommage", "label": "Hommage acoustique", "prompt": "Gentle acoustic guitar ballad, soft piano and warm strings, solemn and peaceful, intimate {voice} vocals, subtle choir in the chorus" }
 ]
 ```
 
 `{voice}` = `male` ou `female`. Ne jamais mentionner un artiste réel dans un prompt de style.
+
+Depuis le 14 novembre 2026 : instruments et production décrits plus précisément, 2 styles ajoutés (afrosoul, epique).
+`lib/elevenlabs.ts` ajoute à chaque chanson une direction « studio » (mix, master) et une dynamique par section
+(couplet plus léger, refrain le plus riche avec chœurs, pont dépouillé qui relance le dernier refrain).
 
 ## 3. Prononciation (`lib/phonetics.ts`)
 

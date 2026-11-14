@@ -24,6 +24,10 @@ Règles de forme :
 
 Règles de fond :
 - Intègre naturellement les anecdotes fournies, sans en inventer d'autres.
+- Écris comme un parolier professionnel : des images concrètes tirées des anecdotes, pas de clichés vides.
+- Le refrain est l'accroche : une phrase forte et mémorable, reprise à l'identique à chaque [Refrain].
+- Le pont apporte un angle nouveau (un vœu, une promesse, un souvenir clé) et prépare le dernier refrain.
+- Le titre est court (2 à 6 mots) et reprend l'accroche du refrain.
 - Ton : joyeux pour une fête, tendre pour l'amour, fier pour une réussite,
   solennel et apaisé pour un deuil (jamais triste au point d'être lourd).
 - Interdit : vulgarité, contenu sexuel, politique, religion polémique, personnalités publiques,

@@ -8,7 +8,7 @@ import { applyPhonetics } from "@/lib/phonetics";
 // Référence : https://elevenlabs.io/docs/api-reference/music/compose
 const MUSIC_URL = "https://api.elevenlabs.io/v1/music";
 const MODEL_ID = "music_v2_5";
-const OUTPUT_FORMAT = "mp3_44100_128"; // ~1 Mo par minute : léger pour la 3G
+const OUTPUT_FORMAT = "mp3_48000_192"; // qualité studio (format par défaut du modèle v2), ~1,4 Mo par minute
 
 const MIN_CHUNK_MS = 3_000;
 const MAX_CHUNK_MS = 120_000;
@@ -90,33 +90,56 @@ export type SongRequest = {
   durationSeconds: number;
 };
 
+// Direction « studio » commune à toutes les chansons (docs/PROMPTS.md §2).
+const PRODUCTION = [
+  "polished professional studio production",
+  "rich layered arrangement with tasteful instrumental fills",
+  "wide stereo mix, punchy drums, warm low end",
+  "radio-ready master",
+];
+const AVOID = ["lo-fi", "muddy mix", "distorted audio", "off-key vocals", "mumbled lyrics", "robotic vocals", "amateur production"];
+// Dynamique par section : c'est le contraste couplet / refrain qui donne un son « pro ».
+const DYNAMICS: Record<string, string[]> = {
+  Intro: ["instrumental intro with a signature melodic hook", "builds anticipation"],
+  Verse: ["lighter arrangement", "intimate storytelling vocal delivery"],
+  Chorus: ["fullest arrangement", "big memorable hook", "stacked vocal harmonies and backing vocals"],
+  Bridge: ["stripped-back emotional bridge", "builds into the final chorus"],
+};
+
 /** Construit le plan de composition : une intro instrumentale puis un morceau par section des paroles. */
 export function buildCompositionPlan({ stylePrompt, lyrics, songLanguage, chorusLanguage, durationSeconds }: SongRequest) {
   const sections = parseLyrics(applyPhonetics(lyrics));
   if (sections.length === 0) throw new MusicError("Paroles vides ou sans sections.", false);
 
+  const genre = stylePrompt.split(",")[0].trim();
   const baseStyles = [
     ...stylePrompt.split(",").map((s) => s.trim()).filter(Boolean),
     "clear and intelligible lead vocals",
     `verses sung in ${sungLanguage(songLanguage)}`,
-    "warm, celebratory African production",
-    "great production quality",
+    ...PRODUCTION,
   ];
 
   const durations = sectionDurations(sections, durationSeconds);
 
   // Refrain dans une autre langue que les couplets : on le précise sur chaque refrain.
   const chorusStyle = chorusLanguage !== songLanguage ? `chorus sung in ${sungLanguage(chorusLanguage)}` : undefined;
+  const lastChorus = sections.map((s) => englishName(s.label)).lastIndexOf("Chorus");
   const chunks = [
-    { text: "[Intro]", duration_ms: INTRO_MS, positive_styles: baseStyles, negative_styles: [] },
+    { text: "[Intro]", duration_ms: INTRO_MS, positive_styles: [...baseStyles, ...DYNAMICS.Intro], negative_styles: AVOID },
     ...sections.map((s, i) => {
       const name = englishName(s.label);
-      const styles = name === "Chorus" && chorusStyle ? [chorusStyle, "catchy sing-along chorus"] : [];
+      const kind = name.startsWith("Verse") ? "Verse" : name;
+      const styles = [
+        genre,
+        ...(DYNAMICS[kind] ?? []),
+        ...(name === "Chorus" && chorusStyle ? [chorusStyle] : []),
+        ...(i === lastChorus ? ["final chorus with extra lift and vocal ad-libs", "ends on a clean, satisfying musical resolution"] : []),
+      ];
       return {
         text: [`[${name}]`, ...s.lines.slice(0, 30)].join("\n"),
         duration_ms: durations[i],
         positive_styles: styles,
-        negative_styles: [],
+        negative_styles: AVOID,
       };
     }),
   ];
