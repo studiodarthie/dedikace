@@ -1,0 +1,15 @@
+# Hébergement Render (offre gratuite) : Dédikace tourne comme un serveur Node classique (next start).
+# Les valeurs secrètes ne sont pas ici : elles se collent dans Render → Environment (« Add from .env »).
+services:
+  - type: web
+    name: dedikace
+    runtime: node
+    plan: free
+    region: frankfurt
+    buildCommand: npm ci && npm run build
+    startCommand: npm start
+    healthCheckPath: /robots.txt
+    autoDeploy: true
+    envVars:
+      - key: NODE_VERSION
+        value: "22"

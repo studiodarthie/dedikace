@@ -99,7 +99,8 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           <Pixels metaId={env.META_PIXEL_ID} />
         </Suspense>
         <SingleAudio />
-        <WebAnalytics />
+        {/* Statistiques Vercel : seulement quand le site tourne chez Vercel. */}
+        {process.env.VERCEL && <WebAnalytics />}
       </body>
     </html>
   );

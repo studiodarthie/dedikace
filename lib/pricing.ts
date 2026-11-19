@@ -27,9 +27,18 @@ export function pricesAt(now: Date): Prices {
   return { momo: env.PRICE_MOMO_XAF, card: env.PRICE_CARD_XAF, launchEnds: null, launchEndsEn: null };
 }
 
-/** Prix des pages vitrine (pré-rendues) : recalculés au plus tard toutes les heures. */
+const DAY_S = 24 * 3600;
+
+/**
+ * Prix des pages vitrine (pré-rendues). Chaque recalcul réécrit ~50 pages dans le cache Vercel (quota « ISR Writes ») :
+ * on ne recalcule donc qu'au moment utile — juste après la fin du prix de lancement, sinon une fois par semaine
+ * (un changement de PRICE_* passe par un redéploiement, qui recalcule tout de toute façon).
+ */
 export async function currentPrices(): Promise<Prices> {
   "use cache";
-  cacheLife("hours");
-  return pricesAt(new Date());
+  const now = new Date();
+  const untilLaunchEnd = Math.ceil((LAUNCH_OFFER.endsAt.getTime() - now.getTime()) / 1000) + 60;
+  const revalidate = untilLaunchEnd > 0 ? Math.min(untilLaunchEnd, 7 * DAY_S) : 7 * DAY_S;
+  cacheLife({ stale: 300, revalidate, expire: revalidate + 30 * DAY_S });
+  return pricesAt(now);
 }
