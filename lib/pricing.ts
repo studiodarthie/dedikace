@@ -8,8 +8,8 @@ export const LAUNCH_OFFER = {
   momoXaf: 2000,
   cardXaf: 3000,
   endsAt: new Date("2026-11-25T23:59:59+01:00"), // heure de Douala
-  endLabel: "25 novembre",
-  endLabelEn: "25 November",
+  endLabel: "25\u00a0novembre",
+  endLabelEn: "25\u00a0November",
 } as const;
 
 export type Prices = { momo: number; card: number; launchEnds: string | null; launchEndsEn: string | null };

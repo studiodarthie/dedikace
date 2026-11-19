@@ -4,7 +4,7 @@ import Link from "next/link";
 import type { ReactNode } from "react";
 import { HeroTitle } from "@/components/home/HeroTitle";
 import { ExamplePlayer, type ExampleTrack } from "@/components/ExamplePlayer";
-import { formatXaf } from "@/lib/format";
+import { formatXaf, nbsp } from "@/lib/format";
 import { JsonLd } from "@/components/JsonLd";
 import { faqSchema, organization, serviceSchema, SITE_NAME, SITE_URL } from "@/lib/seo";
 import { STYLE_PAGES } from "@/lib/seo-pages";
@@ -432,7 +432,7 @@ export async function HomePage({ locale }: { locale: Locale }) {
             {FAQ.map((item) => (
               <details key={item.q} className="group rounded-2xl bg-white p-4 shadow-sm ring-1 ring-sand md:p-6">
                 <summary className="flex cursor-pointer list-none items-center justify-between gap-3 font-semibold md:text-lg">
-                  {item.q}
+                  {nbsp(item.q)}
                   <span
                     className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-sand text-brand transition group-open:rotate-45"
                     aria-hidden="true"

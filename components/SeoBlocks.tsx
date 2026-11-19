@@ -1,6 +1,6 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
-import { formatXaf } from "@/lib/format";
+import { formatXaf, nbsp } from "@/lib/format";
 import type { Faq } from "@/lib/seo-pages";
 import { currentPrices } from "@/lib/pricing";
 import type { Locale } from "@/lib/i18n";
@@ -85,7 +85,7 @@ export function FaqList({ items, locale = "fr" }: { items: Faq[]; locale?: Local
         <details key={f.q} className="group rounded-2xl bg-white p-4 ring-1 ring-sand">
           <summary className="cursor-pointer list-none font-bold marker:hidden">
             <span className="flex items-center justify-between gap-2">
-              {f.q}
+              {nbsp(f.q)}
               <span className="text-brand transition group-open:rotate-45" aria-hidden="true">
                 +
               </span>

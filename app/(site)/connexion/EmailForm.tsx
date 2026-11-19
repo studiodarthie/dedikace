@@ -31,7 +31,7 @@ export function EmailForm({ next, initialError }: { next: string; initialError?:
       <button
         type="submit"
         disabled={pending}
-        className="flex h-14 items-center justify-center rounded-2xl bg-ink px-6 text-lg font-bold text-cream shadow-md disabled:opacity-60"
+        className="flex min-h-14 items-center justify-center rounded-2xl bg-ink px-6 py-3 text-lg leading-tight font-bold text-balance text-cream shadow-md disabled:opacity-60"
       >
         {pending ? (en ? "Sending…" : "Envoi…") : en ? "Get my sign-in link" : "Recevoir mon lien de connexion"}
       </button>
