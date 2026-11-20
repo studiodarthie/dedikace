@@ -4,13 +4,14 @@ import { findStuckOrders, markStuckAlerted } from "@/lib/notifications";
 import { inngest, orderPaid } from "./client";
 
 /**
- * Surveillance toutes les 5 minutes : une commande payée doit toujours finir livrée.
+ * Surveillance toutes les 20 minutes : une commande payée doit toujours finir livrée.
+ * (Pas plus souvent : chez Render gratuit, chaque passage réveille le site, et les 750 h/mois sont partagées avec les autres sites.)
  * - payée sans chanson depuis 10 min (lancement perdu) : on relance la création et on prévient l'équipe ;
  * - en création depuis 20 min : on prévient l'équipe (relance possible depuis le back-office).
  * Une planification Inngest tourne même si l'envoi d'événements depuis le site est cassé (cas du 14 novembre 2026).
  */
 export const watchdogFunction = inngest.createFunction(
-  { id: "watchdog", name: "Surveiller les commandes payées", triggers: [{ cron: "*/5 * * * *" }], retries: 1 },
+  { id: "watchdog", name: "Surveiller les commandes payées", triggers: [{ cron: "*/20 * * * *" }], retries: 1 },
   async ({ step }) => {
     const stuck = await step.run("chercher les commandes bloquées", async () => {
       const { paid, generating } = await findStuckOrders();

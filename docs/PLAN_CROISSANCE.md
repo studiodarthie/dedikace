@@ -67,7 +67,7 @@ Incident : commande « Jeff » payée (Orange Money) à 01:01, création jamais 
 que pour Preview sur Vercel. Clé ajoutée en Production, chanson relancée et livrée à 01:21.
 - [x] E-mail « 💰 Vente » à l'équipe à chaque paiement confirmé (`lib/notifications.ts`).
 - [x] Lancement raté après paiement : alerte immédiate, la vérification du paiement n'échoue plus pour ça.
-- [x] Surveillance Inngest toutes les 5 min (`inngest/watchdog.ts`) : payée sans chanson depuis 10 min → relancée
+- [x] Surveillance Inngest toutes les 20 min (5 min avant Render) (`inngest/watchdog.ts`) : payée sans chanson depuis 10 min → relancée
       + alerte ; en création depuis 20 min → alerte. Une alerte par commande (`orders.stuck_alerted_at`).
 - [x] Back-office : bandeau rouge si un réglage indispensable manque en production.
 - [x] Page d'attente : 3 étapes, barre d'avancement, « 2 à 4 minutes », lien de la chanson à copier ou s'envoyer,

@@ -40,7 +40,7 @@ export async function notifyLaunchFailed(order: Order, error: unknown): Promise<
       "Le paiement est reçu mais la création de la chanson n'a pas pu être lancée.",
       `Erreur : ${error instanceof Error ? error.message : String(error)}`,
       "",
-      "La surveillance automatique réessaie toutes les 5 minutes. Si ça persiste, relance depuis le back-office :",
+      "La surveillance automatique réessaie toutes les 20 minutes. Si ça persiste, relance depuis le back-office :",
       `${APP_URL()}/admin/commandes/${order.id}`,
     ].join("\n"),
   );
